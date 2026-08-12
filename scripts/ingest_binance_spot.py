@@ -59,12 +59,14 @@ def main() -> None:
         for day in _days(args.start_utc_day, args.end_utc_day)
     )
 
-    for archive in archives:
-        bars = parse_1m_archive(archive, symbol=args.symbol)
-        crosscheck_bars_with_rest(bars)
+    provider_crosschecks = tuple(
+        crosscheck_bars_with_rest(parse_1m_archive(archive, symbol=args.symbol))
+        for archive in archives
+    )
 
     dataset = build_trusted_binance_dataset(
         archives=archives,
+        provider_crosschecks=provider_crosschecks,
         metadata=metadata,
         code_version=_git_sha(),
         dependency_lock_sha256=_lock_digest(args.lock_file),
