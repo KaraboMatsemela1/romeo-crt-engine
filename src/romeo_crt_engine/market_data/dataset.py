@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from romeo_crt_engine.market_data.models import CanonicalBar, InstrumentMetadata
+from romeo_crt_engine.market_data.providers.binance_public import RestCrosscheckEvidence
 
 MANIFEST_SCHEMA_VERSION = "PHASE3_DATASET_MANIFEST_V1"
 NORMALIZER_VERSION = "NY_D1_H1_FROM_UTC_M1_V1"
@@ -55,6 +56,7 @@ class DatasetManifest:
     d1_rows: int
     normalized_sha256: str
     raw_artifacts: tuple[dict[str, Any], ...]
+    provider_crosschecks: tuple[dict[str, Any], ...]
     quality_status: str
     correction_policy: str
 
@@ -110,6 +112,7 @@ def build_manifest(
     *,
     metadata: InstrumentMetadata,
     raw_artifacts: tuple[RawArtifact, ...],
+    provider_crosschecks: tuple[RestCrosscheckEvidence, ...],
     m1_rows: int,
     h1: tuple[CanonicalBar, ...],
     d1: tuple[CanonicalBar, ...],
@@ -120,6 +123,11 @@ def build_manifest(
         raise ValueError("trusted dataset requires raw artifacts plus H1 and D1 bars")
     if len(dependency_lock_sha256) != 64:
         raise ValueError("dependency_lock_sha256 must be a SHA-256 digest")
+
+    raw_hashes = {artifact.sha256 for artifact in raw_artifacts}
+    evidence_hashes = {evidence.source_sha256 for evidence in provider_crosschecks}
+    if evidence_hashes != raw_hashes or len(provider_crosschecks) != len(raw_artifacts):
+        raise ValueError("every raw artifact requires exactly one provider REST cross-check")
 
     normalized_sha = normalized_digest(h1, d1)
     metadata_observed_at = metadata.observed_at.astimezone(UTC).isoformat()
@@ -133,6 +141,19 @@ def build_manifest(
             "size_bytes": len(artifact.content),
         }
         for artifact in raw_artifacts
+    )
+    crosscheck_records = tuple(
+        {
+            "provider": evidence.provider,
+            "venue": evidence.venue,
+            "symbol": evidence.symbol,
+            "source_sha256": evidence.source_sha256,
+            "sample_open_times_utc": evidence.sample_open_times_utc,
+            "endpoint_base": evidence.endpoint_base,
+            "verification_method": evidence.verification_method,
+            "evidence_digest": evidence.evidence_digest,
+        }
+        for evidence in provider_crosschecks
     )
 
     version_seed = {
@@ -148,6 +169,9 @@ def build_manifest(
         "dependency_lock_sha256": dependency_lock_sha256,
         "normalized_sha256": normalized_sha,
         "raw_sha256": [artifact.sha256 for artifact in raw_artifacts],
+        "provider_crosscheck_digest": [
+            evidence.evidence_digest for evidence in provider_crosschecks
+        ],
     }
     dataset_version = sha256(
         json.dumps(version_seed, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -177,6 +201,7 @@ def build_manifest(
         d1_rows=len(d1),
         normalized_sha256=normalized_sha,
         raw_artifacts=artifact_records,
+        provider_crosschecks=crosscheck_records,
         quality_status="TRUSTED",
         correction_policy="IMMUTABLE_NEW_VERSION_ON_SOURCE_OR_NORMALIZATION_CHANGE",
     )
