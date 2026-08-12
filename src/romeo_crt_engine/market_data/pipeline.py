@@ -4,7 +4,13 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from romeo_crt_engine.market_data.aggregate import build_complete_new_york_d1, build_h1
-from romeo_crt_engine.market_data.dataset import DatasetManifest, RawArtifact, build_manifest
+from romeo_crt_engine.market_data.dataset import (
+    DatasetManifest,
+    IngestionReceipt,
+    RawArtifact,
+    build_manifest,
+    build_receipt,
+)
 from romeo_crt_engine.market_data.models import (
     CanonicalBar,
     InstrumentMetadata,
@@ -24,6 +30,7 @@ class TrustedDataset:
     h1_bars: tuple[CanonicalBar, ...]
     d1_bars: tuple[CanonicalBar, ...]
     manifest: DatasetManifest
+    receipt: IngestionReceipt
 
 
 def build_trusted_binance_dataset(
@@ -31,8 +38,9 @@ def build_trusted_binance_dataset(
     archives: tuple[RawArchive, ...],
     provider_crosschecks: tuple[ProviderVerificationEvidence, ...],
     metadata: InstrumentMetadata,
-    code_version: str,
+    market_data_code_sha256: str,
     dependency_lock_sha256: str,
+    git_revision: str,
     created_at: datetime,
 ) -> TrustedDataset:
     if not archives:
@@ -59,7 +67,7 @@ def build_trusted_binance_dataset(
     d1_bars = build_complete_new_york_d1(h1_bars)
     raw_artifacts = tuple(
         RawArtifact(
-            archive_date=archive.archive_date,
+            archive_date=archive.archive_date.isoformat(),
             filename=archive.filename,
             source_url=archive.source_url,
             checksum_url=archive.checksum_url,
@@ -75,8 +83,15 @@ def build_trusted_binance_dataset(
         m1_rows=len(minute_bars),
         h1=h1_bars,
         d1=d1_bars,
-        code_version=code_version,
+        market_data_code_sha256=market_data_code_sha256,
         dependency_lock_sha256=dependency_lock_sha256,
+    )
+    receipt = build_receipt(
+        manifest=manifest,
+        raw_artifacts=raw_artifacts,
+        provider_crosschecks=provider_crosschecks,
+        retrieved_at=created_at,
+        git_revision=git_revision,
     )
     return TrustedDataset(
         metadata=metadata,
@@ -86,4 +101,5 @@ def build_trusted_binance_dataset(
         h1_bars=h1_bars,
         d1_bars=d1_bars,
         manifest=manifest,
+        receipt=receipt,
     )
