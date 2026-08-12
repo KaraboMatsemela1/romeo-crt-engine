@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
+from pathlib import Path
 
 import pytest
 
 from romeo_crt_engine.logging_config import log_event
-from romeo_crt_engine.storage import ArtifactRef, DatasetRef
+from romeo_crt_engine.storage import ArtifactRef, DatasetRef, LocalArtifactStore
 
 
 def test_log_event_emits_structured_json(caplog: pytest.LogCaptureFixture) -> None:
@@ -42,3 +43,21 @@ def test_dataset_ref_accepts_versioned_integrity_metadata() -> None:
     ref = DatasetRef("prices", "v1", digest, datetime(2026, 8, 12, tzinfo=UTC))
     assert ref.dataset_id == "prices"
     assert ref.manifest_sha256 == digest
+
+
+def test_local_artifact_store_round_trip_is_integrity_checked(tmp_path: Path) -> None:
+    store = LocalArtifactStore(tmp_path)
+    ref = store.put_bytes("raw/example.bin", b"immutable", "application/octet-stream")
+
+    assert store.read_bytes(ref) == b"immutable"
+    assert ref.size_bytes == len(b"immutable")
+
+
+def test_local_artifact_store_rejects_mutation_and_path_traversal(tmp_path: Path) -> None:
+    store = LocalArtifactStore(tmp_path)
+    store.put_bytes("raw/example.bin", b"first", "application/octet-stream")
+
+    with pytest.raises(ValueError, match="different bytes"):
+        store.put_bytes("raw/example.bin", b"second", "application/octet-stream")
+    with pytest.raises(ValueError, match="relative path"):
+        store.put_bytes("../escape.bin", b"bad", "application/octet-stream")
