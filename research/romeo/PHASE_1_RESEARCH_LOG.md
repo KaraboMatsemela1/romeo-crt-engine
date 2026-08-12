@@ -195,3 +195,63 @@ INDEPENDENT RISK
 ### Next source
 
 `ROMEO-2025-S4 — CRT secrets 4: Candle anatomy` is the next evidence target. It is expected to clarify candle mechanics, opening/closing time, timeframe construction and the live transition semantics needed to make the CRT state machine deterministic.
+
+---
+
+## 2026-08-12 — Pass 5: Candle Anatomy
+
+Analyzed `ROMEO-2025-S4 — CRT secrets ep.4: Candle anatomy`.
+
+### Result
+
+Episode 4 establishes the **trade/parent candle as a first-class object**. The analysis order is parent candle first, then context/narrative, then lower-timeframe technical patterns. Candle anatomy is explicitly tied to opening time, closing time and the price movement that occurs in between.
+
+The strongest new scope rule is the public foundational parent-candle whitelist:
+
+```text
+H4
+D1
+W1
+```
+
+Monthly and larger multi-month/yearly candles are treated as advanced extensions rather than required scope for the first candidate.
+
+### Critical validation finding
+
+Final candle anatomy is future data for an intrabar decision. A historical signal occurring before the parent candle close may only consume a timestamped snapshot (`open`, `high_so_far`, `low_so_far`, `current_price`, known time boundaries), never the final close/high/low/body/wicks that formed later.
+
+This joins the existing KOD and Candle-phase safeguards as a formal anti-look-ahead constraint.
+
+### Repository changes
+
+- Added `research/romeo/videos/ROMEO-2025-S4.md`
+- Marked `ROMEO-2025-S4` as `EVIDENCE_PASS_1`
+- Updated `GLOSSARY.md` with Trade Candle, Candle Anatomy, Candle Snapshot, initial H4/D1/W1 scope and Candle Boundary
+- Expanded `OPEN_QUESTIONS.md` with H4/D1/W1 calendar, DST, execution-timeframe and intrabar-information questions
+- Created provisional candidates `ANA-P001` through `ANA-P008`
+
+### Architectural consequence
+
+The hierarchy is now:
+
+```text
+CALENDAR / TIME ENGINE
+        ↓
+TRADE-CANDLE SELECTOR
+        ↓
+PARENT CANDLE LIFECYCLE
+        ↓
+CRT JOURNEY STATE
+        ↓
+LTF INTERNAL EVENTS
+        ↓
+ENTRY QUALIFICATION
+        ↓
+INDEPENDENT RISK
+```
+
+The calendar/session engine is strategy-critical because incorrect bar boundaries can change the CRT itself.
+
+### Next source
+
+`ROMEO-2025-S5 — CRT secrets 5: Key level` is next. Parent-candle selection alone does not tell us **where** a valid interaction should occur; Episode 5 should help define the price/time location hierarchy needed to qualify meaningful Turtle Soup/KOD/entry events.
