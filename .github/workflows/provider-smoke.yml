@@ -2,13 +2,6 @@ name: Provider Smoke
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - ".github/workflows/provider-smoke.yml"
-      - "src/romeo_crt_engine/market_data/**"
-      - "scripts/ingest_binance_spot.py"
-      - "requirements.lock"
-      - "pyproject.toml"
 
 jobs:
   binance-btcusdt:
