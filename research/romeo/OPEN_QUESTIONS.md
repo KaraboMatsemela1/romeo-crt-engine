@@ -30,6 +30,9 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - What event moves a parent CRT from `MANIPULATION` into `DISTRIBUTION` / Candle 3?
 - Is Candle 3 defined by calendar position, price behavior, confirmation, or a combination?
 - What are the canonical higher-timeframe → lower-timeframe pairs?
+- Episode 4 scopes initial parent candles to H4/D1/W1; what exact evidence defines the execution timeframe beneath each one?
+- Can a parent candle be selected immediately at its open, or only after some internal structure/event appears?
+- What candle-shape properties are actually strategy inputs versus descriptive observations?
 
 ## Kiss of Death
 
@@ -57,6 +60,8 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - What objective families exist: liquidity targets, imbalance/rebalancing targets, 50% targets, or others?
 - What hierarchy chooses the primary target before entry?
 - Does every CRT variant share one journey state machine, or do multiple setup-specific state machines exist?
+- How does the selected parent candle's open price influence phase progression?
+- What intrabar evidence lets the engine infer Candle 2 manipulation before the parent candle has closed?
 
 ## Context / liquidity
 
@@ -83,13 +88,19 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - Are partials/breakeven/trailing part of the methodology?
 - When is `Candle 3` considered complete or failed?
 
-## Time / markets
+## Time / markets / candle construction
 
 - What sessions/trading windows are valid?
 - What does Romeo mean operationally when saying time is more important than price?
 - What exact features define `time meets price`?
-- How is DST handled for those windows?
+- What timezone/session anchor defines Romeo's H4 candles?
+- What exact H4 start times are valid?
+- What is the canonical Daily candle open/close?
+- What is the canonical Weekly candle open/close?
+- Do Forex, indices, metals and crypto require different candle-boundary calendars?
+- How is DST handled for all parent and execution candles?
 - Which instrument classes and timeframe combinations are in scope?
+- Are H4/D1/W1 boundaries provider-native, New-York anchored, London anchored, or otherwise normalized?
 
 ## Backtesting / information-set safety
 
@@ -97,6 +108,9 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - Which retrospective labels are allowed for research annotation but prohibited as live signal inputs?
 - How do we ensure Candle 3 completion is not used to justify an entry that occurred during Candle 2?
 - How do we ensure KOD is never labeled from knowledge of the future target hit?
+- How do we ensure final parent-candle high/low/close/body/wicks are never used for an intrabar decision before those values existed?
+- What minimum event granularity is required to reconstruct candle snapshots faithfully: ticks, 1m bars, or another base interval?
+- How are provider bar-boundary discrepancies detected and prevented from changing CRT labels silently?
 
 ## Corpus/versioning
 
