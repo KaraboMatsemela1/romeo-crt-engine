@@ -61,3 +61,45 @@ None of the above is production logic yet.
 ### Next pass
 
 Perform timestamped evidence extraction for the foundation videos and CRT Secrets episodes, beginning with `What is CRT?`, then create candidate rule records with confidence and contradictions. Do not freeze `CRT-v0.1` until this evidence pass is complete.
+
+---
+
+## 2026-08-12 — Pass 2: Turtle Soup foundation
+
+Analyzed `ROMEO-2024-TS — What is turtle soup?` using indexed timestamped transcript/summary material.
+
+### Result
+
+The safest source-supported abstraction is:
+
+```text
+reference prior extreme
+      ↓
+price excursions beyond it
+      ↓
+continuation fails
+      ↓
+price reverses away
+```
+
+Bearish and bullish variants are mirror images around an old high / old low.
+
+### Important boundary
+
+This video does **not** yet provide enough deterministic detail to implement a production entry. Exact reference-extreme eligibility, timing, confirmation, entry, stop and target rules remain unresolved.
+
+### Repository changes
+
+- Added `research/romeo/videos/ROMEO-2024-TS.md`
+- Updated `GLOSSARY.md`
+- Expanded `OPEN_QUESTIONS.md`
+- Marked `ROMEO-2024-TS` as `EVIDENCE_PASS_1` in the source registry
+- Created provisional candidates `TS-P001` through `TS-P007`
+
+### Architectural consequence
+
+Treat Turtle Soup as a **structural primitive** that later CRT context and execution models constrain, not as the entire strategy by itself.
+
+### Next source
+
+`ROMEO-2025-S2 — CRT secrets episode 2: The kiss of death` is the next evidence target because it explicitly presents Kiss of Death as a Turtle Soup model and should clarify how a structural sweep is converted into an actionable CRT setup.
