@@ -1,782 +1,635 @@
-# CRT v0.1 Strategy Specification
+# CRT v0.1 Strategy Specification — Frozen for Validation
 
-**Candidate name:** `CRT-C3-ALIGNED-v0.1-DRAFT`  
-**Doctrine version:** `CRT_SECRETS_2025`  
-**Status:** DRAFT / RECONCILIATION / NOT FROZEN / NOT VERIFIED  
-**Live trading:** NOT AUTHORIZED  
-**Validation:** NOT AUTHORIZED until active-path blockers are resolved
+**Strategy version:** `CRT-C3-D1-H1-M1-BEAR-v0.1`  
+**Doctrine snapshot:** `CRT_SECRETS_2025`  
+**Freeze parameter version:** `P2_FREEZE_2026_08_12`  
+**Status:** **FROZEN_FOR_VALIDATION**  
+**Live trading:** **NOT AUTHORIZED**  
+**Paper trading:** **NOT AUTHORIZED**  
+**Profitability claim:** **NOT ESTABLISHED**
 
-## 1. Purpose
+This is the first deterministic strategy candidate produced by the Romeo CRT Engine project.
 
-This specification is the first integrated strategy draft produced from the 2024 Romeo CRT foundation material and 2025 `CRT Secrets` Episodes 1–10.
+It is deliberately narrower than Romeo's full public methodology. Phase 1 established broad concepts but also documented several strategy-critical ambiguities. Phase 2 resolves those ambiguities by either:
 
-It is intentionally narrower than the full public doctrine. The purpose is to define the smallest causally testable Candle-3 candidate while preserving unresolved semantics as explicit blockers.
+1. excluding the unresolved branch from v0.1; or
+2. explicitly freezing a project parameter before profitability testing.
 
-This document must not be interpreted as a claim that the strategy is profitable or ready for trading.
+No parameter in this specification was selected because it improved a backtest.
 
-## 2. Evidence policy
+Canonical machine manifest:
 
-Rule statuses:
+- `strategy/CRT_V0.1_FREEZE_MANIFEST.json`
 
-- `VERIFIED` — direct primary evidence + deterministic predicate
-- `HIGH_CONFIDENCE` — strong cross-source support; narrow direct-source verification still required
-- `PROVISIONAL` — source-backed but materially ambiguous
-- `HYPOTHESIS` — inference requiring explicit testing/evidence
-- `UNRESOLVED` — must not enter executable order path
-- `ENGINEERING_CONSTRAINT` — causality/safety requirement rather than alpha rule
+Architectural decision:
 
-Supporting reconciliation artifacts:
+- `docs/adr/ADR-004-freeze-narrow-d1-h1-model1-subset.md`
 
-- `research/romeo/reconciliation/RULE_EVIDENCE_MATRIX.md`
-- `research/romeo/reconciliation/CONTRADICTION_MATRIX.md`
-- `research/romeo/reconciliation/BLOCKER_PRIORITY.md`
-- `research/romeo/PHASE_1_RECONCILIATION_CHECKPOINT.md`
+Executable rule contracts:
 
-## 3. Scope of first candidate
+- `src/romeo_crt_engine/crt/v0_1.py`
+
+Machine-readable fixtures:
+
+- `tests/strategy/fixtures/crt_v0_1_cases.json`
+
+---
+
+## 1. Strategy purpose
+
+The v0.1 objective is **faithful, deterministic reproduction of a narrow Romeo-derived CRT subset**, not maximum historical return.
+
+The strategy asks one question:
+
+> Given a completed New-York Daily Candle 1 and the immediately following Daily Candle 2, did Candle 2 produce a clean bearish sweep/reclaim while the 50% objective remains pending, and during Candle 3 did a qualifying H1 Model-1-core event confirm a short before the setup expired?
+
+If any required condition is unknown, invalid or ambiguous, the result is `NO_SIGNAL`.
+
+---
+
+## 2. Evidence status and project-parameter policy
+
+### Source-supported concepts used
+
+The active path uses source-backed concepts established in Phase 1:
+
+- every candle can be treated as a range;
+- a parent/trade candle is selected before lower-timeframe execution;
+- Turtle Soup involves an excursion beyond an existing high/low followed by failure/reversal;
+- a bearish reaction may use an old `CRTH` reference;
+- Daily CRT can map to H1 Model #1;
+- Model #1 is based on a specific candle rather than a broad zone;
+- bearish Model #1 uses an up-close candle around an old high and requires a later confirming close below the selected candle;
+- Candle 2 must be complete before Candle 3 execution can be evaluated;
+- the 50% point of the parent CRT is a material objective/state boundary;
+- stops are structurally tied to the manipulation/model extreme;
+- targets must be predeclared;
+- risk approval is independent from strategy validity.
+
+### Frozen project parameters
+
+The source does not provide a numerical formula for every qualitative term. These values are therefore explicit project parameters, not represented as Romeo quotations or universal truths:
+
+| Parameter | Frozen v0.1 value | Why |
+|---|---:|---|
+| Model #1 `thick` threshold | `body / full_range >= 0.50` | deterministic interpretation of a qualitative adjective |
+| Stop execution buffer | `1 instrument tick` | separate structural reference from execution tolerance |
+| Parent enumeration | every consecutive D1 pair | avoids hindsight/discretionary Candle-1 selection |
+| Direction | bearish-only | first-party bearish old-CRTH clarification is stronger than the unresolved bullish mirror |
+| C2 midpoint handling | any C2 touch of 50% rejects setup | conservative way to avoid unknown intrabar sequence |
+
+These values must undergo sensitivity analysis later. They cannot be altered after observing final OOS performance without creating a new candidate version.
+
+---
+
+## 3. Frozen scope
 
 ### Included
 
-- doctrine snapshot: 2025 CRT Secrets
-- setup phase: Candle 3 only
-- direction: HTF-aligned only
-- initial parent-candle universe: H4, D1, W1
-- top-down notation: `W1 → D1 → H4`
-- context-first orchestration
-- key-level requirement
-- Candle-2-close gate
-- local Turtle Soup manipulation path for the minimal candidate
-- one or both approved entry families once deterministic:
-  - Model #1
-  - true MSS
-- structural stop reference
-- predeclared price targets
-- independent risk approval
-- complete candidate/rejection/no-signal journaling
+```text
+Doctrine                 CRT_SECRETS_2025
+Direction                BEARISH ONLY
+Parent timeframe         D1
+Execution timeframe      H1
+Source timezone          America/New_York
+Parent setup             rolling C1 -> C2 -> C3
+Key-level role           reaction from C1 CRTH
+Parent manipulation      bearish sweep + close reclaim
+Entry family             Model #1 core only
+Primary target           C1 50% midpoint
+Stop reference           Model-1-core high
+Stop buffer              1 tick
+Risk boundary            independent
+Unknown critical state   NO_SIGNAL
+```
 
-### Explicitly excluded from first minimal executable version unless separately verified
+### Explicitly excluded
 
-- countertrend CRT
-- Candle-2 trading
-- retrospective KOD labeling
-- KOD as required setup condition
-- SMT substitution for missing local Turtle Soup
-- time exits unless directly specified
-- monthly/multi-month parent candles
-- generic order-block/breaker/FVG entries
-- generic retail BOS/MSS substituted for Romeo true MSS
-- `clean close` signal
-- machine-learning trade override
+- bullish mirror;
+- H4 parent setups;
+- W1 parent setups;
+- monthly/quarterly parent setups;
+- broad W1/D1/H4 voting or trend resolver;
+- countertrend CRT;
+- journey-to-key-level entries;
+- true MSS;
+- generic BOS/MSS;
+- KOD;
+- SMT substitution;
+- SMT direct entry;
+- OTE;
+- FVG as a required entry filter;
+- Candle-2 entries;
+- adaptive `near 50%` rules;
+- strong-trend retracement override;
+- time exits;
+- machine-learning entry overrides;
+- 2026 CRTology refinements.
 
-## 4. Strategy invariants
+Excluded concepts are not declared false. They are simply outside this strategy version.
 
-These are architecture/safety invariants and should be implemented before alpha logic.
+---
 
-1. No signal may use data unavailable at its decision timestamp.
-2. Final parent-candle OHLC cannot be used before the candle closes.
-3. Higher-timeframe context exists before lower-timeframe entry detection.
-4. Key-level/context state exists before entry-model scanning can produce a candidate.
-5. Candle 2 must close before Candle 3 becomes eligible.
-6. Candle-3 open does not equal entry.
-7. SMT can never directly emit an order.
-8. KOD can never be labeled using future target knowledge.
-9. Target plan must be selected before trade outcome is known.
-10. `NO_SIGNAL` is a valid terminal state.
-11. Any `UNKNOWN` state on a required active-path predicate fails closed.
-12. Risk engine remains independent of strategy confidence.
+## 4. Calendar contract
 
-## 5. Data and calendar prerequisites
+### 4.1 Parent Daily candle
 
-### 5.1 Canonical timeframes
-
-Initial parent scope:
+The canonical D1 candle is:
 
 ```text
-W1
-D1
-H4
+[00:00 America/New_York, next 00:00 America/New_York)
 ```
 
-Hierarchy notation:
+The strategy uses the named IANA timezone, not a fixed UTC offset.
+
+Therefore DST days may contain 23 or 25 absolute hours while still representing one New-York wall-clock Daily candle.
+
+Provider-native D1 bars may not be substituted unless they match this boundary exactly.
+
+### 4.2 H1 execution candle
+
+H1 is the frozen execution timeframe for the D1 parent route.
+
+An H1 candle must be a completed one-hour observation whose endpoints lie inside Candle 3's D1 window. An H1 close after Candle 3 closes cannot authorize a v0.1 entry.
+
+### 4.3 Venue observations
+
+The strategy calendar defines analytical boundaries. It does not fabricate prices while a market is closed.
+
+Phase 3 must aggregate only actual observations and retain venue/provider quality metadata.
+
+---
+
+## 5. Parent candidate generation
+
+### Rule `CRT-V01-002-ROLLING-PARENT-ENUMERATION`
+
+The project does not guess which historical D1 candle Romeo would subjectively prefer as Candle 1.
+
+Instead:
 
 ```text
-W1 → D1 → H4 → execution timeframe
+for every consecutive pair of canonical completed D1 candles:
+    first  = C1 candidate
+    second = C2 candidate
 ```
 
-**Important:** the exact execution timeframe beneath each parent and exact H4/D1/W1 session anchors remain unresolved.
+This means overlapping parent candidates are allowed as separate strategy instances.
 
-### 5.2 Candle construction — BLOCKED
+No candidate is chosen because a later trade worked.
 
-Required before backtesting:
+Required causal facts:
+
+- C1 is fully closed before C2 uses C1 high/low;
+- C2 is fully closed before C3 becomes eligible;
+- C1 high/low/midpoint are immutable for that candidate instance.
+
+---
+
+## 6. Parent range and key level
+
+For Candle 1:
 
 ```python
-CandleCalendar(
-    timezone,
-    h4_anchor_times,
-    daily_open,
-    daily_close,
-    weekly_open,
-    weekly_close,
-    dst_policy,
-    instrument_session_policy,
-)
+CRTH = C1.high
+CRTL = C1.low
+T1 = (CRTH + CRTL) / 2
 ```
 
-Status: `UNRESOLVED / P0-03`
-
-Provider-native bars must not be assumed equivalent until verified.
-
-### 5.3 Causal candle snapshot
-
-For an active candle at time `t`:
-
-```python
-CandleSnapshot(
-    timeframe,
-    open_time,
-    scheduled_close_time,
-    open_price,
-    high_so_far,
-    low_so_far,
-    current_price,
-    observed_at,
-)
-```
-
-Final close/high/low/body/wick values are unavailable until the relevant information actually exists.
-
-## 6. Core domain objects
-
-### 6.1 Parent CRT
-
-```python
-CRTContext(
-    parent_crt_id,
-    doctrine_version,
-    instrument,
-    context_timeframe,
-    parent_candle_id,
-    range_high,
-    range_low,
-    midpoint_50,
-    context_direction,
-    completion_state,
-    target1_status,
-    target2_status,
-    selected_at,
-    evidence_ids,
-)
-```
-
-Blocked fields:
-
-- parent-candle selector: `P0-01`
-- context direction: `P0-05`
-- completion predicate: `P2-04` unless excluded by stricter parent definition
-
-### 6.2 Key level
-
-```python
-KeyLevel(
-    key_level_id,
-    source_timeframe,
-    level_type,
-    price_or_range,
-    time_window,
-    role,                 # DESTINATION | REACTION_ORIGIN
-    state,                # PENDING | REACHED | CONSUMED | INVALID
-    valid_from,
-    invalidated_at,
-    evidence_ids,
-)
-```
-
-Status: `UNRESOLVED / P0-02`
-
-No generic support/resistance replacement is authorized.
-
-### 6.3 Turtle Soup event
-
-```python
-TurtleSoupEvent(
-    event_id,
-    parent_crt_id,
-    reference_extreme_id,
-    direction,
-    sweep_timestamp,
-    sweep_price,
-    confirmation_timestamp,
-    confirmation_type,
-    structural_extreme,
-    evidence_available_at,
-)
-```
-
-Status: `UNRESOLVED / P0-04`
-
-The detector must define qualifying reference extreme, sweep and continuation-failure semantics before use.
-
-### 6.4 SMT state
-
-```python
-SMTState(
-    relationship_id,
-    primary_instrument,
-    comparison_instrument,
-    reference_type,
-    direction,
-    status,               # NONE | CANDIDATE | CONFIRMED | CONFLICT | UNKNOWN
-    observed_at,
-    stale_guard_passed,
-    evidence_ids,
-)
-```
-
-For the minimal first executable candidate:
+For this bearish-only setup:
 
 ```text
-allow_smt_substitution = False
+reaction key level = C1 CRTH
 ```
 
-SMT may be journaled as context, but it may not replace required local manipulation until P2-01/P2-02 are resolved.
+No nearest-support/resistance algorithm, FVG selector or discretionary ranking is used in v0.1.
 
-### 6.5 TradePlan
+---
+
+## 7. Bearish Candle-2 qualification
+
+A C1/C2 pair qualifies only if all rules pass.
+
+### `CRT-V01-003-BEARISH-C2-SWEEP`
 
 ```python
-TradePlan(
-    plan_id,
-    created_at,
-    strategy_version,
-    doctrine_version,
-    instrument,
-    direction,
-    context_timeframe,
-    trade_candle_timeframe,
-    execution_timeframe,
-    parent_crt_id,
-    key_level_id,
-    manipulation_event_id,
-    entry_model,
-    entry_reference,
-    stop_reference,
-    price_targets,
-    time_exit_policy,
-    invalidation_reasons,
-    evidence_ids,
-)
+C2.high > C1.high
 ```
 
-A `TradePlan` must be immutable once submitted to the risk engine.
+The sweep must be strict.
 
-## 7. Candidate state machine
-
-```text
-WAIT_FOR_CALENDAR_READY
-        ↓
-WAIT_FOR_PARENT_CONTEXT
-        ↓
-PARENT_CRT_SELECTED
-        ↓
-WAIT_FOR_KEY_LEVEL
-        ↓
-KEY_LEVEL_QUALIFIED
-        ↓
-DIRECTION_ALIGNED?
-    ├── NO → REJECT_COUNTERTREND
-    ↓ YES
-TARGET_STATE_VALID?
-    ├── NO → REASSESS_OR_REJECT
-    ↓ YES
-WAIT_FOR_CANDLE_2_CLOSE
-        ↓
-CANDLE_2_CLOSED
-        ↓
-CANDLE_3_OPENED
-        ↓
-C3_ELIGIBLE
-        ↓
-CRT_COMPLETE / REQUIRED STATE KNOWN?
-    ├── NO/UNKNOWN → REJECT_UNKNOWN_CONTEXT
-    ↓ YES
-CONFIRMED SMT CONFLICT?
-    ├── YES → INVALIDATE_OR_DOWNGRADE
-    ↓ NO
-WAIT_FOR_LOCAL_TURTLE_SOUP
-        ↓
-LOCAL_MANIPULATION_CONFIRMED
-        ↓
-WAIT_FOR_ENTRY_MODEL
-    ├── MODEL_1
-    └── TRUE_MSS
-        ↓
-ENTRY_CONFIRMED
-        ↓
-BUILD_IMMUTABLE_TRADE_PLAN
-        ↓
-RISK_CHECK
-    ├── DENIED → JOURNAL_RISK_REJECT
-    ↓ APPROVED
-ORDER_INTENT
-        ↓
-POSITION_MANAGEMENT
-        ↓
-EXIT
-        ↓
-JOURNAL_OUTCOME
-```
-
-Any eligible context that expires without an entry transitions to:
-
-```text
-C3_NO_SIGNAL
-```
-
-not a forced trade.
-
-## 8. Directional alignment
-
-### Candidate policy
-
-```text
-allow_countertrend = False
-```
-
-Required:
+### Single-sided requirement
 
 ```python
-context_direction ∈ {BULLISH, BEARISH, NEUTRAL, UNKNOWN}
+C2.low >= C1.low
 ```
 
-Candidate direction must match context direction.
+If Candle 2 sweeps both C1 high and C1 low, the v0.1 state is ambiguous and fails closed.
 
-If direction is `NEUTRAL` or `UNKNOWN`:
+### `CRT-V01-004-C2-CLOSE-RECLAIM`
+
+Candle 2 must close back inside Candle 1:
+
+```python
+C1.low <= C2.close < C1.high
+```
+
+A wick/sweep alone is insufficient for this frozen subtype.
+
+### `CRT-V01-005-T1-PENDING`
+
+The 50% target must remain untouched during C2:
+
+```python
+C2.low > T1
+```
+
+This is a conservative parameterization. It prevents a candidate from pretending the original midpoint objective is still pristine after price has already traded there.
+
+### Parent context result
+
+If all conditions pass at C2 close:
 
 ```text
-NO TRADE
+context_direction = BEARISH
+key_level          = C1.high
+parent_structural_high = C2.high
+T1                 = C1 midpoint
 ```
 
-Status of direction algorithm: `UNRESOLVED / P0-05`.
+The broad external market-bias resolver is not part of v0.1. The completed D1 CRT state itself is the higher-timeframe context for the H1 execution layer.
 
-## 9. Candle 2 → Candle 3 gate
+---
 
-High-confidence candidate rule:
+## 8. Candle-3 gate
+
+### `CRT-V01-006-C3-GATE`
+
+Candle 3 becomes eligible only when:
 
 ```text
-Candle 2 must be complete before Candle 3 is eligible.
+C2 is closed
+AND
+C3 has opened
+AND
+parent context is qualified
+AND
+T1 is still pending
 ```
 
-At Candle-3 open the engine may know:
+At C3 open, the strategy may know:
 
-- prior candle histories
-- final Candle-2 values
-- Candle-3 open/time
-- pre-existing context/key-level/target state
+- final C1 OHLC;
+- final C2 OHLC;
+- C3 open timestamp and open price;
+- frozen parent context.
 
 It may not know:
 
-- Candle-3 eventual high
-- Candle-3 eventual low
-- Candle-3 eventual close
-- Candle-3 eventual success/failure
+- future C3 high;
+- future C3 low;
+- future C3 close;
+- whether the setup will win.
 
-Therefore:
+`C3_OPEN` never means `ENTER`.
 
-```text
-C3_OPENED → C3_ELIGIBLE
-```
+---
 
-never:
+## 9. Model #1 core
 
-```text
-C3_OPENED → ENTER
-```
+### Why Model #1 was selected
 
-Status: `HIGH_CONFIDENCE`, direct-source verification still required before freeze.
+Phase 2 selects Model #1 and excludes true MSS because Model #1 has the stronger deterministic public evidence baseline.
 
-## 10. Key-level gate — BLOCKED
+### `CRT-V01-007-MODEL1-CORE`
 
-A Candle-3 candidate requires a valid key-level/narrative state.
-
-The project currently distinguishes:
-
-```text
-DESTINATION key level
-REACTION_ORIGIN key level
-```
-
-But exact calculation/ranking remains `P0-02`.
-
-Prohibited shortcut:
+A bearish H1 Model-1-core candle must satisfy:
 
 ```python
-key_level = nearest_support_resistance
+candle.timeframe == H1
+candle.close > candle.open                     # up-close
+candle.low <= C2.high < candle.high            # crosses old structural high
+body_fraction >= 0.50                          # frozen project parameter
 ```
 
-unless directly source-backed and frozen.
-
-## 11. Target state
-
-### 11.1 Midpoint
-
-For a parent range:
+where:
 
 ```python
-midpoint_50 = (range_high + range_low) / 2
+body_fraction = abs(close - open) / (high - low)
 ```
 
-### 11.2 Target-1 state
+Zero-range candles do not qualify.
 
-Current high-confidence doctrine:
+`0.50` is parameter ID:
 
 ```text
-T1_PENDING
-   ↓ price reaches 50% under applicable setup semantics
-T1_REACHED
+P2-PARAM-M1-THICK-050
 ```
 
-Reaching 50% changes the original setup state. The engine must not keep pretending the pristine T1 premise is untouched.
+It is not claimed to be Romeo's unpublished numeric threshold.
 
-### 11.3 Do not force 50% as universal entry touch
+---
 
-The project will calculate 50% on every parent CRT but will not encode:
+## 10. Model #1 confirmation
+
+### `CRT-V01-008-MODEL1-CONFIRMATION`
+
+After a Model-1-core candle has closed, confirmation requires a later completed H1 candle inside the same C3 window to close below:
 
 ```python
-price_must_touch_50_before_entry = True
+min(model1.low, C2.high)
 ```
 
-without setup-specific evidence.
+The confirmation must occur while price is still above the C1 midpoint target.
 
-### 11.4 Target hierarchy — BLOCKED
-
-Possible narrative objectives appearing in the corpus include:
-
-- 50% midpoint
-- opposite CRT extreme
-- prior day high/low
-- key-level / liquidity objectives
-
-The exact setup-family hierarchy is `P1-03`.
-
-Every target used in a backtest must be frozen before the test begins.
-
-## 12. Manipulation path
-
-### Minimal v0.1 policy
-
-Require a deterministic local Turtle Soup event after the candidate context is valid.
+Entry reference for validation:
 
 ```text
-require_local_turtle_soup = True
-allow_smt_substitution = False
+entry = confirming H1 close
 ```
 
-This is a project scope decision to reduce ambiguity, not a claim that Romeo never uses SMT substitution.
+### Model invalidation before confirmation
 
-Turtle Soup detector remains `P0-04`.
-
-## 13. SMT policy
-
-### Architecture rules
-
-- SMT requires explicit related-market relationships.
-- synchronized causal data is required.
-- stale comparison data => `SMT = UNKNOWN`.
-- SMT cannot directly generate an order.
-- HTF direction filters SMT interpretation.
-
-### First minimal candidate
-
-SMT may be logged as:
-
-```text
-NONE | SUPPORTIVE | CONFLICT | UNKNOWN
-```
-
-but no SMT-dependent trade path is allowed until pair/polarity semantics are resolved.
-
-If a directly verified `CONFIRMED SMT CONFLICT` predicate is later activated, it may invalidate/downgrade the pending CRT before entry.
-
-## 14. Entry models
-
-Entry-family whitelist:
-
-```text
-MODEL_1
-TRUE_MSS
-```
-
-No other entry type is allowed in v0.1 without a new strategy version.
-
-### 14.1 Model #1 — BLOCKED
-
-Current safe abstraction:
-
-```text
-QUALIFYING SPECIFIC CANDLE
-        ↓
-REQUIRED CLOSE / DISPLACEMENT
-        ↓
-RETRACE INTO MODEL-1 AREA
-        ↓
-ENTRY CANDIDATE
-```
-
-Unresolved (`P1-01`):
-
-- `thick` definition
-- body/wick geometry
-- old-extreme relation
-- exact close predicate
-- exact retrace region
-- bullish/bearish mirror
-- FVG role
-
-No numerical proxy may be invented to close these gaps.
-
-### 14.2 True MSS — BLOCKED
-
-Current safe abstraction:
-
-```text
-QUALIFIED CONTEXT / MANIPULATION
-        ↓
-LTF STRUCTURAL SEQUENCE
-        ↓
-BREAK OF SPECIFIC REFERENCE SWING
-        ↓
-TRUE_MSS_CONFIRMED
-        ↓
-ENTRY REGION
-```
-
-Unresolved (`P1-02`):
-
-- swing construction
-- exact reference high/low
-- wick vs close break
-- entry region
-- relation to SMT/Turtle Soup/FVG
-
-Generic BOS/MSS logic is explicitly prohibited as a substitute.
-
-## 15. Stop-loss policy
-
-Current candidate principle:
-
-```text
-stop reference = qualifying structural invalidation extreme
-```
-
-Episode 9 supports a bullish example below the Turtle Soup low.
-
-Represent separately:
+If a later H1 candle makes:
 
 ```python
-StructuralStop(
-    reference_type,
-    reference_price,
-    side,
-    buffer_policy,
-)
+later.high > model1.high
 ```
 
-The strategy source determines the structural reference. Execution policy determines any approved buffer.
+before confirmation, that Model-1-core instance is invalidated.
 
-Exact buffer and bearish mirror: `P1-04`.
+The invalidating candle may itself become a new candidate Model-1-core candle if it independently meets all Model-1 rules.
 
-## 16. Exit policy
+This prevents a stale model candle from remaining active after a new structural extreme forms.
 
-### Price exits
+---
 
-Allowed only if predeclared in `TradePlan`.
+## 11. Target-consumption guard during C3
 
-### Time exits
+Before entry, if any completed H1 candle trades to or through:
 
-Status: unresolved.
+```python
+T1 = C1 midpoint
+```
 
-For the first deterministic candidate, time exits should be disabled unless directly specified before backtesting.
-
-Prohibited:
+then:
 
 ```text
-select historically best exit timestamp after observing results
+NO_SIGNAL
+reason = TARGET1_CONSUMED_PRE_ENTRY
 ```
 
-## 17. Invalidation and no-trade states
+The strategy does not chase an entry after its primary objective has already printed.
 
-Pre-entry candidate may terminate as:
+---
+
+## 12. Entry and immutable TradePlan
+
+When confirmation occurs, create an immutable strategy `TradePlan` containing at minimum:
 
 ```text
-REJECT_COUNTERTREND
-REJECT_INVALID_KEY_LEVEL
-REJECT_TARGET_STATE_CONSUMED
-REJECT_SMT_CONFLICT
-REJECT_INCOMPLETE_CONTEXT
-REJECT_UNKNOWN_CONTEXT
-REJECT_DATA_STALE
-C3_NO_SIGNAL
-RISK_REJECTED
+strategy_version
+freeze_parameter_version
+direction
+entry timestamp
+entry reference price
+stop structural reference
+stop execution price
+primary target
+parent/key-level IDs or references
+C1/C2/C3 timestamps
+Model-1 timestamp
+rule/evidence IDs
 ```
 
-These are not strategy losses unless an actual position was opened.
+The strategy ends at `TradePlan`.
 
-## 18. Outcome model
+It does not determine final order size or bypass independent risk authorization.
 
-Trade/candidate analytics must preserve at least:
+---
+
+## 13. Stop policy
+
+### `CRT-V01-009-STRUCTURAL-STOP`
+
+Structural stop reference:
 
 ```text
-NO_ENTRY
-INVALIDATED_PRE_ENTRY
-RISK_REJECTED
-STOPPED_BEFORE_T1
-T1_REACHED
-T1_REACHED_T2_REACHED
-T1_REACHED_T2_NOT_REACHED
-INVALIDATED_AFTER_ENTRY
-TIME_EXIT
-DATA_FAILURE
+Model-1-core high
 ```
 
-A trade that reaches T1 and not T2 must not be mislabeled as equivalent to a trade stopped before T1.
+Execution stop:
 
-## 19. Backtesting causality rules
+```python
+stop = model1.high + (1 * instrument_tick_size)
+```
 
-Mandatory:
-
-1. event-time replay
-2. no future parent-candle OHLC
-3. no future swing/reference selection
-4. no retrospective Candle-1/2/3 labels as inputs
-5. no `last_turtle_soup_before_target`
-6. fixed target policy before each experiment
-7. fixed pair registry before SMT experiments
-8. synchronized cross-market observations
-9. stale stream => unknown/fail closed
-10. fixed strategy version throughout test segment
-11. transaction costs, spread and slippage modeled separately
-
-## 20. Candidate rule register
-
-| Rule ID | Category | Status | Draft statement | Blocker |
-|---|---|---|---|---|
-| CRT-001 | Calendar | UNRESOLVED | Canonical H4/D1/W1 construction must be defined. | P0-03 |
-| CRT-002 | Parent CRT | UNRESOLVED | Select parent CRT/candle causally. | P0-01 |
-| CRT-003 | Context | UNRESOLVED | Compute HTF direction. | P0-05 |
-| CRT-004 | Key level | UNRESOLVED | Select/rank valid key level before LTF entry scan. | P0-02 |
-| CRT-005 | Phase | HIGH_CONFIDENCE | Candle 2 closes before Candle 3 becomes eligible. | direct-source check |
-| CRT-006 | Direction | HIGH_CONFIDENCE / BLOCKED | Reject countertrend candidates. | depends CRT-003 |
-| CRT-007 | Target state | HIGH_CONFIDENCE | Track parent midpoint and T1 consumed state. | setup-specific T1 verification |
-| CRT-008 | Turtle Soup | UNRESOLVED | Require deterministic local Turtle Soup for minimal v0.1. | P0-04 |
-| CRT-009 | SMT | HIGH_CONFIDENCE / SCOPED OUT | SMT cannot directly enter; substitution disabled initially. | P2-01/P2-02 |
-| CRT-010 | Entry family | HIGH_CONFIDENCE | Entry whitelist = Model #1 or true MSS. | internal rules unresolved |
-| CRT-011 | Model #1 | UNRESOLVED | Specific-candle close/retrace entry. | P1-01 |
-| CRT-012 | True MSS | UNRESOLVED | Context-qualified structural entry. | P1-02 |
-| CRT-013 | Stop | PROVISIONAL-HIGH | Structural stop reference beyond invalidation extreme. | P1-04 |
-| CRT-014 | Target | UNRESOLVED | Predeclared narrative target hierarchy. | P1-03 |
-| CRT-015 | C3 expiry | UNRESOLVED | Eligible setup may expire to `C3_NO_SIGNAL`. | P1-05 |
-| CRT-016 | KOD | EXCLUDED | Not required for first v0.1. | P2-03 |
-| CRT-017 | Incomplete CRT | FAIL-CLOSED | Unknown completeness cannot authorize a trade. | P2-04 |
-| CRT-018 | Time exit | EXCLUDED UNTIL VERIFIED | No invented time exit. | P2-05 |
-| CRT-019 | Causality | ENGINEERING_CONSTRAINT | Information available at `t` only. | none |
-| CRT-020 | Risk | ENGINEERING_CONSTRAINT | Independent risk engine decides permission. | none |
-
-## 21. Independent risk boundary
-
-The strategy may only produce a `TradePlan`.
+Parameter:
 
 ```text
-STRATEGY
-   ↓
-TradePlan
-   ↓
-RISK ENGINE
-   ↓
-OrderIntent or Denial
+P2-PARAM-STOP-1TICK
 ```
 
-The risk engine may deny any otherwise valid strategy candidate.
+The structural reference and the execution buffer are deliberately separate.
 
-AI/LLM components may not bypass the risk engine or directly submit broker orders.
+A later version may change the buffer only through a versioned strategy/parameter review.
 
-## 22. Journal requirements
+---
 
-Journal every:
+## 14. Target policy
 
-- context candidate
-- parent selection
-- key-level selection
-- direction decision
-- invalidation/rejection reason
-- Turtle Soup event
-- SMT state when enabled
-- entry-model evidence
-- risk denial
-- no-signal expiry
-- entry/exit
-- T1/T2 state transitions
-- strategy version
-- evidence/rule IDs
+### `CRT-V01-010-PRIMARY-TARGET`
 
-This journal serves both audit and later learning datasets.
+Primary exit objective:
 
-## 23. Freeze blockers
+```python
+target = C1 midpoint
+```
 
-### P0
+The target is fixed before risk approval.
 
-- Parent CRT selector
-- Key-level selector
-- Candle/session construction
-- Turtle Soup primitive
-- HTF direction algorithm
+The opposite C1 low can be journaled as a secondary analytical delivery level, but v0.1 does not require holding or scaling a position to that level.
 
-### Selected-entry P1
+No partial-profit rule is implied.
 
-At least one entry family must be fully deterministic:
+No target may be changed after observing trade outcome.
 
-- Model #1, or
-- true MSS
+---
 
-Then also:
+## 15. Candle-3 expiry
 
-- target hierarchy
-- stop buffer/policy
-- Candle-3 confirmation/expiry
+### `CRT-V01-011-C3-EXPIRY`
 
-## 24. Phase 1 freeze checklist
+New-entry eligibility exists only inside Candle 3.
 
-- [x] First broad corpus pass through CRT Secrets Episode 10
-- [x] Rule evidence matrix created
-- [x] Contradiction/refinement matrix created
-- [x] Blocker priority created
-- [x] First integrated strategy draft created
-- [ ] P0 direct-source verification complete
-- [ ] Parent CRT fixtures complete
-- [ ] Key-level fixtures complete
-- [ ] Candle calendar tests complete
-- [ ] Turtle Soup fixtures complete
-- [ ] Context-direction fixtures complete
-- [ ] One entry family fully deterministic
-- [ ] Positive and negative examples for every active rule
-- [ ] Machine-readable fixtures exist
-- [ ] No active-path `UNRESOLVED` state remains
-- [ ] Independent strategy review complete
-- [ ] Version freeze commit/tag created
+If no confirmed Model #1 occurs before C3 closes:
 
-## 25. Current promotion decision
+```text
+NO_SIGNAL
+reason = NO_MODEL1_CONFIRMATION
+```
 
-`CRT-C3-ALIGNED-v0.1-DRAFT` remains:
+A confirming close after Candle 3 closes is future information for that setup and cannot revive it.
+
+There is **no strategy time exit after a position is opened** in v0.1. Open-position handling at the end of a finite research dataset must be reported separately as censored/mark-to-market data rather than silently inventing a time exit.
+
+---
+
+## 16. Fail-closed rules
+
+### `CRT-V01-012-FAIL-CLOSED`
+
+Return `NO_SIGNAL` when any required active-path input is:
+
+- missing;
+- stale;
+- outside the frozen calendar;
+- temporally inconsistent;
+- ambiguous;
+- based on future information;
+- contradictory to the frozen rule set.
+
+Representative reason codes:
+
+```text
+INVALID_CALENDAR
+NON_CONSECUTIVE_PARENT
+NO_BEARISH_PARENT_SWEEP
+DOUBLE_OR_OPPOSITE_SWEEP
+PARENT_CLOSE_NOT_RECLAIMED
+TARGET1_CONSUMED_IN_C2
+EXECUTION_DATA_OUTSIDE_C3
+TARGET1_CONSUMED_PRE_ENTRY
+NO_MODEL1_CONFIRMATION
+INVALID_TRADE_GEOMETRY
+```
+
+`NO_SIGNAL` is a valid strategy result, not a trading loss.
+
+---
+
+## 17. Independent risk boundary
+
+### `CRT-V01-013-INDEPENDENT-RISK`
+
+Required architecture:
+
+```text
+CRT v0.1 strategy
+      ↓
+immutable TradePlan
+      ↓
+independent Risk Engine
+      ↓
+OrderIntent OR denial
+```
+
+A valid strategy setup may still be denied by risk.
+
+No LLM, setup score or strategy confidence may override hard risk controls.
+
+---
+
+## 18. Anti-look-ahead invariants
+
+The following are mandatory tests and implementation constraints:
+
+1. C1 final range is unavailable before C1 closes.
+2. C2 final close is unavailable before C2 closes.
+3. C3 final OHLC is never an entry input.
+4. Parent candidates are enumerated forward in time rather than selected after outcome.
+5. A model candle is only available after it closes.
+6. Confirmation is only available after the confirming H1 closes.
+7. A confirmation after C3 expiry cannot authorize an earlier trade.
+8. The primary target is frozen before order approval.
+9. Final test/OOS results may not be used to revise this version in place.
+
+---
+
+## 19. Machine-readable fixture requirements
+
+The frozen fixture suite must contain at least:
+
+- one positive trade-plan case;
+- no parent sweep;
+- double/opposite sweep;
+- sweep without reclaim;
+- T1 consumed in C2;
+- T1 consumed during C3 before entry;
+- non-qualifying Model-1 body;
+- future confirmation outside C3.
+
+These are committed under:
+
+```text
+tests/strategy/fixtures/crt_v0_1_cases.json
+```
+
+The fixture suite is a **specification test**, not evidence of profitability.
+
+---
+
+## 20. Frozen rule register
+
+| Rule | Frozen statement | Type |
+|---|---|---|
+| CRT-V01-001 | D1 uses NY-midnight wall-clock boundaries; H1 is execution timeframe | source + calendar contract |
+| CRT-V01-002 | enumerate every consecutive D1 C1/C2 pair | anti-hindsight project policy |
+| CRT-V01-003 | bearish C2 strictly sweeps C1 high only | source-derived subset |
+| CRT-V01-004 | C2 must close back inside C1 range | conservative project formalization |
+| CRT-V01-005 | C1 midpoint must remain unconsumed through C2 | source-derived target state + conservative guard |
+| CRT-V01-006 | C2 close precedes C3 eligibility | source-derived causal rule |
+| CRT-V01-007 | H1 up-close old-high sweep + body fraction >= 0.50 | source-derived Model #1 + explicit parameter |
+| CRT-V01-008 | later H1 close below model/reference confirms | source-derived + deterministic formalization |
+| CRT-V01-009 | stop above Model-1 high + 1 tick | structural source principle + execution parameter |
+| CRT-V01-010 | full primary objective = C1 midpoint | source-derived narrow target policy |
+| CRT-V01-011 | no new entry after C3 close | causal project expiry policy |
+| CRT-V01-012 | unknown/invalid required state => NO_SIGNAL | engineering constraint |
+| CRT-V01-013 | strategy emits TradePlan only; risk remains independent | architecture constraint |
+
+No active rule remains `UNRESOLVED` inside this strategy version.
+
+---
+
+## 21. Required validation work after freeze
+
+`FROZEN_FOR_VALIDATION` means the rules stop moving while evidence/edge is tested.
+
+The next phases must perform:
+
+1. trusted D1/H1 data construction;
+2. known-fixture reproduction;
+3. independent no-lookahead review;
+4. event-driven historical detection;
+5. transaction-cost modeling;
+6. parameter sensitivity around the `0.50` body threshold and one-tick buffer;
+7. in-sample exploration separated from final OOS;
+8. walk-forward/OOS only after data and simulator are frozen;
+9. negative-result preservation;
+10. written reject/revise/promote decision.
+
+If the candidate performs poorly, that is a valid Phase-6 outcome. The rules must not be silently rewritten to rescue the equity curve.
+
+---
+
+## 22. Promotion state
+
+The strategy lifecycle is now:
 
 ```text
 RESEARCH
+   ↓
+FROZEN_FOR_VALIDATION   ← current state
+   ↓
+PAPER                   not authorized
+   ↓
+SHADOW                  not authorized
+   ↓
+LIVE_CANARY             not authorized
+   ↓
+LIVE_APPROVED           not authorized
 ```
 
-It is **not** promoted to:
+**Live trading remains false.**
 
-```text
-FROZEN_FOR_VALIDATION
-PAPER
-SHADOW
-LIVE_CANARY
-LIVE_APPROVED
-```
-
-The next work is direct-source resolution of P0 blockers, not profitability optimization.
+Phase 2 is complete when the freeze manifest, deterministic contracts, fixtures, review record, docs and CI all agree with this specification.
