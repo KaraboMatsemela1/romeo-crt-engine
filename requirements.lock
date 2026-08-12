@@ -3,6 +3,7 @@
 annotated-types==0.8.0
 ast-serialize==0.8.0
 coverage==7.15.4
+editables==0.6
 hatchling==1.31.0
 iniconfig==2.3.0
 librt==0.15.0
