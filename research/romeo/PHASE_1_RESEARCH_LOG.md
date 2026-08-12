@@ -103,3 +103,51 @@ Treat Turtle Soup as a **structural primitive** that later CRT context and execu
 ### Next source
 
 `ROMEO-2025-S2 — CRT secrets episode 2: The kiss of death` is the next evidence target because it explicitly presents Kiss of Death as a Turtle Soup model and should clarify how a structural sweep is converted into an actionable CRT setup.
+
+---
+
+## 2026-08-12 — Pass 3: Kiss of Death
+
+Analyzed `ROMEO-2025-S2 — CRT secrets episode 2: The kiss of death`.
+
+### Result
+
+Kiss of Death is source-backed as a specialized Turtle Soup within an already-active CRT journey. The demonstrated bearish path links Candle 1 range selection, movement through the range, a late Turtle Soup, optional FVG/old-high confluence, lower-timeframe Model #1 execution, 50% as an intermediate objective, and the opposite CRT extreme as a later objective.
+
+### Critical validation finding
+
+Romeo describes KOD as the **final Turtle Soup before the target is hit**. That wording is not directly safe to code because identifying the final event retrospectively would leak future information into historical signals.
+
+Therefore `last_turtle_soup_before_target` is explicitly prohibited as a backtest classifier. Later sources must provide real-time qualifying conditions that allow a KOD candidate to be recognized before the target is reached.
+
+### Repository changes
+
+- Added `research/romeo/videos/ROMEO-2025-S2.md`
+- Updated `GLOSSARY.md` with KOD, Candle 1/2/3, CRT 50%, opposite CRT extreme and FVG-confluence terms
+- Expanded `OPEN_QUESTIONS.md` with KOD-specific and look-ahead-bias questions
+- Marked `ROMEO-2025-S2` as `EVIDENCE_PASS_1` in `SOURCE_REGISTRY.csv`
+- Created provisional candidates `KOD-P001` through `KOD-P010`
+
+### Architectural consequence
+
+The emerging decomposition is:
+
+```text
+parent CRT context
+      ↓
+Turtle Soup / KOD candidate
+      ↓
+confluence
+      ↓
+LTF entry model
+      ↓
+independent risk
+      ↓
+target management
+```
+
+KOD detection and Model #1 entry detection must remain separate modules.
+
+### Next source
+
+`ROMEO-2025-S3 — CRT secrets 3: The journey` should be analyzed next because it is the most likely source to clarify Candle 1→2→3 sequencing, target progression, and the ex-ante state needed to distinguish a late KOD from an arbitrary Turtle Soup.
