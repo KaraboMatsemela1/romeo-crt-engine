@@ -19,6 +19,7 @@ PROVIDER = "BINANCE_PUBLIC_DATA"
 VENUE = "BINANCE_SPOT"
 ARCHIVE_BASE_URL = "https://data.binance.vision"
 MARKET_DATA_API_BASE_URL = "https://data-api.binance.vision"
+REST_VERIFICATION_METHOD = "REST_KLINE_EXACT_MATCH_V1"
 
 
 @dataclass(frozen=True, slots=True)
@@ -29,6 +30,38 @@ class RawArchive:
     checksum_url: str
     sha256: str
     content: bytes
+
+
+@dataclass(frozen=True, slots=True)
+class RestCrosscheckEvidence:
+    provider: str
+    venue: str
+    symbol: str
+    source_sha256: str
+    sample_open_times_utc: tuple[str, ...]
+    endpoint_base: str
+    verification_method: str = REST_VERIFICATION_METHOD
+
+    def __post_init__(self) -> None:
+        if len(self.source_sha256) != 64:
+            raise ValueError("source_sha256 must be a SHA-256 digest")
+        if not self.sample_open_times_utc:
+            raise ValueError("at least one REST sample is required")
+
+    @property
+    def evidence_digest(self) -> str:
+        payload = {
+            "provider": self.provider,
+            "venue": self.venue,
+            "symbol": self.symbol,
+            "source_sha256": self.source_sha256,
+            "sample_open_times_utc": self.sample_open_times_utc,
+            "endpoint_base": self.endpoint_base,
+            "verification_method": self.verification_method,
+        }
+        return sha256(
+            json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
 
 
 def daily_kline_filename(symbol: str, day: date) -> str:
@@ -276,10 +309,15 @@ def crosscheck_bars_with_rest(
     bars: tuple[MinuteBar, ...],
     *,
     timeout_seconds: float = 30.0,
-) -> None:
+) -> RestCrosscheckEvidence:
     if not bars:
         raise ValueError("bars must not be empty")
+    source_hashes = {bar.source_sha256 for bar in bars}
+    if len(source_hashes) != 1:
+        raise ValueError("REST cross-check expects bars from exactly one raw archive")
+
     sample_indexes = sorted({0, len(bars) // 2, len(bars) - 1})
+    sample_times: list[str] = []
     for index in sample_indexes:
         bar = bars[index]
         row = _fetch_api_1m_row(bar.symbol, bar.open_time, timeout_seconds)
@@ -301,3 +339,13 @@ def crosscheck_bars_with_rest(
                     DataQualityCode.PROVIDER_SCHEMA,
                     f"REST/archive mismatch at {bar.open_time.isoformat()} field={field_name}",
                 )
+        sample_times.append(bar.open_time.astimezone(UTC).isoformat())
+
+    return RestCrosscheckEvidence(
+        provider=bars[0].provider,
+        venue=bars[0].venue,
+        symbol=bars[0].symbol,
+        source_sha256=bars[0].source_sha256,
+        sample_open_times_utc=tuple(sample_times),
+        endpoint_base=MARKET_DATA_API_BASE_URL,
+    )
