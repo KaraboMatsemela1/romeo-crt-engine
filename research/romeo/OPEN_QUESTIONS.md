@@ -26,11 +26,17 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - What exactly is the role of the 50% level: target, reaction zone, invalidation/failure filter, or multiple roles?
 - What makes a parent CRT `active` or `pending` before the target is reached?
 - What determines bullish versus bearish CRT direction in real time?
+- What event moves a parent CRT from `ACCUMULATION` into `MANIPULATION`?
+- What event moves a parent CRT from `MANIPULATION` into `DISTRIBUTION` / Candle 3?
+- Is Candle 3 defined by calendar position, price behavior, confirmation, or a combination?
+- What are the canonical higher-timeframe → lower-timeframe pairs?
 
 ## Kiss of Death
 
 - What observable ex-ante conditions distinguish a KOD candidate from earlier Turtle Soups before the target is hit?
 - How do we avoid defining KOD retrospectively as `the final Turtle Soup before target`, which would create look-ahead bias?
+- What makes a CRT journey `late enough` for KOD qualification using only information available at that time?
+- Can interaction with the CRT 50% level act as a causal journey-stage boundary for KOD qualification?
 - Must KOD occur after price has already interacted with the CRT 50% level?
 - Is the demonstrated sequence `first Turtle Soup → 50% → bounce → KOD → opposite extreme` mandatory or merely one example?
 - What exactly did Romeo mean by preferring KOD in the `lower 25%` of the range, and how does that map directionally for bearish/bullish setups?
@@ -39,6 +45,18 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - Is lower-timeframe Model #1 mandatory for KOD execution or only one supported entry model?
 - What invalidates a KOD candidate before lower-timeframe entry confirmation?
 - What is the exact bullish mirror of the bearish KOD sequence?
+
+## Journey / phase progression
+
+- Is the lower-timeframe sequence `Turtle Soup → true MSS → Model #1 → KOD` mandatory, optional, overlapping, or example-specific?
+- What exactly is Romeo's `true market structure shift`, and how is it distinguished from a fake/ordinary MSS?
+- What is the exact breaker concept mentioned alongside true MSS?
+- Can Model #1 occur multiple times within one parent CRT journey?
+- Can Turtle Soup occur multiple times before Candle 3 and, if so, how should events be ranked?
+- How is `target pending` represented in real time without hindsight?
+- What objective families exist: liquidity targets, imbalance/rebalancing targets, 50% targets, or others?
+- What hierarchy chooses the primary target before entry?
+- Does every CRT variant share one journey state machine, or do multiple setup-specific state machines exist?
 
 ## Context / liquidity
 
@@ -69,8 +87,16 @@ These must be answered from evidence or deliberately scoped out before freezing 
 
 - What sessions/trading windows are valid?
 - What does Romeo mean operationally when saying time is more important than price?
+- What exact features define `time meets price`?
 - How is DST handled for those windows?
 - Which instrument classes and timeframe combinations are in scope?
+
+## Backtesting / information-set safety
+
+- For each phase label, what information was actually available at timestamp `t`?
+- Which retrospective labels are allowed for research annotation but prohibited as live signal inputs?
+- How do we ensure Candle 3 completion is not used to justify an entry that occurred during Candle 2?
+- How do we ensure KOD is never labeled from knowledge of the future target hit?
 
 ## Corpus/versioning
 
