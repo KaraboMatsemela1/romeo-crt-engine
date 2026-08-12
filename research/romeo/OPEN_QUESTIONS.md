@@ -48,6 +48,7 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - Is lower-timeframe Model #1 mandatory for KOD execution or only one supported entry model?
 - What invalidates a KOD candidate before lower-timeframe entry confirmation?
 - What is the exact bullish mirror of the bearish KOD sequence?
+- Is Episode 5's pre-key-level KOD the same semantic subtype as Episode 2's final-Turtle-Soup KOD, or are these nested roles at different parent journeys?
 
 ## Journey / phase progression
 
@@ -63,11 +64,27 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - How does the selected parent candle's open price influence phase progression?
 - What intrabar evidence lets the engine infer Candle 2 manipulation before the parent candle has closed?
 
+## Key levels
+
+- What exact structures qualify as Romeo price key levels?
+- What exact structures qualify as time key levels?
+- Are old highs/lows always valid key levels or only under additional context?
+- How are multiple W1 → D1 → H4 key levels ranked when they conflict or overlap?
+- What numerical tolerance defines `at the key level`?
+- Does a touch, wick through, body trade-through, or candle close mark a level as reached?
+- What event marks a key level as consumed or invalidated?
+- Can a destination key level become a reaction-origin key level immediately after being reached?
+- For `journey-to-key-level` trades, what exact event supplies entry and where does the position exit relative to the level?
+- For `reaction-from-key-level` trades, must price first hit/purge the level before any LTF confirmation can qualify?
+- What separates the fake MSS before the key level from the true MSS at the level?
+- Does the true MSS require a specific time window as well as the price level?
+- Is SMT mandatory for identifying the real key-level reaction or only additional confluence?
+- Does key-level type determine which entry models are legal?
+
 ## Context / liquidity
 
 - What liquidity levels are required vs optional?
 - How is higher-timeframe direction/context established?
-- What exact hierarchy determines a valid key level?
 - Is SMT required, optional confirmation, or a failure filter depending on setup type?
 - What explicit no-trade conditions exist?
 
@@ -111,6 +128,8 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - How do we ensure final parent-candle high/low/close/body/wicks are never used for an intrabar decision before those values existed?
 - What minimum event granularity is required to reconstruct candle snapshots faithfully: ticks, 1m bars, or another base interval?
 - How are provider bar-boundary discrepancies detected and prevented from changing CRT labels silently?
+- How do we prevent a key level from being labeled `important` only because a future reversal later occurred there?
+- How do we define destination/reaction roles ex ante rather than from the completed path?
 
 ## Corpus/versioning
 
