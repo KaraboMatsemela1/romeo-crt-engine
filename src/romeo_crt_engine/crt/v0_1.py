@@ -44,6 +44,22 @@ class ReasonCode(StrEnum):
     INVALID_TRADE_GEOMETRY = "INVALID_TRADE_GEOMETRY"
 
 
+def _timestamp(value: datetime) -> float:
+    return value.timestamp()
+
+
+def _is_after(later: datetime, earlier: datetime) -> bool:
+    return _timestamp(later) > _timestamp(earlier)
+
+
+def _same_instant(first: datetime, second: datetime) -> bool:
+    return _timestamp(first) == _timestamp(second)
+
+
+def _elapsed_seconds(start: datetime, end: datetime) -> float:
+    return _timestamp(end) - _timestamp(start)
+
+
 @dataclass(frozen=True, slots=True)
 class ClosedCandle:
     timeframe: Timeframe
@@ -57,7 +73,7 @@ class ClosedCandle:
     def __post_init__(self) -> None:
         if self.open_time.utcoffset() is None or self.close_time.utcoffset() is None:
             raise ValueError("candle timestamps must be timezone-aware")
-        if self.close_time <= self.open_time:
+        if not _is_after(self.close_time, self.open_time):
             raise ValueError("close_time must be after open_time")
         values = (self.open, self.high, self.low, self.close)
         if not all(isfinite(value) for value in values):
@@ -87,7 +103,7 @@ class CandleWindow:
     def __post_init__(self) -> None:
         if self.open_time.utcoffset() is None or self.close_time.utcoffset() is None:
             raise ValueError("window timestamps must be timezone-aware")
-        if self.close_time <= self.open_time:
+        if not _is_after(self.close_time, self.open_time):
             raise ValueError("window close_time must be after open_time")
         if not isfinite(self.open_price):
             raise ValueError("open_price must be finite")
@@ -182,7 +198,7 @@ def is_canonical_h1(candle: ClosedCandle) -> bool:
         return False
     if any((local_close.minute, local_close.second, local_close.microsecond)):
         return False
-    return candle.close_time - candle.open_time == timedelta(hours=1)
+    return _elapsed_seconds(candle.open_time, candle.close_time) == 60 * 60
 
 
 def rolling_parent_pairs(
@@ -196,7 +212,7 @@ def rolling_parent_pairs(
         if (
             is_canonical_daily(first)
             and is_canonical_daily(second)
-            and first.close_time == second.open_time
+            and _same_instant(first.close_time, second.open_time)
         ):
             pairs.append((first, second))
     return tuple(pairs)
@@ -212,7 +228,9 @@ def qualify_bearish_parent(
         return Evaluation(DecisionState.NO_SIGNAL, ReasonCode.INVALID_CALENDAR)
     if not is_canonical_daily_window(c3):
         return Evaluation(DecisionState.NO_SIGNAL, ReasonCode.INVALID_CALENDAR)
-    if c1.close_time != c2.open_time or c2.close_time != c3.open_time:
+    if not _same_instant(c1.close_time, c2.open_time) or not _same_instant(
+        c2.close_time, c3.open_time
+    ):
         return Evaluation(DecisionState.NO_SIGNAL, ReasonCode.NON_CONSECUTIVE_PARENT)
 
     midpoint = (c1.high + c1.low) / 2.0
@@ -270,7 +288,7 @@ def evaluate_bearish_c3(
         return parent_result
     context = parent_result.context
 
-    ordered = tuple(sorted(h1_candles, key=lambda item: item.open_time))
+    ordered = tuple(sorted(h1_candles, key=lambda item: _timestamp(item.open_time)))
     for candle in ordered:
         if not is_canonical_h1(candle):
             return Evaluation(
@@ -278,7 +296,9 @@ def evaluate_bearish_c3(
                 ReasonCode.INVALID_CALENDAR,
                 context=context,
             )
-        if candle.open_time < c3.open_time or candle.close_time > c3.close_time:
+        if _timestamp(candle.open_time) < _timestamp(c3.open_time) or _timestamp(
+            candle.close_time
+        ) > _timestamp(c3.close_time):
             return Evaluation(
                 DecisionState.NO_SIGNAL,
                 ReasonCode.EXECUTION_DATA_OUTSIDE_C3,
@@ -338,7 +358,7 @@ def evaluate_bearish_c3(
                     )
                     return Evaluation(
                         DecisionState.TRADE_PLAN,
-                        ReasonCode.ELIGIBLE,
+                        Reason=ReasonCode.ELIGIBLE,
                         context=context,
                         trade_plan=plan,
                     )
