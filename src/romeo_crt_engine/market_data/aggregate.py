@@ -8,7 +8,11 @@ from hashlib import sha256
 from zoneinfo import ZoneInfo
 
 from romeo_crt_engine.market_data.models import BarTimeframe, CanonicalBar, MinuteBar
-from romeo_crt_engine.market_data.quality import DataQualityCode, DataQualityError, validate_minute_series
+from romeo_crt_engine.market_data.quality import (
+    DataQualityCode,
+    DataQualityError,
+    validate_minute_series,
+)
 
 NY = ZoneInfo("America/New_York")
 
@@ -30,7 +34,7 @@ def _canonical_digest(bars: Sequence[CanonicalBar]) -> str:
 
 
 def _sum_decimal(values: Sequence[Decimal]) -> Decimal:
-    return sum(values, start=Decimal("0"))
+    return sum(values, start=Decimal(0))
 
 
 def build_h1(minute_bars: Sequence[MinuteBar]) -> tuple[CanonicalBar, ...]:
