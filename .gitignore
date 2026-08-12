@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+
+# Data / experiments
+/data/raw/*
+/data/normalized/*
+/data/features/*
+!/data/raw/.gitkeep
+!/data/normalized/.gitkeep
+!/data/features/.gitkeep
+experiments/**/artifacts/
+mlruns/
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Build
+build/
+dist/
+*.egg-info/
