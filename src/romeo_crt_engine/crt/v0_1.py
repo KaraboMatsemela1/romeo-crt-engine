@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import StrEnum
+from itertools import pairwise
 from math import isfinite
-from typing import Final, Sequence
+from typing import Final
 from zoneinfo import ZoneInfo
 
 STRATEGY_VERSION: Final = "CRT-C3-D1-H1-M1-BEAR-v0.1"
@@ -171,22 +173,36 @@ def is_canonical_h1(candle: ClosedCandle) -> bool:
     return candle.close_time - candle.open_time == timedelta(hours=1)
 
 
-def rolling_parent_pairs(daily: Sequence[ClosedCandle]) -> tuple[tuple[ClosedCandle, ClosedCandle], ...]:
+def rolling_parent_pairs(
+    daily: Sequence[ClosedCandle],
+) -> tuple[tuple[ClosedCandle, ClosedCandle], ...]:
     """Enumerate every consecutive D1 pair without hindsight-based Candle-1 selection."""
     if len(daily) < 2:
         return ()
     pairs: list[tuple[ClosedCandle, ClosedCandle]] = []
-    for first, second in zip(daily, daily[1:], strict=False):
-        if is_canonical_daily(first) and is_canonical_daily(second) and first.close_time == second.open_time:
+    for first, second in pairwise(daily):
+        if (
+            is_canonical_daily(first)
+            and is_canonical_daily(second)
+            and first.close_time == second.open_time
+        ):
             pairs.append((first, second))
     return tuple(pairs)
 
 
-def qualify_bearish_parent(c1: ClosedCandle, c2: ClosedCandle, c3: CandleWindow) -> Evaluation:
+def qualify_bearish_parent(
+    c1: ClosedCandle,
+    c2: ClosedCandle,
+    c3: CandleWindow,
+) -> Evaluation:
     """Qualify the frozen bearish D1 Candle-1/Candle-2 state at Candle-3 open."""
     if not is_canonical_daily(c1) or not is_canonical_daily(c2):
         return Evaluation(DecisionState.NO_SIGNAL, ReasonCode.INVALID_CALENDAR)
-    if c3.timeframe is not Timeframe.D1 or not _is_local_midnight(c3.open_time) or not _is_local_midnight(c3.close_time):
+    if (
+        c3.timeframe is not Timeframe.D1
+        or not _is_local_midnight(c3.open_time)
+        or not _is_local_midnight(c3.close_time)
+    ):
         return Evaluation(DecisionState.NO_SIGNAL, ReasonCode.INVALID_CALENDAR)
     if c1.close_time != c2.open_time or c2.close_time != c3.open_time:
         return Evaluation(DecisionState.NO_SIGNAL, ReasonCode.NON_CONSECUTIVE_PARENT)
