@@ -206,15 +206,7 @@ Analyzed `ROMEO-2025-S4 — CRT secrets ep.4: Candle anatomy`.
 
 Episode 4 establishes the **trade/parent candle as a first-class object**. The analysis order is parent candle first, then context/narrative, then lower-timeframe technical patterns. Candle anatomy is explicitly tied to opening time, closing time and the price movement that occurs in between.
 
-The strongest new scope rule is the public foundational parent-candle whitelist:
-
-```text
-H4
-D1
-W1
-```
-
-Monthly and larger multi-month/yearly candles are treated as advanced extensions rather than required scope for the first candidate.
+The strongest new scope rule is the public foundational parent-candle whitelist `{H4, D1, W1}`. When expressing top-down hierarchy, the project uses `W1 → D1 → H4`; the whitelist is a set rather than a requirement to traverse every level on every trade.
 
 ### Critical validation finding
 
@@ -255,3 +247,58 @@ The calendar/session engine is strategy-critical because incorrect bar boundarie
 ### Next source
 
 `ROMEO-2025-S5 — CRT secrets 5: Key level` is next. Parent-candle selection alone does not tell us **where** a valid interaction should occur; Episode 5 should help define the price/time location hierarchy needed to qualify meaningful Turtle Soup/KOD/entry events.
+
+---
+
+## 2026-08-12 — Pass 6: Key Level
+
+Analyzed `ROMEO-2025-S5 — CRT secrets ep.5: Key level`.
+
+### Result
+
+Episode 5 establishes key level as a **context/location concept rather than an entry signal**. Romeo separates two valid opportunity families:
+
+```text
+A. JOURNEY TO KEY LEVEL
+B. REACTION FROM KEY LEVEL
+```
+
+He also warns that convincing lower-timeframe reversal patterns and MSS-like structures can form before the actual key level is reached, making pattern-first execution unsafe.
+
+### Critical architectural finding
+
+The detector ordering must become context-first:
+
+```text
+PARENT CRT / W1→D1→H4 CONTEXT
+          ↓
+KEY LEVEL
+          ↓
+ROLE: DESTINATION OR REACTION ORIGIN
+          ↓
+LOCATION + TIME STATE
+          ↓
+LTF PATTERN / CONFIRMATION
+          ↓
+ENTRY
+          ↓
+RISK
+```
+
+A Turtle Soup, MSS, Model #1 or KOD candidate without valid location/context should not automatically become a trade candidate.
+
+### KOD tension discovered
+
+Episode 2 describes KOD as the final Turtle Soup before target delivery. Episode 5 associates KOD/Turtle-Soup behavior with a fake reversal before the actual key-level reaction. These may reflect nested CRT journeys at different timeframes, but the engine must not collapse them into one global KOD predicate until later evidence resolves the semantics.
+
+### Repository changes
+
+- Added `research/romeo/videos/ROMEO-2025-S5.md`
+- Marked `ROMEO-2025-S5` as `EVIDENCE_PASS_1`
+- Updated `GLOSSARY.md` with Key Level, Destination Key Level, Reaction-Origin Key Level, Fake MSS and Time Key Level
+- Expanded `OPEN_QUESTIONS.md` with key-level ranking, location-tolerance, consumption, true-vs-fake MSS and KOD-role questions
+- Created provisional candidates `KL-P001` through `KL-P009`
+
+### Next source
+
+`ROMEO-2025-S6 — CRT secrets ep.6: SMT` is next because Episode 5 explicitly places SMT alongside the true market-structure-shift example. The next pass must determine whether SMT is required confirmation, optional confluence, a cross-asset selector, or a failure filter.
