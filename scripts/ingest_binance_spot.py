@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from __future__ import annotations
 
 import argparse
@@ -51,21 +50,14 @@ def main() -> None:
     parser.add_argument("--end-utc-day", type=_date, required=True)
     parser.add_argument("--data-root", type=Path, default=Path("data"))
     parser.add_argument("--lock-file", type=Path, default=Path("requirements.lock"))
-    parser.add_argument(
-        "--skip-rest-crosscheck",
-        action="store_true",
-        help="For offline recovery only; datasets produced with this flag must not be promoted as trusted.",
-    )
     args = parser.parse_args()
 
     created_at = datetime.now(UTC)
     metadata = fetch_exchange_info(args.symbol, observed_at=created_at)
-    archives = tuple(fetch_daily_archive(args.symbol, day) for day in _days(args.start_utc_day, args.end_utc_day))
-
-    if args.skip_rest_crosscheck:
-        raise RuntimeError(
-            "REST cross-check is mandatory for TRUSTED Phase-3 datasets; remove --skip-rest-crosscheck"
-        )
+    archives = tuple(
+        fetch_daily_archive(args.symbol, day)
+        for day in _days(args.start_utc_day, args.end_utc_day)
+    )
 
     for archive in archives:
         bars = parse_1m_archive(archive, symbol=args.symbol)
