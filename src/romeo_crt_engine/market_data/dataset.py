@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass
-from datetime import UTC, date, datetime
+from datetime import UTC, date
 from decimal import Decimal
 from hashlib import sha256
 from pathlib import Path
@@ -57,7 +57,6 @@ class DatasetManifest:
     raw_artifacts: tuple[dict[str, Any], ...]
     quality_status: str
     correction_policy: str
-    created_at_utc: str
 
     def to_json(self) -> str:
         return json.dumps(asdict(self), sort_keys=True, separators=(",", ":")) + "\n"
@@ -116,16 +115,14 @@ def build_manifest(
     d1: tuple[CanonicalBar, ...],
     code_version: str,
     dependency_lock_sha256: str,
-    created_at: datetime,
 ) -> DatasetManifest:
     if not raw_artifacts or not h1 or not d1:
         raise ValueError("trusted dataset requires raw artifacts plus H1 and D1 bars")
-    if created_at.utcoffset() is None:
-        raise ValueError("created_at must be timezone-aware")
     if len(dependency_lock_sha256) != 64:
         raise ValueError("dependency_lock_sha256 must be a SHA-256 digest")
 
     normalized_sha = normalized_digest(h1, d1)
+    metadata_observed_at = metadata.observed_at.astimezone(UTC).isoformat()
     artifact_records = tuple(
         {
             "archive_date": artifact.archive_date.isoformat(),
@@ -144,6 +141,7 @@ def build_manifest(
         "venue": metadata.venue,
         "symbol": metadata.symbol,
         "instrument_metadata_version": metadata.metadata_version,
+        "instrument_metadata_observed_at": metadata_observed_at,
         "analytical_timezone": "America/New_York",
         "normalizer_version": NORMALIZER_VERSION,
         "code_version": code_version,
@@ -163,7 +161,7 @@ def build_manifest(
         symbol=metadata.symbol,
         asset_class=metadata.asset_class.value,
         instrument_metadata_version=metadata.metadata_version,
-        instrument_metadata_observed_at=metadata.observed_at.astimezone(UTC).isoformat(),
+        instrument_metadata_observed_at=metadata_observed_at,
         price_tick_size=_decimal_text(metadata.price_tick_size),
         quantity_step=_decimal_text(metadata.quantity_step),
         metadata_temporal_semantics=metadata.temporal_semantics,
@@ -181,7 +179,6 @@ def build_manifest(
         raw_artifacts=artifact_records,
         quality_status="TRUSTED",
         correction_policy="IMMUTABLE_NEW_VERSION_ON_SOURCE_OR_NORMALIZATION_CHANGE",
-        created_at_utc=created_at.astimezone(UTC).isoformat(),
     )
 
 
