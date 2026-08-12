@@ -1,7 +1,7 @@
 # Romeo CRT Engine — Project Bible
 
 **Repository:** `KaraboMatsemela1/romeo-crt-engine`  
-**Status:** Research foundation / strategy not yet verified  
+**Status:** Phase 2 complete / `CRT-C3-D1-H1-M1-BEAR-v0.1` frozen for validation  
 **Live trading:** **NOT AUTHORIZED**
 
 This document is the canonical source of truth for the project. If implementation, research notes, an AI agent, or a proposed strategy conflicts with this document, the conflict must be surfaced and resolved explicitly rather than silently encoded.
@@ -185,7 +185,7 @@ WAIT_FOR_CONTEXT
  -> EXIT
 ```
 
-The exact transitions remain unresolved until corpus research proves them.
+The first frozen transition subset is now defined in `strategy/CRT_V0.1_SPEC.md`; broader CRT doctrine transitions remain versioned research/strategy work.
 
 ---
 
@@ -590,9 +590,9 @@ Do not overwrite or hide failed experiments.
 
 ```text
 Phase 0  Engineering foundation     IN PROGRESS
-Phase 1  Romeo corpus acquisition   NEXT / ACTIVE RESEARCH FOCUS
-Phase 2  Formal strategy spec       NOT FROZEN
-Phase 3  Market data                NOT STARTED
+Phase 1  Romeo corpus acquisition   COMPLETE
+Phase 2  Formal strategy spec       COMPLETE — FROZEN_FOR_VALIDATION
+Phase 3  Market data                READY TO START
 Phase 4  CRT detector               NOT STARTED
 Phase 5  Backtester                 NOT STARTED
 Phase 6  Validation                 NOT STARTED
@@ -602,22 +602,30 @@ Phase 9  Shadow trading             NOT STARTED
 Phase 10 Controlled live            NOT AUTHORIZED
 ```
 
-The largest current missing asset is the verified, source-traceable Romeo CRT specification.
+The frozen first candidate is:
+
+```text
+CRT-C3-D1-H1-M1-BEAR-v0.1
+```
+
+Its active-path rules, explicit project parameters and exclusions are canonical in `strategy/CRT_V0.1_SPEC.md` and `strategy/CRT_V0.1_FREEZE_MANIFEST.json`.
+
+The largest current missing asset is now a trusted, reproducible market-data layer and real-data detector reproduction for the frozen route. Profitability has not been established.
 
 ---
 
 ## 26. Immediate next actions
 
-1. Finish the engineering foundation and ensure CI passes.
-2. Catalogue the complete relevant Romeo public corpus.
-3. Build the source registry and structured analysis artifacts.
-4. Extract glossary terms and candidate rules.
-5. Reconcile contradictions and open questions.
-6. Freeze a minimal evidence-backed `CRT-v0.1`.
-7. Build positive/negative market-data fixtures from known examples.
-8. Implement generic market primitives.
-9. Implement the CRT state machine against the frozen spec.
-10. Only after faithful reproduction begin profitability backtesting.
+1. Complete the remaining Phase-0 reproducibility items without changing frozen strategy semantics.
+2. Build Phase-3 raw/normalized market-data contracts for the frozen D1/H1 route.
+3. Implement New-York wall-clock D1/H1 construction with DST and data-quality tests.
+4. Freeze instrument/symbol/venue metadata and dataset versions.
+5. Implement Phase-4 detector primitives against `CRT-C3-D1-H1-M1-BEAR-v0.1`.
+6. Reproduce the committed machine-readable positive and negative fixtures without LLM judgement.
+7. Add source-derived market fixtures as trusted data permits.
+8. Only after data/detector integrity gates pass begin meaningful historical simulation.
+9. Preserve the frozen v0.1 parameters while running later sensitivity and OOS validation.
+10. Do not promote to paper/shadow/live without their explicit gates.
 
 ---
 

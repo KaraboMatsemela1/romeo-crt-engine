@@ -1,0 +1,76 @@
+{
+  "strategy_version": "CRT-C3-D1-H1-M1-BEAR-v0.1",
+  "status": "FROZEN_FOR_VALIDATION",
+  "doctrine_version": "CRT_SECRETS_2025",
+  "freeze_parameter_version": "P2_FREEZE_2026_08_12",
+  "frozen_at": "2026-08-12",
+  "live_trading_authorized": false,
+  "paper_trading_authorized": false,
+  "profitability_claims_authorized": false,
+  "scope": {
+    "direction": "BEARISH_ONLY",
+    "parent_timeframe": "D1",
+    "execution_timeframe": "H1",
+    "source_timezone": "America/New_York",
+    "daily_open_local": "00:00",
+    "setup_family": "CANDLE_3_REACTION_FROM_PARENT_CRTH",
+    "entry_model": "MODEL_1_CORE",
+    "countertrend": false,
+    "smt_substitution": false,
+    "kod_required": false,
+    "true_mss_enabled": false,
+    "time_exit_enabled": false
+  },
+  "parameters": {
+    "model1_min_body_fraction": 0.5,
+    "model1_parameter_id": "P2-PARAM-M1-THICK-050",
+    "stop_buffer_ticks": 1,
+    "stop_buffer_parameter_id": "P2-PARAM-STOP-1TICK",
+    "primary_target": "C1_MIDPOINT_50",
+    "target_must_be_unconsumed_before_entry": true,
+    "double_sweep_allowed": false,
+    "parent_close_reclaim_required": true,
+    "new_entry_window": "C3_OPEN_INCLUSIVE_TO_C3_CLOSE_EXCLUSIVE"
+  },
+  "rule_ids": [
+    "CRT-V01-001-CALENDAR",
+    "CRT-V01-002-ROLLING-PARENT-ENUMERATION",
+    "CRT-V01-003-BEARISH-C2-SWEEP",
+    "CRT-V01-004-C2-CLOSE-RECLAIM",
+    "CRT-V01-005-T1-PENDING",
+    "CRT-V01-006-C3-GATE",
+    "CRT-V01-007-MODEL1-CORE",
+    "CRT-V01-008-MODEL1-CONFIRMATION",
+    "CRT-V01-009-STRUCTURAL-STOP",
+    "CRT-V01-010-PRIMARY-TARGET",
+    "CRT-V01-011-C3-EXPIRY",
+    "CRT-V01-012-FAIL-CLOSED",
+    "CRT-V01-013-INDEPENDENT-RISK"
+  ],
+  "evidence": [
+    "ROMEO-2024-CRT",
+    "ROMEO-2024-TS",
+    "ROMEO-2025-S1",
+    "ROMEO-2025-S4",
+    "ROMEO-2025-S7",
+    "ROMEO-2025-S8",
+    "ROMEO-2025-S9",
+    "P0-FIX-002-BEARISH-OLD-CRTH-CLARIFICATION",
+    "P0_03_CANDLE_CALENDAR",
+    "ADR-004-freeze-narrow-d1-h1-model1-subset"
+  ],
+  "project_parameters_not_claimed_as_romeo_rules": [
+    "model1_min_body_fraction=0.50",
+    "stop_buffer_ticks=1",
+    "reject any C2 midpoint touch rather than reconstructing uncertain intrabar ordering",
+    "bearish-only first variant"
+  ],
+  "required_validation": [
+    "known-fixture reproduction",
+    "no-lookahead regression",
+    "parameter sensitivity around body fraction and buffer",
+    "transaction-cost stress",
+    "out-of-sample evaluation after data pipeline freeze",
+    "results may not be generalized to excluded setup families"
+  ]
+}

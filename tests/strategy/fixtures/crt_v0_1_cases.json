@@ -1,0 +1,88 @@
+[
+  {
+    "id": "P2-POS-001",
+    "description": "Bearish parent sweep/reclaim with H1 Model-1-core confirmation",
+    "tick_size": 0.25,
+    "expected_state": "TRADE_PLAN",
+    "expected_reason": "ELIGIBLE",
+    "c1": {"timeframe":"D1","open_time":"2025-09-15T00:00:00-04:00","close_time":"2025-09-16T00:00:00-04:00","open":100.0,"high":110.0,"low":90.0,"close":105.0},
+    "c2": {"timeframe":"D1","open_time":"2025-09-16T00:00:00-04:00","close_time":"2025-09-17T00:00:00-04:00","open":105.0,"high":112.0,"low":103.0,"close":108.0},
+    "c3": {"timeframe":"D1","open_time":"2025-09-17T00:00:00-04:00","close_time":"2025-09-18T00:00:00-04:00","open_price":108.0},
+    "h1": [
+      {"timeframe":"H1","open_time":"2025-09-17T00:00:00-04:00","close_time":"2025-09-17T01:00:00-04:00","open":108.0,"high":109.0,"low":106.0,"close":108.5},
+      {"timeframe":"H1","open_time":"2025-09-17T01:00:00-04:00","close_time":"2025-09-17T02:00:00-04:00","open":108.5,"high":113.0,"low":107.0,"close":112.0},
+      {"timeframe":"H1","open_time":"2025-09-17T02:00:00-04:00","close_time":"2025-09-17T03:00:00-04:00","open":112.0,"high":112.5,"low":105.0,"close":106.0}
+    ]
+  },
+  {
+    "id": "P2-NEG-001",
+    "description": "C2 never sweeps Candle-1 high",
+    "tick_size": 0.25,
+    "expected_state": "NO_SIGNAL",
+    "expected_reason": "NO_BEARISH_PARENT_SWEEP",
+    "c1": {"timeframe":"D1","open_time":"2025-09-15T00:00:00-04:00","close_time":"2025-09-16T00:00:00-04:00","open":100.0,"high":110.0,"low":90.0,"close":105.0},
+    "c2": {"timeframe":"D1","open_time":"2025-09-16T00:00:00-04:00","close_time":"2025-09-17T00:00:00-04:00","open":105.0,"high":109.5,"low":103.0,"close":108.0},
+    "c3": {"timeframe":"D1","open_time":"2025-09-17T00:00:00-04:00","close_time":"2025-09-18T00:00:00-04:00","open_price":108.0},
+    "h1": []
+  },
+  {
+    "id": "P2-NEG-002",
+    "description": "C2 sweeps both sides of Candle-1 and is rejected as ambiguous",
+    "tick_size": 0.25,
+    "expected_state": "NO_SIGNAL",
+    "expected_reason": "DOUBLE_OR_OPPOSITE_SWEEP",
+    "c1": {"timeframe":"D1","open_time":"2025-09-15T00:00:00-04:00","close_time":"2025-09-16T00:00:00-04:00","open":100.0,"high":110.0,"low":90.0,"close":105.0},
+    "c2": {"timeframe":"D1","open_time":"2025-09-16T00:00:00-04:00","close_time":"2025-09-17T00:00:00-04:00","open":105.0,"high":112.0,"low":89.0,"close":108.0},
+    "c3": {"timeframe":"D1","open_time":"2025-09-17T00:00:00-04:00","close_time":"2025-09-18T00:00:00-04:00","open_price":108.0},
+    "h1": []
+  },
+  {
+    "id": "P2-NEG-003",
+    "description": "C2 sweeps high but closes above the Candle-1 range",
+    "tick_size": 0.25,
+    "expected_state": "NO_SIGNAL",
+    "expected_reason": "PARENT_CLOSE_NOT_RECLAIMED",
+    "c1": {"timeframe":"D1","open_time":"2025-09-15T00:00:00-04:00","close_time":"2025-09-16T00:00:00-04:00","open":100.0,"high":110.0,"low":90.0,"close":105.0},
+    "c2": {"timeframe":"D1","open_time":"2025-09-16T00:00:00-04:00","close_time":"2025-09-17T00:00:00-04:00","open":105.0,"high":114.0,"low":103.0,"close":111.0},
+    "c3": {"timeframe":"D1","open_time":"2025-09-17T00:00:00-04:00","close_time":"2025-09-18T00:00:00-04:00","open_price":111.0},
+    "h1": []
+  },
+  {
+    "id": "P2-NEG-004",
+    "description": "C2 consumes the midpoint target before Candle 3",
+    "tick_size": 0.25,
+    "expected_state": "NO_SIGNAL",
+    "expected_reason": "TARGET1_CONSUMED_IN_C2",
+    "c1": {"timeframe":"D1","open_time":"2025-09-15T00:00:00-04:00","close_time":"2025-09-16T00:00:00-04:00","open":100.0,"high":110.0,"low":90.0,"close":105.0},
+    "c2": {"timeframe":"D1","open_time":"2025-09-16T00:00:00-04:00","close_time":"2025-09-17T00:00:00-04:00","open":105.0,"high":112.0,"low":99.0,"close":108.0},
+    "c3": {"timeframe":"D1","open_time":"2025-09-17T00:00:00-04:00","close_time":"2025-09-18T00:00:00-04:00","open_price":108.0},
+    "h1": []
+  },
+  {
+    "id": "P2-NEG-005",
+    "description": "Midpoint is reached during Candle 3 before an entry confirms",
+    "tick_size": 0.25,
+    "expected_state": "NO_SIGNAL",
+    "expected_reason": "TARGET1_CONSUMED_PRE_ENTRY",
+    "c1": {"timeframe":"D1","open_time":"2025-09-15T00:00:00-04:00","close_time":"2025-09-16T00:00:00-04:00","open":100.0,"high":110.0,"low":90.0,"close":105.0},
+    "c2": {"timeframe":"D1","open_time":"2025-09-16T00:00:00-04:00","close_time":"2025-09-17T00:00:00-04:00","open":105.0,"high":112.0,"low":103.0,"close":108.0},
+    "c3": {"timeframe":"D1","open_time":"2025-09-17T00:00:00-04:00","close_time":"2025-09-18T00:00:00-04:00","open_price":108.0},
+    "h1": [
+      {"timeframe":"H1","open_time":"2025-09-17T00:00:00-04:00","close_time":"2025-09-17T01:00:00-04:00","open":108.0,"high":109.0,"low":99.5,"close":101.0}
+    ]
+  },
+  {
+    "id": "P2-NEG-006",
+    "description": "A thin up-close sweep candle does not pass the frozen Model-1-core body threshold",
+    "tick_size": 0.25,
+    "expected_state": "NO_SIGNAL",
+    "expected_reason": "NO_MODEL1_CONFIRMATION",
+    "c1": {"timeframe":"D1","open_time":"2025-09-15T00:00:00-04:00","close_time":"2025-09-16T00:00:00-04:00","open":100.0,"high":110.0,"low":90.0,"close":105.0},
+    "c2": {"timeframe":"D1","open_time":"2025-09-16T00:00:00-04:00","close_time":"2025-09-17T00:00:00-04:00","open":105.0,"high":112.0,"low":103.0,"close":108.0},
+    "c3": {"timeframe":"D1","open_time":"2025-09-17T00:00:00-04:00","close_time":"2025-09-18T00:00:00-04:00","open_price":108.0},
+    "h1": [
+      {"timeframe":"H1","open_time":"2025-09-17T01:00:00-04:00","close_time":"2025-09-17T02:00:00-04:00","open":111.0,"high":113.0,"low":107.0,"close":111.5},
+      {"timeframe":"H1","open_time":"2025-09-17T02:00:00-04:00","close_time":"2025-09-17T03:00:00-04:00","open":111.5,"high":112.0,"low":105.0,"close":106.0}
+    ]
+  }
+]
