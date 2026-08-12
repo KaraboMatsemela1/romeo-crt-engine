@@ -182,10 +182,10 @@ def fetch_daily_archive(symbol: str, day: date, *, timeout_seconds: float = 30.0
     filename = daily_kline_filename(symbol, day)
     source_url = daily_kline_url(symbol, day)
     checksum_url = daily_checksum_url(symbol, day)
-    with urlopen(checksum_url, timeout=timeout_seconds) as checksum_response:  # noqa: S310
+    with urlopen(checksum_url, timeout=timeout_seconds) as checksum_response:
         checksum_text = checksum_response.read().decode("utf-8")
     expected = parse_checksum(checksum_text, filename)
-    with urlopen(source_url, timeout=timeout_seconds) as archive_response:  # noqa: S310
+    with urlopen(source_url, timeout=timeout_seconds) as archive_response:
         content = archive_response.read()
     verify_sha256(content, expected)
     return RawArchive(day, filename, source_url, checksum_url, expected, content)
@@ -250,7 +250,7 @@ def fetch_exchange_info(
     timeout_seconds: float = 30.0,
 ) -> InstrumentMetadata:
     url = f"{MARKET_DATA_API_BASE_URL}/api/v3/exchangeInfo?symbol={symbol.upper()}"
-    with urlopen(url, timeout=timeout_seconds) as response:  # noqa: S310
+    with urlopen(url, timeout=timeout_seconds) as response:
         payload = response.read()
     return parse_exchange_info(payload, symbol=symbol, observed_at=observed_at)
 
@@ -265,7 +265,7 @@ def _fetch_api_1m_row(symbol: str, open_time: datetime, timeout_seconds: float) 
         }
     )
     url = f"{MARKET_DATA_API_BASE_URL}/api/v3/klines?{query}"
-    with urlopen(url, timeout=timeout_seconds) as response:  # noqa: S310
+    with urlopen(url, timeout=timeout_seconds) as response:
         payload = cast(list[list[Any]], json.loads(response.read()))
     if len(payload) != 1 or len(payload[0]) < 9:
         raise DataQualityError(DataQualityCode.PROVIDER_SCHEMA, "unexpected REST kline response")
