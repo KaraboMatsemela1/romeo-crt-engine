@@ -8,8 +8,11 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
-from romeo_crt_engine.market_data.models import CanonicalBar, InstrumentMetadata
-from romeo_crt_engine.market_data.providers.binance_public import RestCrosscheckEvidence
+from romeo_crt_engine.market_data.models import (
+    CanonicalBar,
+    InstrumentMetadata,
+    ProviderVerificationEvidence,
+)
 
 MANIFEST_SCHEMA_VERSION = "PHASE3_DATASET_MANIFEST_V1"
 NORMALIZER_VERSION = "NY_D1_H1_FROM_UTC_M1_V1"
@@ -112,7 +115,7 @@ def build_manifest(
     *,
     metadata: InstrumentMetadata,
     raw_artifacts: tuple[RawArtifact, ...],
-    provider_crosschecks: tuple[RestCrosscheckEvidence, ...],
+    provider_crosschecks: tuple[ProviderVerificationEvidence, ...],
     m1_rows: int,
     h1: tuple[CanonicalBar, ...],
     d1: tuple[CanonicalBar, ...],
@@ -148,7 +151,7 @@ def build_manifest(
             "venue": evidence.venue,
             "symbol": evidence.symbol,
             "source_sha256": evidence.source_sha256,
-            "sample_open_times_utc": evidence.sample_open_times_utc,
+            "sample_refs": evidence.sample_refs,
             "endpoint_base": evidence.endpoint_base,
             "verification_method": evidence.verification_method,
             "evidence_digest": evidence.evidence_digest,
