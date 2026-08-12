@@ -151,14 +151,26 @@ def _is_local_midnight(timestamp: datetime) -> bool:
     return local.hour == 0 and local.minute == 0 and local.second == 0 and local.microsecond == 0
 
 
+def _is_next_local_day(open_time: datetime, close_time: datetime) -> bool:
+    local_open = open_time.astimezone(_NY)
+    local_close = close_time.astimezone(_NY)
+    return local_close.date() == local_open.date() + timedelta(days=1)
+
+
 def is_canonical_daily(candle: ClosedCandle) -> bool:
     if candle.timeframe is not Timeframe.D1:
         return False
     if not _is_local_midnight(candle.open_time) or not _is_local_midnight(candle.close_time):
         return False
-    local_open = candle.open_time.astimezone(_NY)
-    local_close = candle.close_time.astimezone(_NY)
-    return local_close.date() == local_open.date() + timedelta(days=1)
+    return _is_next_local_day(candle.open_time, candle.close_time)
+
+
+def is_canonical_daily_window(window: CandleWindow) -> bool:
+    if window.timeframe is not Timeframe.D1:
+        return False
+    if not _is_local_midnight(window.open_time) or not _is_local_midnight(window.close_time):
+        return False
+    return _is_next_local_day(window.open_time, window.close_time)
 
 
 def is_canonical_h1(candle: ClosedCandle) -> bool:
@@ -198,11 +210,7 @@ def qualify_bearish_parent(
     """Qualify the frozen bearish D1 Candle-1/Candle-2 state at Candle-3 open."""
     if not is_canonical_daily(c1) or not is_canonical_daily(c2):
         return Evaluation(DecisionState.NO_SIGNAL, ReasonCode.INVALID_CALENDAR)
-    if (
-        c3.timeframe is not Timeframe.D1
-        or not _is_local_midnight(c3.open_time)
-        or not _is_local_midnight(c3.close_time)
-    ):
+    if not is_canonical_daily_window(c3):
         return Evaluation(DecisionState.NO_SIGNAL, ReasonCode.INVALID_CALENDAR)
     if c1.close_time != c2.open_time or c2.close_time != c3.open_time:
         return Evaluation(DecisionState.NO_SIGNAL, ReasonCode.NON_CONSECUTIVE_PARENT)
