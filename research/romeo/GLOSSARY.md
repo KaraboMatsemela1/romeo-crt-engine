@@ -13,6 +13,10 @@ No glossary term is assumed verified until source evidence is added. `PROVISIONA
 | False breakout / breakdown | A move beyond a prior reference high/low that does not sustain continuation and instead reverses. | PROVISIONAL | ROMEO-2024-TS 06:29–15:54 |
 | Confirmation | The observable event that establishes failure of continuation and makes a setup actionable. Exact Romeo semantics remain unresolved. | UNRESOLVED | ROMEO-2024-TS identifies the need conceptually; later sources required |
 | Model #1 | Romeo's later candle-specific setup/entry model. Deterministic definition not yet frozen. | PROVISIONAL | ROMEO-2025-S1 |
-| Kiss of Death (KOD) | Later CRT/Turtle Soup refinement or entry concept; definition pending source analysis. | UNRESOLVED | ROMEO-2025-S2 pending |
+| Kiss of Death (KOD) | A specialized Turtle Soup occurring late in an active CRT journey; Romeo defines it as the final Turtle Soup before the target is hit. This definition is not directly implementable without ex-ante qualifying conditions because using `final` retrospectively would introduce look-ahead bias. | PROVISIONAL | ROMEO-2025-S2 01:49, 06:12 |
+| Candle 1 / 2 / 3 | Provisional CRT sequence mapped to accumulation / manipulation / distribution. Exact selection and transition rules remain unresolved. | PROVISIONAL | ROMEO-2025-S2 03:39 |
+| CRT 50% | Midpoint of the parent CRT range; used as Target 1 / reaction area in the demonstrated bearish KOD journey. Mandatory/optional status remains unresolved. | PROVISIONAL | ROMEO-2025-S2 06:42, 10:49–11:11 |
+| Opposite CRT extreme | The opposite boundary of the selected parent CRT range; demonstrated as Target 2 in the bearish KOD example. | PROVISIONAL | ROMEO-2025-S2 06:42, 14:27–14:41 |
+| FVG confluence | Fair Value Gap aligned around an old extreme; presented as useful KOD confluence, not yet established as mandatory. | PROVISIONAL | ROMEO-2025-S2 17:39–17:57 |
 | Key level | Context/reference level used to select meaningful price interactions; exact hierarchy and calculation pending. | UNRESOLVED | ROMEO-2025-S5 pending |
 | SMT | Cross-market/correlated-market divergence concept used as later CRT context/confirmation; exact required/optional role pending. | UNRESOLVED | ROMEO-2025-S6 pending |
