@@ -24,6 +24,21 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - How does a higher-timeframe CRT map deterministically to lower-timeframe Turtle Soup behaviour?
 - How are inside bars, overlapping ranges and nested CRTs handled?
 - What exactly is the role of the 50% level: target, reaction zone, invalidation/failure filter, or multiple roles?
+- What makes a parent CRT `active` or `pending` before the target is reached?
+- What determines bullish versus bearish CRT direction in real time?
+
+## Kiss of Death
+
+- What observable ex-ante conditions distinguish a KOD candidate from earlier Turtle Soups before the target is hit?
+- How do we avoid defining KOD retrospectively as `the final Turtle Soup before target`, which would create look-ahead bias?
+- Must KOD occur after price has already interacted with the CRT 50% level?
+- Is the demonstrated sequence `first Turtle Soup → 50% → bounce → KOD → opposite extreme` mandatory or merely one example?
+- What exactly did Romeo mean by preferring KOD in the `lower 25%` of the range, and how does that map directionally for bearish/bullish setups?
+- Is KOD allowed at OTE instead of the 25% location, and what is the exact OTE definition used here?
+- Is FVG aligned with an old high/low mandatory, preferred, or optional confluence?
+- Is lower-timeframe Model #1 mandatory for KOD execution or only one supported entry model?
+- What invalidates a KOD candidate before lower-timeframe entry confirmation?
+- What is the exact bullish mirror of the bearish KOD sequence?
 
 ## Context / liquidity
 
@@ -40,7 +55,6 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - What exactly constitutes Romeo's `true market structure shift`?
 - What is the deterministic definition of Model #1?
 - What makes a candle `thick` or otherwise eligible for Model #1?
-- What is Kiss of Death and how does it relate to Turtle Soup / Model #1?
 - Are FVGs required or probability enhancers only?
 
 ## Invalidation / exit
