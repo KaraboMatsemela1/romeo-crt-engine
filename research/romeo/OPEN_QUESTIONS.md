@@ -63,6 +63,7 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - Does every CRT variant share one journey state machine, or do multiple setup-specific state machines exist?
 - How does the selected parent candle's open price influence phase progression?
 - What intrabar evidence lets the engine infer Candle 2 manipulation before the parent candle has closed?
+- Episode 6 suggests AMD order may not be rigid; what exact alternative sequences are valid and how are they identified causally?
 
 ## Key levels
 
@@ -80,6 +81,31 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - Does the true MSS require a specific time window as well as the price level?
 - Is SMT mandatory for identifying the real key-level reaction or only additional confluence?
 - Does key-level type determine which entry models are legal?
+
+## SMT / cross-market context
+
+- What does `SMT` expand to in Romeo's own terminology?
+- What exact pair/group registry does Romeo use for ES/NQ/Dow, Gold/Silver, BTC/ETH and FX/DXY?
+- For each pair/group, is the expected relationship correlated, inverse, or context-dependent?
+- Which market is `the one that takes` and which is `the one that doesn't`, and what directional inference follows?
+- Does the non-take represent weakness, strength, or only divergence until confirmation?
+- What corresponding high/low definition is used across the pair?
+- What synchronization window is valid between the two markets' reference events?
+- Is a wick through sufficient, or must a close beyond the corresponding level occur?
+- What happens when both instruments take the level?
+- What happens when neither instrument takes the level?
+- Is SMT required only at key levels, or can it qualify the journey toward a key level?
+- Is SMT mandatory for any CRT setup family, or always optional context/confluence?
+- Can SMT fully substitute for a local Turtle Soup? Under exactly what conditions?
+- Is SMT an entry confirmation, manipulation detector, target selector, failure filter, or multiple roles depending on state?
+- Does true MSS need to form on the primary instrument, the comparison instrument, or either?
+- Which instrument's Model #1 is used for actual execution?
+- How is the instrument to trade selected after SMT appears?
+- How do different market sessions and holidays affect pair validity?
+- How stale may one market's data be before SMT becomes `UNKNOWN`?
+- How does Episode 8 use SMT as a CRT failure condition?
+- What does Episode 9 refine about `correct SMT usage`?
+- Does SMT alter the Candle 2 → Candle 3 transition?
 
 ## Context / liquidity
 
@@ -130,6 +156,11 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - How are provider bar-boundary discrepancies detected and prevented from changing CRT labels silently?
 - How do we prevent a key level from being labeled `important` only because a future reversal later occurred there?
 - How do we define destination/reaction roles ex ante rather than from the completed path?
+- How do we prevent pair-selection hindsight by fixing SMT relationships before the signal timestamp?
+- How do we ensure both instruments are compared using data available at the same causal timestamp?
+- How do we prevent stale/missing comparison data from becoming a false SMT non-take?
+- How are differing session calendars normalized without fabricating cross-market observations?
+- How are corresponding highs/lows chosen without selecting the pair of extremes that looks best after the outcome?
 
 ## Corpus/versioning
 
