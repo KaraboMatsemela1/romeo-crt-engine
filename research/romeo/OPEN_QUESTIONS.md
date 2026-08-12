@@ -1,298 +1,229 @@
-# Open Strategy Questions — Phase 2 Evidence-Debt Ledger
+# Open Strategy Questions — Post-Phase-2 Evidence-Debt Ledger
 
 **Updated:** 2026-08-12  
-**Phase 1 status:** COMPLETE  
-**Strategy:** `CRT-C3-ALIGNED-v0.1-DRAFT` — NOT FROZEN / NON-EXECUTABLE
+**Phase 1:** COMPLETE  
+**Phase 2:** COMPLETE  
+**Frozen strategy:** `CRT-C3-D1-H1-M1-BEAR-v0.1`  
+**Lifecycle:** `FROZEN_FOR_VALIDATION`
 
 ## Purpose
 
-Phase 1 is closed. This file now tracks only questions that can materially change the first executable strategy or future separately-versioned expansions.
+The first executable strategy candidate no longer contains an unresolved active-path term. This ledger therefore tracks **future strategy expansion and validation debts**, not blockers that may silently default inside v0.1.
 
-Questions are classified as:
+Anything still unresolved here is either:
 
-- `P0-ACTIVE` — must be resolved before the first candidate can be frozen;
-- `P1-ACTIVE` — required after the P0 context path is deterministic;
-- `DEFERRED` — explicitly outside first v0.1;
-- `VERSIONED` — belongs to a later doctrine/strategy version.
+- `DEFERRED` — intentionally outside v0.1;
+- `VERSIONED` — belongs to a later strategy/doctrine version; or
+- `VALIDATION` — a frozen parameter/assumption that must be stress-tested without rewriting v0.1 in place.
 
-A missing answer never becomes a trading default. Required unknown state => `NO_SIGNAL`.
-
----
-
-# P0-ACTIVE — blocks first deterministic candidate
-
-## ED-P0-01 — Parent CRT / Candle-1 selector
-
-Resolved contract:
-
-- parent/trade candle is selected before LTF pattern detection;
-- selected closed range is immutable for that parent instance;
-- hindsight selection is prohibited;
-- ambiguity fails closed.
-
-Still required:
-
-1. What exact observable predicate makes one completed candle the parent/Candle 1?
-2. Are C1/C2/C3 necessarily consecutive chronological candles?
-3. How are inside, nested and overlapping candidate ranges owned?
-4. When does a parent expire or become superseded?
-5. How are simultaneous W1/D1/H4 parent candidates resolved for the selected first route?
-
-**Freeze criterion:** deterministic selector + lifecycle + positive/negative fixtures.
-
----
-
-## ED-P0-02 — KeyLevelSelector
-
-Resolved contract:
-
-- key level is context, not entry;
-- roles are `DESTINATION` and `REACTION_ORIGIN`;
-- first v0.1 uses `REACTION_FROM_KEY_LEVEL` only;
-- pre-level LTF reversals cannot be retrofitted into valid reactions.
-
-Still required:
-
-1. Which exact structures are eligible price/time key levels for first v0.1?
-2. How are competing levels ranked without hindsight?
-3. What exact event means `LEVEL_REACHED` — touch, wick, trade-through, close or another rule?
-4. What marks a level `CONSUMED`, `INVALIDATED` or `SUPERSEDED`?
-5. Is a time qualifier mandatory for the selected level family?
-
-**Freeze criterion:** versioned registry + ranking + lifecycle + counterexample fixtures.
-
----
-
-## ED-P0-03 — Candle calendar for selected route
-
-Resolved/high-confidence:
-
-- source calendar uses New York semantics for D1/W1 examples;
-- D1 candidate boundary: `00:00 America/New_York`;
-- W1 candidate reference open: Sunday `17:00 America/New_York`;
-- DST must preserve named wall-clock semantics;
-- asset-class H4 shorthand is strongly interpreted as:
-  - Forex: `01/05/09/13/17/21`
-  - index futures: `02/06/10/14/18/22`
-  - crypto: `00/04/08/12/16/20`.
-
-Still required for the first active route:
-
-1. Are those H4 values candle opens or only high-probability CRT formation times?
-2. What timezone applies to the shorthand?
-3. What venue/session/maintenance policy applies?
-4. How are holidays and missing observations handled?
-5. Can provider-native bars be proven identical to canonical construction?
-
-**Scope option:** if an H4 route cannot be resolved, exclude H4 rather than using provider defaults.
-
----
-
-## ED-P0-04 — Turtle Soup confirmation / lifecycle
-
-Resolved contract:
+The governing rule remains:
 
 ```text
-PRE-EXISTING REFERENCE
-    ↓
-STRICT EXCURSION
-    ↓
-TURTLE_SOUP_CANDIDATE
-    ↓
-FAILURE / REVERSAL CONFIRMATION
-    ↓
-TURTLE_SOUP_CONFIRMED
+required state missing/unknown/ambiguous -> NO_SIGNAL
 ```
 
-A sweep alone cannot create an entry.
+---
 
-First-party narrowing supports an `OLD_CRTH` bearish reaction-reference subtype.
+# Closed for `CRT-C3-D1-H1-M1-BEAR-v0.1`
 
-Still required:
+| Former debt | v0.1 disposition | Closure mechanism |
+|---|---|---|
+| Parent CRT / Candle-1 selector | CLOSED FOR V0.1 | enumerate every consecutive canonical D1 C1/C2 pair; no hindsight ranking |
+| Parent lifecycle | CLOSED FOR V0.1 | one C1/C2/C3 three-candle instance; new-entry eligibility expires at C3 close |
+| Key-level selector | CLOSED FOR V0.1 | reaction level fixed to selected C1 `CRTH` |
+| Calendar | CLOSED FOR SELECTED ROUTE | D1 = NY midnight to next NY midnight; H1 execution; H4/W1 parent routes excluded |
+| Broad Turtle Soup confirmation | CLOSED AS NARROW SUBTYPE | strict C1-high sweep + no C1-low sweep + C2 close reclaim |
+| Broad HTF direction resolver | REMOVED FROM ACTIVE PATH | completed bearish D1 parent CRT is v0.1 execution context; multi-HTF bias resolver deferred |
+| First entry family | CLOSED | Model #1 core selected; true MSS excluded |
+| `thick` Model #1 adjective | EXPLICIT PARAMETER | `body/full_range >= 0.50`, parameter `P2-PARAM-M1-THICK-050` |
+| Target hierarchy | CLOSED FOR V0.1 | one primary target = C1 midpoint / 50% |
+| Structural stop | CLOSED | Model-1-core high |
+| Stop execution buffer | EXPLICIT PARAMETER | one instrument tick, parameter `P2-PARAM-STOP-1TICK` |
+| Candle-3 confirmation | CLOSED | later completed H1 close below the frozen confirmation reference |
+| Candle-3 expiry | CLOSED | no new entry after C3 close |
+| Target consumption | CLOSED CONSERVATIVELY | any C2 midpoint touch rejects; C3 midpoint touch before entry rejects |
+| Unknown-state behavior | CLOSED | `NO_SIGNAL` |
+| Risk boundary | CLOSED ARCHITECTURALLY | immutable `TradePlan -> independent Risk Engine` |
 
-1. Exact eligible reference taxonomy for first v0.1.
-2. Meaning of `old` / reference freshness.
-3. Exact failure/reversal confirmation event.
-4. Same-candle vs later-candle confirmation rules.
-5. Expiry/timeout after excursion.
-6. True-breakout invalidation.
-7. Reference consumption / reuse.
-8. Bullish mirror only if directly evidenced or explicitly specified as a project symmetry assumption in a separate experiment.
+These decisions are specified in:
 
-**Freeze criterion:** causal bullish/bearish or intentionally one-sided predicate + lifecycle + fixtures.
+- `strategy/CRT_V0.1_SPEC.md`
+- `strategy/CRT_V0.1_FREEZE_MANIFEST.json`
+- `docs/adr/ADR-004-freeze-narrow-d1-h1-model1-subset.md`
+- `strategy/reviews/CRT_V0.1_FREEZE_REVIEW.md`
 
 ---
 
-## ED-P0-05 — Context-direction resolver
+# VALIDATION — frozen assumptions that must be attacked, not silently tuned
 
-Resolved contract:
+## V-01 — Model #1 body threshold
 
-- direction precedes SMT/entry interpretation;
-- `context_direction` and `candidate_direction` are separate;
-- countertrend disabled in first v0.1;
-- direction is stateful and can transition when qualifying opposite evidence appears;
-- future active-candle close is prohibited;
-- unresolved timeframe conflict => `UNKNOWN`.
-
-Still required:
-
-1. Exact bullish/bearish/neutral predicate.
-2. Which timeframe owns direction for the selected first parent route?
-3. What exact close/wick/reference relationship establishes or changes direction?
-4. What makes an opposite CRT sufficiently `convincing` to flip bias?
-5. What is the conflict-resolution rule when multiple HTFs disagree?
-
-**Freeze criterion:** deterministic `BULLISH | BEARISH | NEUTRAL | UNKNOWN` resolver + transition fixtures.
-
----
-
-# P1-ACTIVE — entry / management freeze debts
-
-## ED-P1-01 — Choose first entry family
-
-Phase 2 must choose **one** based on evidence completeness and determinism, not backtest returns:
+Frozen v0.1:
 
 ```text
-MODEL_1
-OR
-TRUE_MSS
+body / full_range >= 0.50
 ```
 
-### Model #1 questions
+This is a project formalization of Romeo's qualitative `thick` adjective, not a claimed Romeo numerical rule.
 
-- exact bullish/bearish candle geometry;
-- exact meaning of `thick`;
-- relation to old high/low / Turtle Soup;
-- close requirement;
-- retrace/entry zone;
-- FVG mandatory vs optional.
+Later validation must:
 
-### True MSS questions
+- report sensitivity around the threshold;
+- avoid choosing the final threshold against final OOS results;
+- preserve v0.1 results even if a later candidate changes it.
 
-- exact structural swing construction;
-- exact reference high/low;
-- wick vs close break;
-- exact entry region after shift;
-- whether SMT/Turtle Soup/FVG are required for this setup family.
+A material change creates a new candidate/version.
 
-Generic BOS/MSS may not substitute for Romeo true MSS.
+## V-02 — Stop buffer
 
----
-
-## ED-P1-02 — Target hierarchy
-
-Need a deterministic immutable `TargetPlan` created before risk approval.
-
-Questions:
-
-1. When is 50% T1 versus context/reaction level?
-2. What setup-specific conditions allow T2 at opposite CRT extreme?
-3. When are prior-day high/low or other liquidity objectives selected instead?
-4. What state change is required after T1 before continuation to T2?
-
-No target may be chosen after observing which level was historically reached.
-
----
-
-## ED-P1-03 — Structural stop + execution buffer
-
-Source evidence supports a structural invalidation reference in the demonstrated framework.
-
-Need:
-
-- exact strategy stop reference by selected setup;
-- bullish/bearish handling;
-- separate tick/spread/slippage execution buffer;
-- buffer policy frozen before validation rather than optimized against the final test.
-
----
-
-## ED-P1-04 — Candle-3 confirmation and expiry
-
-Known:
+Frozen v0.1:
 
 ```text
-C2_COMPLETE -> C3_OPEN -> C3_ELIGIBLE
+stop = Model-1-core high + 1 instrument tick
 ```
 
-Need:
+The structural reference is source-derived; one tick is a project execution parameter.
 
-- exact event producing `C3_ENTRY_CONFIRMED`;
-- relation to selected key level and Turtle Soup;
-- expiry if no confirmation occurs;
-- `C3_NO_SIGNAL` versus `C3_FAILED` semantics;
-- pre-entry and post-entry invalidation events.
+Later validation must separate:
+
+- source-defined structural invalidation;
+- instrument tick size;
+- spread/slippage;
+- any additional execution tolerance.
+
+## V-03 — Conservative midpoint-consumption rule
+
+v0.1 rejects any C2 that touches the C1 midpoint because D1 OHLC cannot reveal intrabar ordering by itself.
+
+Phase 3/4 may reconstruct finer chronology from trusted H1/lower data, but changing the qualification rule requires a later strategy version rather than silently altering v0.1.
+
+## V-04 — Bearish-only representativeness
+
+v0.1 is deliberately bearish-only. Validation results cannot be generalized to bullish CRT setups.
 
 ---
 
-# DEFERRED — not blockers for first v0.1
+# DEFERRED — future strategy variants
+
+## Bullish mirror
+
+Open questions include:
+
+- direct source verification of `old CRTL` as the bullish mirror of old CRTH;
+- bullish Model #1 geometry;
+- bullish stop/target symmetry;
+- whether the same project parameterization is appropriate.
+
+Do not add the mirror to v0.1 merely by code symmetry.
+
+## H4 parent route
+
+Still unresolved for future versions:
+
+- exact Romeo H4 clock anchors;
+- asset/venue-specific timing semantics;
+- provider-native equivalence;
+- maintenance/holiday handling.
+
+v0.1 avoids this debt by using D1 only.
+
+## W1 parent route
+
+The Sunday 17:00 New-York reference is evidence-backed, but W1 execution mapping and venue handling still require a separately versioned implementation/fixture pass.
+
+## Broad market/context direction
+
+Future full-doctrine work must still determine:
+
+- exact bullish/bearish/neutral predicate outside the narrow completed D1 parent state;
+- timeframe ownership;
+- W1/D1/H4 conflict resolution;
+- bias-transition semantics;
+- exact relation between market direction and parent CRT direction.
+
+No moving-average, voting or hindsight resolver may be introduced as a shortcut.
+
+## General key-level registry
+
+v0.1 fixes the key level to C1 CRTH. Future setup families must still define:
+
+- eligible price/time key-level types;
+- ranking;
+- reached/consumed/invalid lifecycle;
+- tolerance;
+- destination vs reaction-origin state transitions.
+
+## Full Turtle Soup family
+
+v0.1 implements one conservative bearish close-reclaim subtype. Future work may resolve:
+
+- old-high/old-low taxonomy beyond C1 CRTH;
+- freshness and reuse;
+- same-candle vs later-candle failure confirmation;
+- timeout;
+- true-breakout invalidation;
+- other source-demonstrated variants.
+
+## True MSS
+
+Deferred until a deterministic Romeo-specific structural definition exists for:
+
+- swing construction;
+- reference high/low;
+- wick versus close break;
+- entry region;
+- relationship to Turtle Soup/SMT/FVG.
+
+Generic BOS/MSS remains prohibited as a substitute.
 
 ## SMT
 
-First v0.1:
+v0.1:
 
 ```text
 allow_smt_substitution = False
 SMTEvent -> OrderIntent = prohibited
 ```
 
-Later version must resolve:
-
-- pair/group registry and polarity;
-- corresponding-extreme construction;
-- synchronization window;
-- stale-data rules;
-- traded-instrument selection;
-- exact substitution relationship with local Turtle Soup.
-
-First-party public pair examples recorded during research include major FX/DXY, NQ/ES, BTC/ETH and Gold/Silver relationships; exact semantics remain versioned research work.
+Future version must resolve pair registry/polarity, corresponding extremes, synchronization, stale-data behavior and traded-instrument selection.
 
 ## Kiss of Death
 
 Deferred until an ex-ante classifier exists.
 
-Never use retrospective:
+Never define a historical signal as:
 
 ```text
 last_turtle_soup_before_target
 ```
 
-as a historical signal feature.
+using future target knowledge.
 
-## Time exits
+## FVG / OTE
 
-Disabled until deterministic source semantics exist.
-
-## Journey-to-key-level trading
-
-Excluded from first v0.1; reaction-from-level only initially.
-
-## Countertrend CRT
-
-Excluded from first v0.1; must become separate strategy variant if researched later.
+Neither is an active requirement in v0.1. A later confluence/entry variant requires its own evidence, parameters and validation.
 
 ## Candle-2 trading
 
-Deferred until base Candle-3 strategy is frozen and validated.
+Deferred until the simpler Candle-3 candidate has completed validation.
 
-## Adaptive / regime rules
+## Time exits
 
-Deferred:
+No source-backed deterministic time exit is active in v0.1. Do not invent one to make historical positions convenient to close.
 
-- `near 50%` thresholds;
-- strong-trend shallow retracement;
-- optional confluence scoring;
-- broad market-regime model.
+## Journey-to-key-level trading
 
-No numerical threshold may be selected because it produces a prettier backtest.
+v0.1 is reaction-from-CRTH only. Journey-to-level entries/targets require a later separately measured variant.
+
+## Countertrend CRT
+
+Excluded. Any countertrend candidate must be separately specified and validated.
 
 ---
 
-# VERSIONED — doctrine evolution
+# VERSIONED doctrine evolution
 
-## 2024 vs 2025 vs 2026
-
-The engine must preserve doctrine versions instead of silently merging them:
+Preserve doctrine snapshots:
 
 ```text
 CRT_FOUNDATION_2024
@@ -300,40 +231,36 @@ CRT_SECRETS_2025
 CRTOLOGY_2026
 ```
 
-The first candidate uses:
+The frozen candidate uses:
 
 ```text
 CRT_SECRETS_2025
 ```
 
-Any 2026 rule that changes a 2025 interpretation requires an explicit doctrine-diff / strategy-version decision.
+Later Romeo material may motivate a new candidate, but it may not silently rewrite historical v0.1 semantics.
 
 ---
 
-# Information-set safety — mandatory, not open
+# Information-set safety — resolved engineering invariants
 
-The following are already resolved engineering invariants:
+These remain mandatory across every future version:
 
-- no final HTF OHLC before close;
-- no future swing points;
-- no retrospective parent/key-level selection;
+- no final higher-timeframe OHLC before close;
+- no future swing/reference points;
+- no hindsight parent/key-level selection;
 - no retrospective KOD;
-- no target selected after outcome;
-- no Candle-3 final state at Candle-3 open;
+- no target chosen after outcome;
+- no final Candle-3 state at Candle-3 open;
+- no post-expiry confirmation backdated into an earlier entry;
 - synchronized causal timestamps for cross-market data;
-- stale/missing required data => `UNKNOWN`;
-- provider candle-boundary mismatch is an error, not silent acceptance;
-- every strategy decision must retain `information_available_at` and rule/evidence provenance.
+- stale/missing required data => `UNKNOWN` / fail closed;
+- provider candle-boundary mismatch is an error;
+- strategy decisions retain strategy/rule/evidence/data-version provenance.
 
 ---
 
-# Phase 2 completion condition
+# Current gate
 
-This ledger is clear enough to start formalization but **not** to execute the strategy.
+There are **no open evidence-debt placeholders on the `CRT-C3-D1-H1-M1-BEAR-v0.1` order path**.
 
-`CRT-C3-ALIGNED-v0.1` can move to `FROZEN_FOR_VALIDATION` only when every active-path P0 and selected-entry P1 debt is either:
-
-1. resolved deterministically with evidence + fixtures; or
-2. explicitly removed from the strategy path.
-
-There may be no unresolved placeholder on the order path.
+The next project work is not to reinterpret v0.1. It is to build trusted market data and deterministic detection around the frozen candidate, then validate or reject it honestly.
