@@ -19,6 +19,12 @@ def test_log_event_emits_structured_json(caplog: pytest.LogCaptureFixture) -> No
     assert '"rows":42' in caplog.text
 
 
+def test_log_event_rejects_event_field_override() -> None:
+    logger = logging.getLogger("romeo_crt_engine.test")
+    with pytest.raises(ValueError, match="reserved"):
+        log_event(logger, "dataset.created", fields={"event": "spoofed"})
+
+
 def test_artifact_ref_requires_valid_sha256() -> None:
     with pytest.raises(ValueError, match="64-character"):
         ArtifactRef("file:///tmp/a", "bad", 1, "application/octet-stream")
