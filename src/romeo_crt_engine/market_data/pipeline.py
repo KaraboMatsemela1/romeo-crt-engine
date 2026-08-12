@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from romeo_crt_engine.market_data.aggregate import build_complete_new_york_d1, build_h1
-from romeo_crt_engine.market_data.dataset import RawArtifact, DatasetManifest, build_manifest
+from romeo_crt_engine.market_data.dataset import DatasetManifest, RawArtifact, build_manifest
 from romeo_crt_engine.market_data.models import CanonicalBar, InstrumentMetadata, MinuteBar
 from romeo_crt_engine.market_data.providers.binance_public import RawArchive, parse_1m_archive
 from romeo_crt_engine.market_data.quality import validate_minute_series
@@ -57,7 +57,6 @@ def build_trusted_binance_dataset(
         d1=d1_bars,
         code_version=code_version,
         dependency_lock_sha256=dependency_lock_sha256,
-        created_at=created_at,
     )
     return TrustedDataset(
         metadata=metadata,
