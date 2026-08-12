@@ -59,6 +59,9 @@
     "P0_03_CANDLE_CALENDAR",
     "ADR-004-freeze-narrow-d1-h1-model1-subset"
   ],
+  "evidence_aliases": {
+    "P0-FIX-002": "P0-FIX-002-BEARISH-OLD-CRTH-CLARIFICATION"
+  },
   "project_parameters_not_claimed_as_romeo_rules": [
     "model1_min_body_fraction=0.50",
     "stop_buffer_ticks=1",
