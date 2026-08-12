@@ -3,11 +3,12 @@ from __future__ import annotations
 import csv
 import json
 from dataclasses import dataclass
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from io import BytesIO, TextIOWrapper
 from typing import Any, cast
+from urllib.parse import urlencode
 from urllib.request import urlopen
 from zipfile import BadZipFile, ZipFile
 
@@ -36,9 +37,7 @@ def daily_kline_filename(symbol: str, day: date) -> str:
 
 def daily_kline_url(symbol: str, day: date) -> str:
     filename = daily_kline_filename(symbol, day)
-    return (
-        f"{ARCHIVE_BASE_URL}/data/spot/daily/klines/{symbol.upper()}/1m/{filename}"
-    )
+    return f"{ARCHIVE_BASE_URL}/data/spot/daily/klines/{symbol.upper()}/1m/{filename}"
 
 
 def daily_checksum_url(symbol: str, day: date) -> str:
@@ -114,6 +113,12 @@ def parse_1m_archive(archive: RawArchive, *, symbol: str) -> tuple[MinuteBar, ..
     except BadZipFile as error:
         raise DataQualityError(DataQualityCode.PROVIDER_SCHEMA, "invalid zip archive") from error
 
+    if len(rows) != 1440:
+        raise DataQualityError(
+            DataQualityCode.INCOMPLETE_BUCKET,
+            f"daily crypto archive contains {len(rows)} minutes, expected 1440",
+        )
+
     bars: list[MinuteBar] = []
     for row_number, row in enumerate(rows, start=1):
         if len(row) != 12:
@@ -161,6 +166,14 @@ def parse_1m_archive(archive: RawArchive, *, symbol: str) -> tuple[MinuteBar, ..
                 trade_count=trade_count,
                 source_sha256=source_sha,
             )
+        )
+
+    expected_start = datetime.combine(archive.archive_date, time.min, tzinfo=UTC)
+    expected_end = expected_start + timedelta(days=1)
+    if bars[0].open_time != expected_start or bars[-1].close_time != expected_end:
+        raise DataQualityError(
+            DataQualityCode.INCOMPLETE_BUCKET,
+            f"archive {archive.filename} does not cover its exact UTC day",
         )
     return tuple(bars)
 
@@ -213,10 +226,7 @@ def parse_exchange_info(
         typed_filters = cast(list[dict[str, Any]], filters)
         tick_size = _filter_decimal(typed_filters, "PRICE_FILTER", "tickSize")
         quantity_step = _filter_decimal(typed_filters, "LOT_SIZE", "stepSize")
-        metadata_seed = (
-            f"{PROVIDER}|{VENUE}|{symbol.upper()}|{tick_size}|{quantity_step}|"
-            f"{observed_at.astimezone(UTC).isoformat()}"
-        )
+        metadata_seed = f"{PROVIDER}|{VENUE}|{symbol.upper()}|{tick_size}|{quantity_step}"
         return InstrumentMetadata(
             provider=PROVIDER,
             venue=VENUE,
@@ -243,3 +253,51 @@ def fetch_exchange_info(
     with urlopen(url, timeout=timeout_seconds) as response:  # noqa: S310
         payload = response.read()
     return parse_exchange_info(payload, symbol=symbol, observed_at=observed_at)
+
+
+def _fetch_api_1m_row(symbol: str, open_time: datetime, timeout_seconds: float) -> list[Any]:
+    query = urlencode(
+        {
+            "symbol": symbol.upper(),
+            "interval": "1m",
+            "startTime": int(open_time.timestamp() * 1000),
+            "limit": 1,
+        }
+    )
+    url = f"{MARKET_DATA_API_BASE_URL}/api/v3/klines?{query}"
+    with urlopen(url, timeout=timeout_seconds) as response:  # noqa: S310
+        payload = cast(list[list[Any]], json.loads(response.read()))
+    if len(payload) != 1 or len(payload[0]) < 9:
+        raise DataQualityError(DataQualityCode.PROVIDER_SCHEMA, "unexpected REST kline response")
+    return payload[0]
+
+
+def crosscheck_bars_with_rest(
+    bars: tuple[MinuteBar, ...],
+    *,
+    timeout_seconds: float = 30.0,
+) -> None:
+    if not bars:
+        raise ValueError("bars must not be empty")
+    sample_indexes = sorted({0, len(bars) // 2, len(bars) - 1})
+    for index in sample_indexes:
+        bar = bars[index]
+        row = _fetch_api_1m_row(bar.symbol, bar.open_time, timeout_seconds)
+        observed_open_ms = int(row[0])
+        expected_open_ms = int(bar.open_time.timestamp() * 1000)
+        comparisons = (
+            (observed_open_ms, expected_open_ms, "open_time"),
+            (_decimal(str(row[1]), "api.open"), bar.open, "open"),
+            (_decimal(str(row[2]), "api.high"), bar.high, "high"),
+            (_decimal(str(row[3]), "api.low"), bar.low, "low"),
+            (_decimal(str(row[4]), "api.close"), bar.close, "close"),
+            (_decimal(str(row[5]), "api.volume"), bar.volume, "volume"),
+            (_decimal(str(row[7]), "api.quote_volume"), bar.quote_volume, "quote_volume"),
+            (int(row[8]), bar.trade_count, "trade_count"),
+        )
+        for observed, expected, field_name in comparisons:
+            if observed != expected:
+                raise DataQualityError(
+                    DataQualityCode.PROVIDER_SCHEMA,
+                    f"REST/archive mismatch at {bar.open_time.isoformat()} field={field_name}",
+                )
