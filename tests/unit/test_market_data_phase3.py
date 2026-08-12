@@ -6,11 +6,13 @@ from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
 from io import BytesIO, StringIO
+from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
 import pytest
 
 from romeo_crt_engine.market_data.aggregate import build_complete_new_york_d1, build_h1
+from romeo_crt_engine.market_data.dataset import write_dataset
 from romeo_crt_engine.market_data.models import AssetClass, InstrumentMetadata, MinuteBar
 from romeo_crt_engine.market_data.pipeline import build_trusted_binance_dataset
 from romeo_crt_engine.market_data.providers.binance_public import (
@@ -23,7 +25,11 @@ from romeo_crt_engine.market_data.providers.binance_public import (
     parse_1m_archive,
     parse_exchange_info,
 )
-from romeo_crt_engine.market_data.quality import DataQualityCode, DataQualityError, validate_minute_series
+from romeo_crt_engine.market_data.quality import (
+    DataQualityCode,
+    DataQualityError,
+    validate_minute_series,
+)
 
 SOURCE_SHA = "a" * 64
 LOCK_SHA = "b" * 64
@@ -46,7 +52,7 @@ def _minute_bars(start: datetime, count: int) -> tuple[MinuteBar, ...]:
     output: list[MinuteBar] = []
     for offset in range(count):
         open_time = start + timedelta(minutes=offset)
-        price = Decimal("50000") + Decimal(offset) / Decimal("100")
+        price = Decimal(50000) + Decimal(offset) / Decimal(100)
         output.append(
             MinuteBar(
                 provider=PROVIDER,
@@ -55,11 +61,11 @@ def _minute_bars(start: datetime, count: int) -> tuple[MinuteBar, ...]:
                 open_time=open_time,
                 close_time=open_time + timedelta(minutes=1),
                 open=price,
-                high=price + Decimal("1"),
-                low=price - Decimal("1"),
+                high=price + Decimal(1),
+                low=price - Decimal(1),
                 close=price + Decimal("0.25"),
-                volume=Decimal("1"),
-                quote_volume=Decimal("50000"),
+                volume=Decimal(1),
+                quote_volume=Decimal(50000),
                 trade_count=10,
                 source_sha256=SOURCE_SHA,
             )
@@ -76,13 +82,13 @@ def _archive(day: date, *, microseconds: bool) -> RawArchive:
         open_time = start + timedelta(minutes=minute)
         raw_open = int(open_time.timestamp()) * scale
         raw_close = raw_open + (60 * scale) - 1
-        price = Decimal("50000") + Decimal(minute) / Decimal("100")
+        price = Decimal(50000) + Decimal(minute) / Decimal(100)
         writer.writerow(
             [
                 raw_open,
                 format(price, "f"),
-                format(price + Decimal("1"), "f"),
-                format(price - Decimal("1"), "f"),
+                format(price + Decimal(1), "f"),
+                format(price - Decimal(1), "f"),
                 format(price + Decimal("0.25"), "f"),
                 "1.0",
                 raw_close,
@@ -109,6 +115,19 @@ def _archive(day: date, *, microseconds: bool) -> RawArchive:
     )
 
 
+def _dataset(created_at: datetime, metadata_time: datetime | None = None):
+    return build_trusted_binance_dataset(
+        archives=(
+            _archive(date(2025, 9, 17), microseconds=True),
+            _archive(date(2025, 9, 18), microseconds=True),
+        ),
+        metadata=_metadata(metadata_time or created_at),
+        code_version="deadbeef",
+        dependency_lock_sha256=LOCK_SHA,
+        created_at=created_at,
+    )
+
+
 def test_binance_archive_parser_supports_millisecond_and_microsecond_eras() -> None:
     old = parse_1m_archive(_archive(date(2024, 1, 2), microseconds=False), symbol="BTCUSDT")
     new = parse_1m_archive(_archive(date(2025, 1, 2), microseconds=True), symbol="BTCUSDT")
@@ -117,6 +136,21 @@ def test_binance_archive_parser_supports_millisecond_and_microsecond_eras() -> N
     assert len(new) == 1440
     assert old[0].open_time == datetime(2024, 1, 2, tzinfo=UTC)
     assert new[0].open_time == datetime(2025, 1, 2, tzinfo=UTC)
+
+
+def test_archive_checksum_mismatch_fails_closed() -> None:
+    archive = _archive(date(2025, 1, 2), microseconds=True)
+    damaged = RawArchive(
+        archive_date=archive.archive_date,
+        filename=archive.filename,
+        source_url=archive.source_url,
+        checksum_url=archive.checksum_url,
+        sha256="0" * 64,
+        content=archive.content,
+    )
+    with pytest.raises(DataQualityError) as error:
+        parse_1m_archive(damaged, symbol="BTCUSDT")
+    assert error.value.code is DataQualityCode.CHECKSUM_MISMATCH
 
 
 def test_minute_quality_gate_rejects_gap() -> None:
@@ -172,17 +206,7 @@ def test_exchange_info_captures_tick_and_quantity_step_snapshot() -> None:
 
 
 def test_two_utc_daily_archives_reproduce_one_complete_new_york_day() -> None:
-    created_at = datetime(2025, 9, 20, tzinfo=UTC)
-    dataset = build_trusted_binance_dataset(
-        archives=(
-            _archive(date(2025, 9, 17), microseconds=True),
-            _archive(date(2025, 9, 18), microseconds=True),
-        ),
-        metadata=_metadata(created_at),
-        code_version="deadbeef",
-        dependency_lock_sha256=LOCK_SHA,
-        created_at=created_at,
-    )
+    dataset = _dataset(datetime(2025, 9, 20, tzinfo=UTC))
 
     assert len(dataset.minute_bars) == 2880
     assert len(dataset.h1_bars) == 48
@@ -194,20 +218,21 @@ def test_two_utc_daily_archives_reproduce_one_complete_new_york_day() -> None:
     assert len(dataset.manifest.dataset_version) == 24
 
 
-def test_dataset_version_is_stable_across_ingestion_timestamp_only() -> None:
-    archive_one = _archive(date(2025, 9, 17), microseconds=True)
-    archive_two = _archive(date(2025, 9, 18), microseconds=True)
+def test_dataset_manifest_is_stable_across_ingestion_timestamp_only() -> None:
     metadata_time = datetime(2025, 9, 19, tzinfo=UTC)
-
+    archives = (
+        _archive(date(2025, 9, 17), microseconds=True),
+        _archive(date(2025, 9, 18), microseconds=True),
+    )
     first = build_trusted_binance_dataset(
-        archives=(archive_one, archive_two),
+        archives=archives,
         metadata=_metadata(metadata_time),
         code_version="deadbeef",
         dependency_lock_sha256=LOCK_SHA,
         created_at=datetime(2025, 9, 20, tzinfo=UTC),
     )
     second = build_trusted_binance_dataset(
-        archives=(archive_one, archive_two),
+        archives=archives,
         metadata=_metadata(metadata_time),
         code_version="deadbeef",
         dependency_lock_sha256=LOCK_SHA,
@@ -216,4 +241,37 @@ def test_dataset_version_is_stable_across_ingestion_timestamp_only() -> None:
 
     assert first.manifest.dataset_version == second.manifest.dataset_version
     assert first.manifest.normalized_sha256 == second.manifest.normalized_sha256
-    assert first.manifest.manifest_sha256 != second.manifest.manifest_sha256
+    assert first.manifest.manifest_sha256 == second.manifest.manifest_sha256
+
+
+def test_metadata_snapshot_time_changes_dataset_identity() -> None:
+    first = _dataset(
+        datetime(2025, 9, 20, tzinfo=UTC),
+        metadata_time=datetime(2025, 9, 19, tzinfo=UTC),
+    )
+    second = _dataset(
+        datetime(2025, 9, 20, tzinfo=UTC),
+        metadata_time=datetime(2025, 9, 20, tzinfo=UTC),
+    )
+    assert first.manifest.dataset_version != second.manifest.dataset_version
+
+
+def test_dataset_writer_is_idempotent_for_identical_version(tmp_path: Path) -> None:
+    dataset = _dataset(datetime(2025, 9, 20, tzinfo=UTC))
+    first = write_dataset(
+        root=tmp_path,
+        raw_artifacts=dataset.raw_artifacts,
+        h1=dataset.h1_bars,
+        d1=dataset.d1_bars,
+        manifest=dataset.manifest,
+    )
+    second = write_dataset(
+        root=tmp_path,
+        raw_artifacts=dataset.raw_artifacts,
+        h1=dataset.h1_bars,
+        d1=dataset.d1_bars,
+        manifest=dataset.manifest,
+    )
+
+    assert first == second
+    assert (first / "manifest.json").read_text(encoding="utf-8") == dataset.manifest.to_json()
