@@ -9,6 +9,8 @@ from romeo_crt_engine.crt.v0_1 import (
     Timeframe,
     evaluate_bearish_c3,
     is_canonical_daily,
+    is_canonical_daily_window,
+    is_canonical_h1,
     rolling_parent_pairs,
 )
 
@@ -25,6 +27,18 @@ def _daily(open_time: datetime, close_time: datetime, high: float, low: float) -
         high=high,
         low=low,
         close=midpoint,
+    )
+
+
+def _h1(open_time: datetime, close_time: datetime) -> ClosedCandle:
+    return ClosedCandle(
+        timeframe=Timeframe.H1,
+        open_time=open_time,
+        close_time=close_time,
+        open=100.0,
+        high=102.0,
+        low=99.0,
+        close=101.0,
     )
 
 
@@ -48,6 +62,34 @@ def test_daily_calendar_preserves_new_york_midnight_through_fall_dst() -> None:
     )
     assert is_canonical_daily(candle)
     assert candle.close_time.timestamp() - candle.open_time.timestamp() == 25 * 60 * 60
+
+
+def test_h1_calendar_accepts_spring_forward_elapsed_hour() -> None:
+    candle = _h1(
+        datetime(2026, 3, 8, 1, 0, tzinfo=NY),
+        datetime(2026, 3, 8, 3, 0, tzinfo=NY),
+    )
+    assert is_canonical_h1(candle)
+    assert candle.close_time.timestamp() - candle.open_time.timestamp() == 60 * 60
+
+
+def test_h1_calendar_accepts_repeated_fall_back_hour() -> None:
+    candle = _h1(
+        datetime(2026, 11, 1, 1, 0, tzinfo=NY, fold=0),
+        datetime(2026, 11, 1, 1, 0, tzinfo=NY, fold=1),
+    )
+    assert is_canonical_h1(candle)
+    assert candle.close_time.timestamp() - candle.open_time.timestamp() == 60 * 60
+
+
+def test_daily_window_rejects_two_local_days_even_with_midnight_endpoints() -> None:
+    window = CandleWindow(
+        Timeframe.D1,
+        datetime(2026, 1, 7, 0, 0, tzinfo=NY),
+        datetime(2026, 1, 9, 0, 0, tzinfo=NY),
+        108.0,
+    )
+    assert not is_canonical_daily_window(window)
 
 
 def test_rolling_parent_pairs_enumerate_all_consecutive_daily_candidates() -> None:
