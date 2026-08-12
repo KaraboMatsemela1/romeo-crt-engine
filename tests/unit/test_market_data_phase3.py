@@ -40,6 +40,8 @@ from romeo_crt_engine.market_data.quality import (
 
 SOURCE_SHA = "a" * 64
 LOCK_SHA = "b" * 64
+CODE_SHA = "c" * 64
+GIT_REVISION = "deadbeef"
 
 
 def _metadata(observed_at: datetime) -> InstrumentMetadata:
@@ -157,8 +159,9 @@ def _dataset(created_at: datetime, metadata_time: datetime | None = None) -> Tru
         archives=archives,
         provider_crosschecks=_crosschecks(archives),
         metadata=_metadata(metadata_time or created_at),
-        code_version="deadbeef",
+        market_data_code_sha256=CODE_SHA,
         dependency_lock_sha256=LOCK_SHA,
+        git_revision=GIT_REVISION,
         created_at=created_at,
     )
 
@@ -188,12 +191,43 @@ def test_archive_checksum_mismatch_fails_closed() -> None:
     assert error.value.code is DataQualityCode.CHECKSUM_MISMATCH
 
 
-def test_minute_quality_gate_rejects_gap() -> None:
+def test_minute_quality_gate_rejects_gap_duplicate_order_and_future() -> None:
     bars = _minute_bars(datetime(2026, 1, 1, tzinfo=UTC), 120)
-    damaged = bars[:30] + bars[31:]
-    with pytest.raises(DataQualityError) as error:
-        validate_minute_series(damaged)
-    assert error.value.code is DataQualityCode.GAP
+
+    with pytest.raises(DataQualityError) as gap:
+        validate_minute_series(bars[:30] + bars[31:])
+    assert gap.value.code is DataQualityCode.GAP
+
+    with pytest.raises(DataQualityError) as duplicate:
+        validate_minute_series(bars[:30] + (bars[29],) + bars[30:])
+    assert duplicate.value.code is DataQualityCode.DUPLICATE_TIMESTAMP
+
+    with pytest.raises(DataQualityError) as order:
+        validate_minute_series((bars[0], bars[1], bars[0]))
+    assert order.value.code is DataQualityCode.OUT_OF_ORDER
+
+    with pytest.raises(DataQualityError) as future:
+        validate_minute_series(bars, as_of=bars[-1].open_time)
+    assert future.value.code is DataQualityCode.FUTURE_TIMESTAMP
+
+
+def test_minute_bar_rejects_impossible_ohlc() -> None:
+    with pytest.raises(ValueError, match="high must contain"):
+        MinuteBar(
+            provider=PROVIDER,
+            venue=VENUE,
+            symbol="BTCUSDT",
+            open_time=datetime(2026, 1, 1, tzinfo=UTC),
+            close_time=datetime(2026, 1, 1, 0, 1, tzinfo=UTC),
+            open=Decimal(100),
+            high=Decimal(99),
+            low=Decimal(90),
+            close=Decimal(95),
+            volume=Decimal(1),
+            quote_volume=Decimal(100),
+            trade_count=1,
+            source_sha256=SOURCE_SHA,
+        )
 
 
 def test_spring_dst_new_york_day_contains_23_elapsed_h1_bars() -> None:
@@ -251,8 +285,9 @@ def test_trusted_promotion_rejects_missing_provider_crosscheck() -> None:
             archives=archives,
             provider_crosschecks=(),
             metadata=_metadata(created_at),
-            code_version="deadbeef",
+            market_data_code_sha256=CODE_SHA,
             dependency_lock_sha256=LOCK_SHA,
+            git_revision=GIT_REVISION,
             created_at=created_at,
         )
 
@@ -269,6 +304,7 @@ def test_two_utc_daily_archives_reproduce_one_complete_new_york_day() -> None:
     assert dataset.manifest.m1_rows == 2880
     assert len(dataset.manifest.provider_crosschecks) == 2
     assert len(dataset.manifest.dataset_version) == 24
+    assert dataset.receipt.to_dataset_ref().version == dataset.manifest.dataset_version
 
 
 def test_dataset_manifest_is_stable_across_ingestion_timestamp_only() -> None:
@@ -282,22 +318,25 @@ def test_dataset_manifest_is_stable_across_ingestion_timestamp_only() -> None:
         archives=archives,
         provider_crosschecks=crosschecks,
         metadata=_metadata(metadata_time),
-        code_version="deadbeef",
+        market_data_code_sha256=CODE_SHA,
         dependency_lock_sha256=LOCK_SHA,
+        git_revision=GIT_REVISION,
         created_at=datetime(2025, 9, 20, tzinfo=UTC),
     )
     second = build_trusted_binance_dataset(
         archives=archives,
         provider_crosschecks=crosschecks,
         metadata=_metadata(metadata_time),
-        code_version="deadbeef",
+        market_data_code_sha256=CODE_SHA,
         dependency_lock_sha256=LOCK_SHA,
+        git_revision=GIT_REVISION,
         created_at=datetime(2025, 9, 21, tzinfo=UTC),
     )
 
     assert first.manifest.dataset_version == second.manifest.dataset_version
     assert first.manifest.normalized_sha256 == second.manifest.normalized_sha256
     assert first.manifest.manifest_sha256 == second.manifest.manifest_sha256
+    assert first.receipt.receipt_sha256 != second.receipt.receipt_sha256
 
 
 def test_metadata_snapshot_time_changes_dataset_identity() -> None:
@@ -312,6 +351,31 @@ def test_metadata_snapshot_time_changes_dataset_identity() -> None:
     assert first.manifest.dataset_version != second.manifest.dataset_version
 
 
+def test_market_data_code_change_changes_dataset_identity() -> None:
+    created_at = datetime(2025, 9, 20, tzinfo=UTC)
+    archives = (
+        _archive(date(2025, 9, 17), microseconds=True),
+        _archive(date(2025, 9, 18), microseconds=True),
+    )
+    kwargs = {
+        "archives": archives,
+        "provider_crosschecks": _crosschecks(archives),
+        "metadata": _metadata(created_at),
+        "dependency_lock_sha256": LOCK_SHA,
+        "git_revision": GIT_REVISION,
+        "created_at": created_at,
+    }
+    first = build_trusted_binance_dataset(
+        market_data_code_sha256=CODE_SHA,
+        **kwargs,
+    )
+    second = build_trusted_binance_dataset(
+        market_data_code_sha256="d" * 64,
+        **kwargs,
+    )
+    assert first.manifest.dataset_version != second.manifest.dataset_version
+
+
 def test_dataset_writer_is_idempotent_for_identical_version(tmp_path: Path) -> None:
     dataset = _dataset(datetime(2025, 9, 20, tzinfo=UTC))
     first = write_dataset(
@@ -320,6 +384,7 @@ def test_dataset_writer_is_idempotent_for_identical_version(tmp_path: Path) -> N
         h1=dataset.h1_bars,
         d1=dataset.d1_bars,
         manifest=dataset.manifest,
+        receipt=dataset.receipt,
     )
     second = write_dataset(
         root=tmp_path,
@@ -327,7 +392,15 @@ def test_dataset_writer_is_idempotent_for_identical_version(tmp_path: Path) -> N
         h1=dataset.h1_bars,
         d1=dataset.d1_bars,
         manifest=dataset.manifest,
+        receipt=dataset.receipt,
     )
 
     assert first == second
     assert (first / "manifest.json").read_text(encoding="utf-8") == dataset.manifest.to_json()
+    receipt_path = (
+        tmp_path
+        / "receipts"
+        / dataset.manifest.dataset_version
+        / f"{dataset.receipt.receipt_sha256}.json"
+    )
+    assert receipt_path.exists()
