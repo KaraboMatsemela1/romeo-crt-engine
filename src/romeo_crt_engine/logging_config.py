@@ -25,7 +25,8 @@ def log_event(
     """Emit a structured JSON event suitable for later ingestion by any log backend."""
     if not event:
         raise ValueError("event must not be empty")
-    payload: dict[str, Any] = {"event": event}
-    if fields:
-        payload.update(fields)
+    if fields and "event" in fields:
+        raise ValueError("event is a reserved structured-log field")
+    payload: dict[str, Any] = dict(fields or {})
+    payload["event"] = event
     logger.log(level, json.dumps(payload, sort_keys=True, default=str, separators=(",", ":")))
