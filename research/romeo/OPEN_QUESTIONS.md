@@ -65,6 +65,29 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - What intrabar evidence lets the engine infer Candle 2 manipulation before the parent candle has closed?
 - Episode 6 suggests AMD order may not be rigid; what exact alternative sequences are valid and how are they identified causally?
 
+## Candle 3
+
+- Is `Candle 2 closed` sufficient to label the next candle `Candle 3`, or must Candle 1/2 first satisfy a complete CRT predicate?
+- Does Candle-3 execution occur literally at the parent Candle-3 open, or only after lower-timeframe confirmation after that open?
+- What exact event turns `C3_ELIGIBLE` into `C3_ENTRY_CONFIRMED`?
+- Must Candle 3 open from a particular side of the Candle-2 range or key level?
+- Is a local Turtle Soup mandatory for Candle 3, or can SMT fully substitute for local manipulation evidence?
+- If SMT substitutes for Turtle Soup, which instrument must show the actual Candle-3 confirmation?
+- What exact relation between Candle-3 open and the key level is required?
+- Is 50% primarily an expected entry retracement, a target, a reaction point, or different roles in different setup families?
+- How should `near 50%` be quantified without curve fitting?
+- What exact regime condition allows shallower-than-50% retracement?
+- Does strong trend change only entry retracement depth, or also target/stop logic?
+- What specific pre-entry conditions make a Candle-3 CRT likely to fail versus succeed?
+- Does reaching 50% before Candle 3 begins strengthen, weaken, complete, or invalidate the intended setup?
+- What happens if Candle 3 opens but no valid LTF confirmation appears before the parent candle closes?
+- Can a valid CRT journey terminate as `NO_SIGNAL` without being labeled a failed strategy setup?
+- Which target is primary for Candle 3: 50%, Candle-1 extreme, parent key level, pending HTF target, or setup-specific hierarchy?
+- What exact event completes Candle 3 successfully?
+- What exact event invalidates Candle 3 before entry?
+- What exact event invalidates Candle 3 after entry?
+- Does Episode 8 supersede any Episode-7 Candle-3 assumptions?
+
 ## Key levels
 
 - What exact structures qualify as Romeo price key levels?
@@ -161,6 +184,8 @@ These must be answered from evidence or deliberately scoped out before freezing 
 - How do we prevent stale/missing comparison data from becoming a false SMT non-take?
 - How are differing session calendars normalized without fabricating cross-market observations?
 - How are corresponding highs/lows chosen without selecting the pair of extremes that looks best after the outcome?
+- How do we prevent final Candle-3 direction/high/low/close from being used at Candle-3 open?
+- How do we separate `C3_ELIGIBLE`, `C3_ENTRY_CONFIRMED`, `C3_NO_SIGNAL`, and `C3_FAILED` without using future outcomes to label earlier states?
 
 ## Corpus/versioning
 
