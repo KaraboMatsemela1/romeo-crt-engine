@@ -7,16 +7,23 @@ from decimal import Decimal
 from hashlib import sha256
 from io import BytesIO, StringIO
 from pathlib import Path
-from zipfile import ZIP_DEFLATED, ZipFile
+from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 import pytest
 
 from romeo_crt_engine.market_data.aggregate import build_complete_new_york_d1, build_h1
 from romeo_crt_engine.market_data.dataset import write_dataset
-from romeo_crt_engine.market_data.models import AssetClass, InstrumentMetadata, MinuteBar
-from romeo_crt_engine.market_data.pipeline import build_trusted_binance_dataset
+from romeo_crt_engine.market_data.models import (
+    AssetClass,
+    InstrumentMetadata,
+    MinuteBar,
+    ProviderVerificationEvidence,
+)
+from romeo_crt_engine.market_data.pipeline import TrustedDataset, build_trusted_binance_dataset
 from romeo_crt_engine.market_data.providers.binance_public import (
+    MARKET_DATA_API_BASE_URL,
     PROVIDER,
+    REST_VERIFICATION_METHOD,
     VENUE,
     RawArchive,
     daily_checksum_url,
@@ -101,8 +108,13 @@ def _archive(day: date, *, microseconds: bool) -> RawArchive:
         )
 
     zip_buffer = BytesIO()
-    with ZipFile(zip_buffer, "w", compression=ZIP_DEFLATED) as zipped:
-        zipped.writestr(f"BTCUSDT-1m-{day.isoformat()}.csv", buffer.getvalue())
+    member = ZipInfo(
+        filename=f"BTCUSDT-1m-{day.isoformat()}.csv",
+        date_time=(2020, 1, 1, 0, 0, 0),
+    )
+    member.compress_type = ZIP_DEFLATED
+    with ZipFile(zip_buffer, "w") as zipped:
+        zipped.writestr(member, buffer.getvalue())
     content = zip_buffer.getvalue()
     digest = sha256(content).hexdigest()
     return RawArchive(
@@ -115,12 +127,35 @@ def _archive(day: date, *, microseconds: bool) -> RawArchive:
     )
 
 
-def _dataset(created_at: datetime, metadata_time: datetime | None = None):
+def _crosschecks(
+    archives: tuple[RawArchive, ...],
+) -> tuple[ProviderVerificationEvidence, ...]:
+    return tuple(
+        ProviderVerificationEvidence(
+            provider=PROVIDER,
+            venue=VENUE,
+            symbol="BTCUSDT",
+            source_sha256=archive.sha256,
+            sample_refs=(
+                f"{archive.archive_date.isoformat()}T00:00:00+00:00",
+                f"{archive.archive_date.isoformat()}T12:00:00+00:00",
+                f"{archive.archive_date.isoformat()}T23:59:00+00:00",
+            ),
+            endpoint_base=MARKET_DATA_API_BASE_URL,
+            verification_method=REST_VERIFICATION_METHOD,
+        )
+        for archive in archives
+    )
+
+
+def _dataset(created_at: datetime, metadata_time: datetime | None = None) -> TrustedDataset:
+    archives = (
+        _archive(date(2025, 9, 17), microseconds=True),
+        _archive(date(2025, 9, 18), microseconds=True),
+    )
     return build_trusted_binance_dataset(
-        archives=(
-            _archive(date(2025, 9, 17), microseconds=True),
-            _archive(date(2025, 9, 18), microseconds=True),
-        ),
+        archives=archives,
+        provider_crosschecks=_crosschecks(archives),
         metadata=_metadata(metadata_time or created_at),
         code_version="deadbeef",
         dependency_lock_sha256=LOCK_SHA,
@@ -205,6 +240,23 @@ def test_exchange_info_captures_tick_and_quantity_step_snapshot() -> None:
     assert metadata.temporal_semantics == "SNAPSHOT_AT_INGESTION"
 
 
+def test_trusted_promotion_rejects_missing_provider_crosscheck() -> None:
+    created_at = datetime(2025, 9, 20, tzinfo=UTC)
+    archives = (
+        _archive(date(2025, 9, 17), microseconds=True),
+        _archive(date(2025, 9, 18), microseconds=True),
+    )
+    with pytest.raises(ValueError, match="provider cross-check"):
+        build_trusted_binance_dataset(
+            archives=archives,
+            provider_crosschecks=(),
+            metadata=_metadata(created_at),
+            code_version="deadbeef",
+            dependency_lock_sha256=LOCK_SHA,
+            created_at=created_at,
+        )
+
+
 def test_two_utc_daily_archives_reproduce_one_complete_new_york_day() -> None:
     dataset = _dataset(datetime(2025, 9, 20, tzinfo=UTC))
 
@@ -215,6 +267,7 @@ def test_two_utc_daily_archives_reproduce_one_complete_new_york_day() -> None:
     assert dataset.d1_bars[0].close_time == datetime(2025, 9, 18, 4, 0, tzinfo=UTC)
     assert dataset.manifest.quality_status == "TRUSTED"
     assert dataset.manifest.m1_rows == 2880
+    assert len(dataset.manifest.provider_crosschecks) == 2
     assert len(dataset.manifest.dataset_version) == 24
 
 
@@ -224,8 +277,10 @@ def test_dataset_manifest_is_stable_across_ingestion_timestamp_only() -> None:
         _archive(date(2025, 9, 17), microseconds=True),
         _archive(date(2025, 9, 18), microseconds=True),
     )
+    crosschecks = _crosschecks(archives)
     first = build_trusted_binance_dataset(
         archives=archives,
+        provider_crosschecks=crosschecks,
         metadata=_metadata(metadata_time),
         code_version="deadbeef",
         dependency_lock_sha256=LOCK_SHA,
@@ -233,6 +288,7 @@ def test_dataset_manifest_is_stable_across_ingestion_timestamp_only() -> None:
     )
     second = build_trusted_binance_dataset(
         archives=archives,
+        provider_crosschecks=crosschecks,
         metadata=_metadata(metadata_time),
         code_version="deadbeef",
         dependency_lock_sha256=LOCK_SHA,
