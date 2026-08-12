@@ -358,7 +358,7 @@ def evaluate_bearish_c3(
                     )
                     return Evaluation(
                         DecisionState.TRADE_PLAN,
-                        Reason=ReasonCode.ELIGIBLE,
+                        ReasonCode.ELIGIBLE,
                         context=context,
                         trade_plan=plan,
                     )
