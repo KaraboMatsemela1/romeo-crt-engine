@@ -32,8 +32,9 @@ def test_artifact_ref_requires_valid_sha256() -> None:
 
 def test_dataset_ref_requires_timezone_aware_created_at() -> None:
     digest = "a" * 64
+    naive_created_at = datetime(2026, 8, 12, tzinfo=UTC).replace(tzinfo=None)
     with pytest.raises(ValueError, match="timezone-aware"):
-        DatasetRef("prices", "v1", digest, datetime(2026, 8, 12))
+        DatasetRef("prices", "v1", digest, naive_created_at)
 
 
 def test_dataset_ref_accepts_versioned_integrity_metadata() -> None:
