@@ -1,0 +1,32 @@
+name: Provider Smoke
+
+on:
+  workflow_dispatch:
+
+jobs:
+  binance-btcusdt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Install locked environment
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps --no-build-isolation -e .
+      - name: Build trusted BTCUSDT provider window
+        run: |
+          python scripts/ingest_binance_spot.py \
+            --symbol BTCUSDT \
+            --start-utc-day 2025-09-17 \
+            --end-utc-day 2025-09-18 \
+            --data-root /tmp/romeo-phase3-data
+      - name: Print canonical manifest
+        run: |
+          manifest=$(find /tmp/romeo-phase3-data/normalized -name manifest.json -type f -print -quit)
+          test -n "$manifest"
+          cat "$manifest"

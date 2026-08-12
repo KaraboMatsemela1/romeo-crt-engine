@@ -1,0 +1,23 @@
+# Phase 3 reproducibility lock for CPython 3.12.
+# Refresh deliberately and review the diff before freezing a new dataset version.
+annotated-types==0.8.0
+ast-serialize==0.8.0
+coverage==7.15.4
+editables==0.6
+hatchling==1.31.0
+iniconfig==2.3.0
+librt==0.15.0
+mypy==2.3.0
+mypy_extensions==1.1.0
+packaging==26.3
+pathspec==1.1.1
+pluggy==1.6.0
+pydantic==2.13.4
+pydantic_core==2.46.4
+Pygments==2.20.0
+pytest==9.1.1
+pytest-cov==7.1.0
+ruff==0.16.2
+trove-classifiers==2026.6.1.19
+typing_extensions==4.16.0
+typing-inspection==0.4.4

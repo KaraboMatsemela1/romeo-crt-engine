@@ -7,8 +7,8 @@ Updated: 2026-08-12
 | 0 — Engineering foundation | **COMPLETE** | Reproducible dev + CI + logging/storage/experiment contracts |
 | 1 — Romeo corpus / reconciliation | **COMPLETE** | Evidence-indexed corpus + reconciled doctrine + explicit evidence debts |
 | 2 — Formal CRT spec | **COMPLETE — FROZEN_FOR_VALIDATION** | Deterministic CRT v0.1 with no unresolved active-path predicates |
-| 3 — Market data | **READY TO START** | Trusted versioned D1/H1 dataset for the frozen route |
-| 4 — CRT detector | Not started | Reproduce frozen fixtures and known examples |
+| 3 — Market data | **COMPLETE** | Provider-backed trusted/reproducible D1/H1 dataset |
+| 4 — CRT detector | **READY TO START** | Reproduce frozen strategy and fixtures on canonical data |
 | 5 — Backtester | Not started | Deterministic cost-aware simulator |
 | 6 — Validation | Not started | Written robustness decision |
 | 7 — Paper trading | Not started | Stable realtime semantics |
@@ -16,52 +16,89 @@ Updated: 2026-08-12
 | 9 — Shadow trading | Not started | Production-like readiness |
 | 10 — Controlled live | **NOT AUTHORIZED** | Explicit approval + canary gates |
 
-## Pre-Phase-3 gate review
+## Current frozen pair
 
-A full repository review was performed after Phase 2 and before Phase 3.
+```text
+Strategy  CRT-C3-D1-H1-M1-BEAR-v0.1
+Dataset   ee1300f0da50e4debcbbc3b7
+```
 
-The review checked:
+Neither identifier is a profitability claim.
 
-- Project Bible / roadmap / status consistency;
-- frozen strategy specification and freeze manifest;
-- deterministic implementation and fixtures;
-- strategy-vs-code calendar semantics;
-- open evidence debt and excluded doctrine;
-- CI, lint and strict typing;
-- Phase-0 foundation completeness;
-- logging/storage/experiment provenance contracts;
-- paper/live safety state.
+## Phase 3 completion
 
-Findings corrected before Phase 3:
+Phase 3 is complete for the first approved provider route.
 
-1. **C3 calendar bug:** the implementation previously accepted any D1 `CandleWindow` with midnight endpoints, including a malformed multi-day window. It now requires exactly the next New-York local date, matching the already-frozen strategy specification.
-2. **Phase-0 logging contract:** added provider-neutral structured event logging.
-3. **Phase-0 storage contract:** added immutable artifact and dataset integrity/version references plus a provider-neutral store protocol.
-4. **Experiment convention:** added versioned experiment provenance rules.
-5. **Stale docs/checklists:** README and Phase 0/1/2 checklists were brought in line with canonical status.
+Route:
 
-The C3 fix is a semantic-preserving implementation correction to match the frozen spec; it does not alter the v0.1 trading rule.
+```text
+Binance Public Data
+ -> Binance Spot BTCUSDT
+ -> DAILY 1m provider archives
+ -> checksum + REST verification
+ -> normalized UTC M1
+ -> exact elapsed-hour H1
+ -> New-York local-midnight D1
+ -> immutable manifest/receipt
+```
 
-## Phase 0 completion
+Frozen Phase-4 reproduction dataset:
 
-Phase 0 is now complete.
+```text
+dataset_version         ee1300f0da50e4debcbbc3b7
+manifest_sha256          eaf828ee3acc8adf9e3b931cc6a55d385b0be61b58ae72f01205b3f6034a2141
+normalized_sha256        86f6f69176e68655032f3d12910572214de2fa04266c5615146ae03e9f414fc2
+market_data_code_sha256  8fbcbb435ce47a405f3500a66935f633136669750cfbe2e014ce1649d4b6140d
+dependency_lock_sha256   13653ec2f358aa078fb3a4189299cc8e1f4b71e930cdc3141a8e044de14effa5
+```
 
-Foundation includes:
+Provider-backed smoke evidence:
 
-- Python 3.12+ package metadata and reproducible dependency declaration;
-- CI with Ruff, strict MyPy and pytest;
-- safe `.env.example` and secret/data ignore conventions;
-- provider-neutral structured logging contract;
-- provider-neutral storage/integrity contracts;
-- documentation, ADRs and AI-agent operating contract;
-- experiment provenance/versioning convention;
-- project check script and tests.
+```text
+Provider Smoke run  31642788087
+Job                 94269168670
+Result              SUCCESS
+Raw M1              2,880
+Canonical H1        48
+Complete NY D1      1
+```
 
-Market-data provider selection, database schema and concrete storage adapters remain Phase-3 decisions behind these interfaces.
+Canonical Phase-3 artifacts:
 
-## Phase 2 completion
+- `docs/MARKET_DATA.md`
+- `docs/adr/ADR-005-binance-btcusdt-first-market-data-route.md`
+- `docs/PHASE_3_COMPLETION_REPORT.md`
+- `docs/reviews/PHASE_3_GATE_REVIEW.md`
+- `data/manifests/PHASE3_BTCUSDT_EE1300F0DA50E4DEBCBBC3B7.json`
+- `data/manifests/PHASE3_BTCUSDT_EE1300F0DA50E4DEBCBBC3B7_EVIDENCE.json`
+- `src/romeo_crt_engine/market_data/`
+- `src/romeo_crt_engine/storage/local.py`
+- `scripts/ingest_binance_spot.py`
+- `requirements.lock`
 
-Phase 2 formal strategy specification is complete as of 2026-08-12.
+### Phase-3 guarantees
+
+- provider raw files are SHA-256 verified and retained immutably;
+- checksum-only trust is insufficient; provider REST verification is required per raw archive;
+- duplicate, out-of-order, gap, future and illegal-OHLC states fail closed;
+- internal chronology is UTC;
+- H1 spans exactly 3,600 elapsed seconds;
+- D1 follows `America/New_York` local midnight and correctly supports 23/24/25-hour days;
+- provider-native H1/D1 are not substituted for canonical bars;
+- data correction creates a new dataset version;
+- canonical dataset identity is separated from acquisition receipt identity;
+- dependency and market-data code fingerprints are part of dataset identity;
+- no strategy outcome is used to select or repair data.
+
+### Accepted Phase-3 limitations
+
+- first route is BTCUSDT Spot only;
+- no bid/ask or spread history in the chosen archive route;
+- `exchangeInfo` is snapshot-at-ingestion, not historical exchange-filter history;
+- `ee1300...` is a compact detector-reproduction dataset, not the full later OOS/validation sample;
+- non-24/7 instruments need venue-aware closure/session policies in future provider routes.
+
+## Phase 2 frozen strategy
 
 Frozen candidate:
 
@@ -75,38 +112,7 @@ Lifecycle:
 FROZEN_FOR_VALIDATION
 ```
 
-Phase 2 delivered:
-
-- a deterministic bearish-only D1 → H1 strategy route;
-- canonical New-York Daily candle semantics;
-- exhaustive rolling D1 parent-candidate generation to eliminate hindsight Candle-1 selection;
-- a fixed reaction key level at C1 `CRTH`;
-- a conservative bearish Candle-2 sweep + close-reclaim subtype;
-- Candle-3 eligibility and expiry semantics;
-- Model #1 selected as the sole v0.1 entry family;
-- explicit versioned formalization of the qualitative `thick` candle term;
-- deterministic Model-1 confirmation/invalidation;
-- immutable primary target at C1 midpoint / 50%;
-- structural stop reference at Model-1 high plus versioned execution buffer;
-- fail-closed reason codes;
-- immutable `TradePlan` output before independent risk approval;
-- machine-readable positive/negative fixtures;
-- DST, parent-enumeration, C3-window and future-confirmation causality tests;
-- an adversarial freeze review;
-- a machine-readable freeze manifest;
-- all unresolved broader-doctrine questions reclassified as deferred/versioned rather than hidden active defaults.
-
-Canonical Phase-2 artifacts:
-
-- `strategy/CRT_V0.1_SPEC.md`
-- `strategy/CRT_V0.1_FREEZE_MANIFEST.json`
-- `src/romeo_crt_engine/crt/v0_1.py`
-- `tests/strategy/fixtures/crt_v0_1_cases.json`
-- `strategy/reviews/CRT_V0.1_FREEZE_REVIEW.md`
-- `docs/adr/ADR-004-freeze-narrow-d1-h1-model1-subset.md`
-- `research/romeo/OPEN_QUESTIONS.md`
-
-## Frozen v0.1 boundary
+Core frozen boundary:
 
 ```text
 Doctrine                    CRT_SECRETS_2025
@@ -115,61 +121,58 @@ Parent timeframe            D1
 Execution timeframe         H1
 Source timezone             America/New_York
 Setup family                Candle-3 reaction from C1 CRTH
+Entry model                 Model #1 core
+Primary target              C1 midpoint / 50%
+Unknown required state      NO_SIGNAL
 Countertrend                disabled
 SMT substitution            disabled
 KOD                         excluded
 True MSS                    excluded
 Time exits                  excluded
-Entry model                 Model #1 core
-Primary target              C1 midpoint / 50%
-Unknown required state      NO_SIGNAL
 ```
 
-Two explicit project parameters are frozen before profitability testing:
+Frozen project parameters remain:
 
 ```text
 P2-PARAM-M1-THICK-050 = body/full_range >= 0.50
 P2-PARAM-STOP-1TICK   = structural high + one instrument tick
 ```
 
-They are **project formalizations**, not represented as Romeo numerical claims. Later validation must sensitivity-test them without rewriting this candidate in place.
+No Phase-3 implementation changed them.
 
-## What Phase 2 completion does NOT mean
+## What completion does NOT mean
 
-The frozen candidate is:
+The project is still:
 
 - **NOT proven profitable**;
-- **NOT yet evaluated on a trusted historical dataset**;
 - **NOT paper-ready**;
 - **NOT shadow-ready**;
 - **NOT live-ready**.
 
-No backtest result was used to choose the frozen v0.1 rules or parameters.
-
 `LIVE_TRADING_AUTHORIZED = false` remains unchanged.
 
-## Phase 3 entry gate
+## Phase 4 entry gate
 
-Phase 3 may start only with the following constraints:
+Phase 4 may start with these hard constraints:
 
-1. do not change frozen v0.1 strategy semantics while building data infrastructure;
-2. raw provider observations must be retained immutably or content-addressed wherever practical;
-3. every normalized dataset must have a versioned manifest and integrity digest;
-4. provider symbol, venue, timezone, price precision and tick-size metadata must be explicit;
-5. internal observation timestamps use UTC while analytical D1/H1 boundaries preserve `America/New_York` wall clock;
-6. DST transition behavior must be tested;
-7. duplicate, out-of-order, impossible-OHLC and missing/stale observations must be detected and classified;
-8. no provider-native D1 bar may be assumed canonical without equivalence verification;
-9. data corrections must create a new dataset version rather than silently rewriting a frozen validation dataset;
-10. the frozen strategy consumes only trusted normalized data after these gates pass.
+1. consume only canonical bars from a declared trusted dataset version;
+2. start with strategy `CRT-C3-D1-H1-M1-BEAR-v0.1` and dataset `ee1300f0da50e4debcbbc3b7`;
+3. do not reinterpret strategy predicates because the real dataset yields few/no signals;
+4. convert canonical data into detector inputs without changing timestamps/OHLC;
+5. produce deterministic accepted/rejected reason codes and rule evidence;
+6. reproduce existing synthetic strategy fixtures first;
+7. add real-data positive/negative fixtures without hindsight labeling;
+8. keep detection separate from backtest fill/P&L logic;
+9. preserve strategy version, dataset version, code version and evidence IDs in detector outputs;
+10. do not begin profitability claims until detector/data integrity gates pass.
 
-## Immediate next actions — Phase 3
+## Immediate next actions — Phase 4
 
-1. Select and document the first provider/instrument/venue route.
-2. Define raw observation and instrument metadata schemas.
-3. Implement immutable/content-addressed raw storage behind the Phase-0 storage contract.
-4. Implement normalized UTC observations and New-York D1/H1 candle construction.
-5. Add DST, gap, duplicate, ordering and OHLC validation.
-6. Build dataset manifest hashing/versioning.
-7. Prove provider-native/canonical boundary equivalence or always construct canonical bars ourselves.
-8. Freeze the first trusted dataset version before Phase-4 detector evaluation.
+1. Define canonical-bar-to-CRT detector input adapters.
+2. Implement deterministic rolling C1/C2/C3 detection over trusted D1/H1 chronology.
+3. Emit an explanation object for every candidate/rejection.
+4. Reproduce committed Phase-2 positive/negative fixtures through the detector entry point.
+5. Run the detector over `ee1300f0da50e4debcbbc3b7` as a data-integration fixture.
+6. Add source-derived real-market fixtures when evidence is available.
+7. Independently audit for future-bar leakage and detector/spec drift.
+8. Freeze Phase-4 detector version only after those gates pass.
