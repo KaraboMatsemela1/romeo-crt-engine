@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
 from enum import StrEnum
+from hashlib import sha256
 
 
 class AssetClass(StrEnum):
@@ -71,6 +73,40 @@ class InstrumentMetadata:
     @property
     def instrument_id(self) -> str:
         return f"{self.provider}:{self.venue}:{self.symbol}"
+
+
+@dataclass(frozen=True, slots=True)
+class ProviderVerificationEvidence:
+    provider: str
+    venue: str
+    symbol: str
+    source_sha256: str
+    sample_refs: tuple[str, ...]
+    endpoint_base: str
+    verification_method: str
+
+    def __post_init__(self) -> None:
+        if not self.provider or not self.venue or not self.symbol:
+            raise ValueError("verification identity fields must not be empty")
+        if len(self.source_sha256) != 64:
+            raise ValueError("source_sha256 must be a SHA-256 digest")
+        if not self.sample_refs or not self.endpoint_base or not self.verification_method:
+            raise ValueError("verification evidence fields must not be empty")
+
+    @property
+    def evidence_digest(self) -> str:
+        payload = {
+            "provider": self.provider,
+            "venue": self.venue,
+            "symbol": self.symbol,
+            "source_sha256": self.source_sha256,
+            "sample_refs": self.sample_refs,
+            "endpoint_base": self.endpoint_base,
+            "verification_method": self.verification_method,
+        }
+        return sha256(
+            json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
 
 
 @dataclass(frozen=True, slots=True)
