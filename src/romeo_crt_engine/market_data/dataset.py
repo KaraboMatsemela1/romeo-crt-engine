@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass
-from datetime import UTC, date
+from datetime import UTC, datetime
 from decimal import Decimal
 from hashlib import sha256
 from pathlib import Path
@@ -13,14 +13,16 @@ from romeo_crt_engine.market_data.models import (
     InstrumentMetadata,
     ProviderVerificationEvidence,
 )
+from romeo_crt_engine.storage import DatasetRef, LocalArtifactStore
 
 MANIFEST_SCHEMA_VERSION = "PHASE3_DATASET_MANIFEST_V1"
+RECEIPT_SCHEMA_VERSION = "PHASE3_INGESTION_RECEIPT_V1"
 NORMALIZER_VERSION = "NY_D1_H1_FROM_UTC_M1_V1"
 
 
 @dataclass(frozen=True, slots=True)
 class RawArtifact:
-    archive_date: date
+    archive_date: str
     filename: str
     source_url: str
     checksum_url: str
@@ -50,7 +52,7 @@ class DatasetManifest:
     internal_timezone: str
     analytical_timezone: str
     normalizer_version: str
-    code_version: str
+    market_data_code_sha256: str
     dependency_lock_sha256: str
     coverage_start_utc: str
     coverage_end_utc: str
@@ -69,6 +71,33 @@ class DatasetManifest:
     @property
     def manifest_sha256(self) -> str:
         return sha256(self.to_json().encode("utf-8")).hexdigest()
+
+
+@dataclass(frozen=True, slots=True)
+class IngestionReceipt:
+    schema_version: str
+    dataset_id: str
+    dataset_version: str
+    manifest_sha256: str
+    retrieved_at_utc: str
+    git_revision: str
+    raw_sha256: tuple[str, ...]
+    provider_crosscheck_digests: tuple[str, ...]
+
+    def to_json(self) -> str:
+        return json.dumps(asdict(self), sort_keys=True, separators=(",", ":")) + "\n"
+
+    @property
+    def receipt_sha256(self) -> str:
+        return sha256(self.to_json().encode("utf-8")).hexdigest()
+
+    def to_dataset_ref(self) -> DatasetRef:
+        return DatasetRef(
+            dataset_id=self.dataset_id,
+            version=self.dataset_version,
+            manifest_sha256=self.manifest_sha256,
+            created_at=datetime.fromisoformat(self.retrieved_at_utc),
+        )
 
 
 def _decimal_text(value: Decimal) -> str:
@@ -119,13 +148,17 @@ def build_manifest(
     m1_rows: int,
     h1: tuple[CanonicalBar, ...],
     d1: tuple[CanonicalBar, ...],
-    code_version: str,
+    market_data_code_sha256: str,
     dependency_lock_sha256: str,
 ) -> DatasetManifest:
     if not raw_artifacts or not h1 or not d1:
         raise ValueError("trusted dataset requires raw artifacts plus H1 and D1 bars")
-    if len(dependency_lock_sha256) != 64:
-        raise ValueError("dependency_lock_sha256 must be a SHA-256 digest")
+    for name, digest in (
+        ("market_data_code_sha256", market_data_code_sha256),
+        ("dependency_lock_sha256", dependency_lock_sha256),
+    ):
+        if len(digest) != 64:
+            raise ValueError(f"{name} must be a SHA-256 digest")
 
     raw_hashes = {artifact.sha256 for artifact in raw_artifacts}
     evidence_hashes = {evidence.source_sha256 for evidence in provider_crosschecks}
@@ -136,7 +169,7 @@ def build_manifest(
     metadata_observed_at = metadata.observed_at.astimezone(UTC).isoformat()
     artifact_records = tuple(
         {
-            "archive_date": artifact.archive_date.isoformat(),
+            "archive_date": artifact.archive_date,
             "filename": artifact.filename,
             "source_url": artifact.source_url,
             "checksum_url": artifact.checksum_url,
@@ -168,7 +201,7 @@ def build_manifest(
         "instrument_metadata_observed_at": metadata_observed_at,
         "analytical_timezone": "America/New_York",
         "normalizer_version": NORMALIZER_VERSION,
-        "code_version": code_version,
+        "market_data_code_sha256": market_data_code_sha256,
         "dependency_lock_sha256": dependency_lock_sha256,
         "normalized_sha256": normalized_sha,
         "raw_sha256": [artifact.sha256 for artifact in raw_artifacts],
@@ -195,7 +228,7 @@ def build_manifest(
         internal_timezone="UTC",
         analytical_timezone="America/New_York",
         normalizer_version=NORMALIZER_VERSION,
-        code_version=code_version,
+        market_data_code_sha256=market_data_code_sha256,
         dependency_lock_sha256=dependency_lock_sha256,
         coverage_start_utc=h1[0].open_time.astimezone(UTC).isoformat(),
         coverage_end_utc=h1[-1].close_time.astimezone(UTC).isoformat(),
@@ -210,12 +243,30 @@ def build_manifest(
     )
 
 
-def _write_or_verify(path: Path, expected: bytes) -> None:
-    if path.exists():
-        if path.read_bytes() != expected:
-            raise ValueError(f"immutable dataset path contains different content: {path}")
-        return
-    path.write_bytes(expected)
+def build_receipt(
+    *,
+    manifest: DatasetManifest,
+    raw_artifacts: tuple[RawArtifact, ...],
+    provider_crosschecks: tuple[ProviderVerificationEvidence, ...],
+    retrieved_at: datetime,
+    git_revision: str,
+) -> IngestionReceipt:
+    if retrieved_at.utcoffset() is None:
+        raise ValueError("retrieved_at must be timezone-aware")
+    if not git_revision:
+        raise ValueError("git_revision must not be empty")
+    return IngestionReceipt(
+        schema_version=RECEIPT_SCHEMA_VERSION,
+        dataset_id=f"{manifest.provider}:{manifest.venue}:{manifest.symbol}",
+        dataset_version=manifest.dataset_version,
+        manifest_sha256=manifest.manifest_sha256,
+        retrieved_at_utc=retrieved_at.astimezone(UTC).isoformat(),
+        git_revision=git_revision,
+        raw_sha256=tuple(artifact.sha256 for artifact in raw_artifacts),
+        provider_crosscheck_digests=tuple(
+            evidence.evidence_digest for evidence in provider_crosschecks
+        ),
+    )
 
 
 def write_dataset(
@@ -225,16 +276,32 @@ def write_dataset(
     h1: tuple[CanonicalBar, ...],
     d1: tuple[CanonicalBar, ...],
     manifest: DatasetManifest,
+    receipt: IngestionReceipt,
 ) -> Path:
+    if receipt.dataset_version != manifest.dataset_version:
+        raise ValueError("ingestion receipt does not belong to manifest dataset version")
+    store = LocalArtifactStore(root)
     for artifact in raw_artifacts:
-        raw_dir = root / "raw" / manifest.provider / manifest.venue / manifest.symbol / "1m"
-        raw_dir.mkdir(parents=True, exist_ok=True)
-        raw_path = raw_dir / f"{artifact.archive_date.isoformat()}-{artifact.sha256}.zip"
-        _write_or_verify(raw_path, artifact.content)
+        store.put_bytes(
+            (
+                f"raw/{manifest.provider}/{manifest.venue}/{manifest.symbol}/1m/"
+                f"{artifact.archive_date}-{artifact.sha256}.zip"
+            ),
+            artifact.content,
+            "application/zip",
+        )
 
-    dataset_dir = root / "normalized" / manifest.dataset_version
-    dataset_dir.mkdir(parents=True, exist_ok=True)
-    _write_or_verify(dataset_dir / "H1.jsonl", encode_bars_jsonl(h1))
-    _write_or_verify(dataset_dir / "D1.jsonl", encode_bars_jsonl(d1))
-    _write_or_verify(dataset_dir / "manifest.json", manifest.to_json().encode("utf-8"))
-    return dataset_dir
+    dataset_key = f"normalized/{manifest.dataset_version}"
+    store.put_bytes(f"{dataset_key}/H1.jsonl", encode_bars_jsonl(h1), "application/x-ndjson")
+    store.put_bytes(f"{dataset_key}/D1.jsonl", encode_bars_jsonl(d1), "application/x-ndjson")
+    store.put_bytes(
+        f"{dataset_key}/manifest.json",
+        manifest.to_json().encode("utf-8"),
+        "application/json",
+    )
+    store.put_bytes(
+        f"receipts/{manifest.dataset_version}/{receipt.receipt_sha256}.json",
+        receipt.to_json().encode("utf-8"),
+        "application/json",
+    )
+    return root / "normalized" / manifest.dataset_version
