@@ -1,194 +1,339 @@
-# Open Strategy Questions
+# Open Strategy Questions — Phase 2 Evidence-Debt Ledger
 
-These must be answered from evidence or deliberately scoped out before freezing the first strategy candidate.
+**Updated:** 2026-08-12  
+**Phase 1 status:** COMPLETE  
+**Strategy:** `CRT-C3-ALIGNED-v0.1-DRAFT` — NOT FROZEN / NON-EXECUTABLE
 
-## Turtle Soup primitive
+## Purpose
 
-- What exact conditions make a previous high/low an eligible Turtle Soup reference extreme?
-- Do equal highs/lows count, and how should clusters be handled?
-- Is there a minimum age or minimum separation for the old high/low?
-- Must price merely trade beyond the extreme, or must a wick/body/close condition occur?
-- Is there a minimum or maximum sweep distance?
-- Is a close back inside the reference range required?
-- What precisely confirms failure of continuation after the sweep?
-- How many bars may elapse between sweep and confirmation?
-- When is a swept extreme considered invalid/consumed?
-- Are there multiple Turtle Soup variants that need separate formal specifications?
-- What time/session conditions turn a generic liquidity sweep into a valid Romeo Turtle Soup trade?
+Phase 1 is closed. This file now tracks only questions that can materially change the first executable strategy or future separately-versioned expansions.
 
-## CRT range and timeframe semantics
+Questions are classified as:
 
-- What is the exact CRT range definition?
-- What candles/timeframes are permitted to define the range?
-- How is a CRT candle selected versus ignored?
-- How does a higher-timeframe CRT map deterministically to lower-timeframe Turtle Soup behaviour?
-- How are inside bars, overlapping ranges and nested CRTs handled?
-- What exactly is the role of the 50% level: target, reaction zone, invalidation/failure filter, or multiple roles?
-- What makes a parent CRT `active` or `pending` before the target is reached?
-- What determines bullish versus bearish CRT direction in real time?
-- What event moves a parent CRT from `ACCUMULATION` into `MANIPULATION`?
-- What event moves a parent CRT from `MANIPULATION` into `DISTRIBUTION` / Candle 3?
-- Is Candle 3 defined by calendar position, price behavior, confirmation, or a combination?
-- What are the canonical higher-timeframe → lower-timeframe pairs?
-- Episode 4 scopes initial parent candles to H4/D1/W1; what exact evidence defines the execution timeframe beneath each one?
-- Can a parent candle be selected immediately at its open, or only after some internal structure/event appears?
-- What candle-shape properties are actually strategy inputs versus descriptive observations?
+- `P0-ACTIVE` — must be resolved before the first candidate can be frozen;
+- `P1-ACTIVE` — required after the P0 context path is deterministic;
+- `DEFERRED` — explicitly outside first v0.1;
+- `VERSIONED` — belongs to a later doctrine/strategy version.
+
+A missing answer never becomes a trading default. Required unknown state => `NO_SIGNAL`.
+
+---
+
+# P0-ACTIVE — blocks first deterministic candidate
+
+## ED-P0-01 — Parent CRT / Candle-1 selector
+
+Resolved contract:
+
+- parent/trade candle is selected before LTF pattern detection;
+- selected closed range is immutable for that parent instance;
+- hindsight selection is prohibited;
+- ambiguity fails closed.
+
+Still required:
+
+1. What exact observable predicate makes one completed candle the parent/Candle 1?
+2. Are C1/C2/C3 necessarily consecutive chronological candles?
+3. How are inside, nested and overlapping candidate ranges owned?
+4. When does a parent expire or become superseded?
+5. How are simultaneous W1/D1/H4 parent candidates resolved for the selected first route?
+
+**Freeze criterion:** deterministic selector + lifecycle + positive/negative fixtures.
+
+---
+
+## ED-P0-02 — KeyLevelSelector
+
+Resolved contract:
+
+- key level is context, not entry;
+- roles are `DESTINATION` and `REACTION_ORIGIN`;
+- first v0.1 uses `REACTION_FROM_KEY_LEVEL` only;
+- pre-level LTF reversals cannot be retrofitted into valid reactions.
+
+Still required:
+
+1. Which exact structures are eligible price/time key levels for first v0.1?
+2. How are competing levels ranked without hindsight?
+3. What exact event means `LEVEL_REACHED` — touch, wick, trade-through, close or another rule?
+4. What marks a level `CONSUMED`, `INVALIDATED` or `SUPERSEDED`?
+5. Is a time qualifier mandatory for the selected level family?
+
+**Freeze criterion:** versioned registry + ranking + lifecycle + counterexample fixtures.
+
+---
+
+## ED-P0-03 — Candle calendar for selected route
+
+Resolved/high-confidence:
+
+- source calendar uses New York semantics for D1/W1 examples;
+- D1 candidate boundary: `00:00 America/New_York`;
+- W1 candidate reference open: Sunday `17:00 America/New_York`;
+- DST must preserve named wall-clock semantics;
+- asset-class H4 shorthand is strongly interpreted as:
+  - Forex: `01/05/09/13/17/21`
+  - index futures: `02/06/10/14/18/22`
+  - crypto: `00/04/08/12/16/20`.
+
+Still required for the first active route:
+
+1. Are those H4 values candle opens or only high-probability CRT formation times?
+2. What timezone applies to the shorthand?
+3. What venue/session/maintenance policy applies?
+4. How are holidays and missing observations handled?
+5. Can provider-native bars be proven identical to canonical construction?
+
+**Scope option:** if an H4 route cannot be resolved, exclude H4 rather than using provider defaults.
+
+---
+
+## ED-P0-04 — Turtle Soup confirmation / lifecycle
+
+Resolved contract:
+
+```text
+PRE-EXISTING REFERENCE
+    ↓
+STRICT EXCURSION
+    ↓
+TURTLE_SOUP_CANDIDATE
+    ↓
+FAILURE / REVERSAL CONFIRMATION
+    ↓
+TURTLE_SOUP_CONFIRMED
+```
+
+A sweep alone cannot create an entry.
+
+First-party narrowing supports an `OLD_CRTH` bearish reaction-reference subtype.
+
+Still required:
+
+1. Exact eligible reference taxonomy for first v0.1.
+2. Meaning of `old` / reference freshness.
+3. Exact failure/reversal confirmation event.
+4. Same-candle vs later-candle confirmation rules.
+5. Expiry/timeout after excursion.
+6. True-breakout invalidation.
+7. Reference consumption / reuse.
+8. Bullish mirror only if directly evidenced or explicitly specified as a project symmetry assumption in a separate experiment.
+
+**Freeze criterion:** causal bullish/bearish or intentionally one-sided predicate + lifecycle + fixtures.
+
+---
+
+## ED-P0-05 — Context-direction resolver
+
+Resolved contract:
+
+- direction precedes SMT/entry interpretation;
+- `context_direction` and `candidate_direction` are separate;
+- countertrend disabled in first v0.1;
+- direction is stateful and can transition when qualifying opposite evidence appears;
+- future active-candle close is prohibited;
+- unresolved timeframe conflict => `UNKNOWN`.
+
+Still required:
+
+1. Exact bullish/bearish/neutral predicate.
+2. Which timeframe owns direction for the selected first parent route?
+3. What exact close/wick/reference relationship establishes or changes direction?
+4. What makes an opposite CRT sufficiently `convincing` to flip bias?
+5. What is the conflict-resolution rule when multiple HTFs disagree?
+
+**Freeze criterion:** deterministic `BULLISH | BEARISH | NEUTRAL | UNKNOWN` resolver + transition fixtures.
+
+---
+
+# P1-ACTIVE — entry / management freeze debts
+
+## ED-P1-01 — Choose first entry family
+
+Phase 2 must choose **one** based on evidence completeness and determinism, not backtest returns:
+
+```text
+MODEL_1
+OR
+TRUE_MSS
+```
+
+### Model #1 questions
+
+- exact bullish/bearish candle geometry;
+- exact meaning of `thick`;
+- relation to old high/low / Turtle Soup;
+- close requirement;
+- retrace/entry zone;
+- FVG mandatory vs optional.
+
+### True MSS questions
+
+- exact structural swing construction;
+- exact reference high/low;
+- wick vs close break;
+- exact entry region after shift;
+- whether SMT/Turtle Soup/FVG are required for this setup family.
+
+Generic BOS/MSS may not substitute for Romeo true MSS.
+
+---
+
+## ED-P1-02 — Target hierarchy
+
+Need a deterministic immutable `TargetPlan` created before risk approval.
+
+Questions:
+
+1. When is 50% T1 versus context/reaction level?
+2. What setup-specific conditions allow T2 at opposite CRT extreme?
+3. When are prior-day high/low or other liquidity objectives selected instead?
+4. What state change is required after T1 before continuation to T2?
+
+No target may be chosen after observing which level was historically reached.
+
+---
+
+## ED-P1-03 — Structural stop + execution buffer
+
+Source evidence supports a structural invalidation reference in the demonstrated framework.
+
+Need:
+
+- exact strategy stop reference by selected setup;
+- bullish/bearish handling;
+- separate tick/spread/slippage execution buffer;
+- buffer policy frozen before validation rather than optimized against the final test.
+
+---
+
+## ED-P1-04 — Candle-3 confirmation and expiry
+
+Known:
+
+```text
+C2_COMPLETE -> C3_OPEN -> C3_ELIGIBLE
+```
+
+Need:
+
+- exact event producing `C3_ENTRY_CONFIRMED`;
+- relation to selected key level and Turtle Soup;
+- expiry if no confirmation occurs;
+- `C3_NO_SIGNAL` versus `C3_FAILED` semantics;
+- pre-entry and post-entry invalidation events.
+
+---
+
+# DEFERRED — not blockers for first v0.1
+
+## SMT
+
+First v0.1:
+
+```text
+allow_smt_substitution = False
+SMTEvent -> OrderIntent = prohibited
+```
+
+Later version must resolve:
+
+- pair/group registry and polarity;
+- corresponding-extreme construction;
+- synchronization window;
+- stale-data rules;
+- traded-instrument selection;
+- exact substitution relationship with local Turtle Soup.
+
+First-party public pair examples recorded during research include major FX/DXY, NQ/ES, BTC/ETH and Gold/Silver relationships; exact semantics remain versioned research work.
 
 ## Kiss of Death
 
-- What observable ex-ante conditions distinguish a KOD candidate from earlier Turtle Soups before the target is hit?
-- How do we avoid defining KOD retrospectively as `the final Turtle Soup before target`, which would create look-ahead bias?
-- What makes a CRT journey `late enough` for KOD qualification using only information available at that time?
-- Can interaction with the CRT 50% level act as a causal journey-stage boundary for KOD qualification?
-- Must KOD occur after price has already interacted with the CRT 50% level?
-- Is the demonstrated sequence `first Turtle Soup → 50% → bounce → KOD → opposite extreme` mandatory or merely one example?
-- What exactly did Romeo mean by preferring KOD in the `lower 25%` of the range, and how does that map directionally for bearish/bullish setups?
-- Is KOD allowed at OTE instead of the 25% location, and what is the exact OTE definition used here?
-- Is FVG aligned with an old high/low mandatory, preferred, or optional confluence?
-- Is lower-timeframe Model #1 mandatory for KOD execution or only one supported entry model?
-- What invalidates a KOD candidate before lower-timeframe entry confirmation?
-- What is the exact bullish mirror of the bearish KOD sequence?
-- Is Episode 5's pre-key-level KOD the same semantic subtype as Episode 2's final-Turtle-Soup KOD, or are these nested roles at different parent journeys?
+Deferred until an ex-ante classifier exists.
 
-## Journey / phase progression
+Never use retrospective:
 
-- Is the lower-timeframe sequence `Turtle Soup → true MSS → Model #1 → KOD` mandatory, optional, overlapping, or example-specific?
-- What exactly is Romeo's `true market structure shift`, and how is it distinguished from a fake/ordinary MSS?
-- What is the exact breaker concept mentioned alongside true MSS?
-- Can Model #1 occur multiple times within one parent CRT journey?
-- Can Turtle Soup occur multiple times before Candle 3 and, if so, how should events be ranked?
-- How is `target pending` represented in real time without hindsight?
-- What objective families exist: liquidity targets, imbalance/rebalancing targets, 50% targets, or others?
-- What hierarchy chooses the primary target before entry?
-- Does every CRT variant share one journey state machine, or do multiple setup-specific state machines exist?
-- How does the selected parent candle's open price influence phase progression?
-- What intrabar evidence lets the engine infer Candle 2 manipulation before the parent candle has closed?
-- Episode 6 suggests AMD order may not be rigid; what exact alternative sequences are valid and how are they identified causally?
+```text
+last_turtle_soup_before_target
+```
 
-## Candle 3
+as a historical signal feature.
 
-- Is `Candle 2 closed` sufficient to label the next candle `Candle 3`, or must Candle 1/2 first satisfy a complete CRT predicate?
-- Does Candle-3 execution occur literally at the parent Candle-3 open, or only after lower-timeframe confirmation after that open?
-- What exact event turns `C3_ELIGIBLE` into `C3_ENTRY_CONFIRMED`?
-- Must Candle 3 open from a particular side of the Candle-2 range or key level?
-- Is a local Turtle Soup mandatory for Candle 3, or can SMT fully substitute for local manipulation evidence?
-- If SMT substitutes for Turtle Soup, which instrument must show the actual Candle-3 confirmation?
-- What exact relation between Candle-3 open and the key level is required?
-- Is 50% primarily an expected entry retracement, a target, a reaction point, or different roles in different setup families?
-- How should `near 50%` be quantified without curve fitting?
-- What exact regime condition allows shallower-than-50% retracement?
-- Does strong trend change only entry retracement depth, or also target/stop logic?
-- What specific pre-entry conditions make a Candle-3 CRT likely to fail versus succeed?
-- Does reaching 50% before Candle 3 begins strengthen, weaken, complete, or invalidate the intended setup?
-- What happens if Candle 3 opens but no valid LTF confirmation appears before the parent candle closes?
-- Can a valid CRT journey terminate as `NO_SIGNAL` without being labeled a failed strategy setup?
-- Which target is primary for Candle 3: 50%, Candle-1 extreme, parent key level, pending HTF target, or setup-specific hierarchy?
-- What exact event completes Candle 3 successfully?
-- What exact event invalidates Candle 3 before entry?
-- What exact event invalidates Candle 3 after entry?
-- Does Episode 8 supersede any Episode-7 Candle-3 assumptions?
+## Time exits
 
-## Key levels
+Disabled until deterministic source semantics exist.
 
-- What exact structures qualify as Romeo price key levels?
-- What exact structures qualify as time key levels?
-- Are old highs/lows always valid key levels or only under additional context?
-- How are multiple W1 → D1 → H4 key levels ranked when they conflict or overlap?
-- What numerical tolerance defines `at the key level`?
-- Does a touch, wick through, body trade-through, or candle close mark a level as reached?
-- What event marks a key level as consumed or invalidated?
-- Can a destination key level become a reaction-origin key level immediately after being reached?
-- For `journey-to-key-level` trades, what exact event supplies entry and where does the position exit relative to the level?
-- For `reaction-from-key-level` trades, must price first hit/purge the level before any LTF confirmation can qualify?
-- What separates the fake MSS before the key level from the true MSS at the level?
-- Does the true MSS require a specific time window as well as the price level?
-- Is SMT mandatory for identifying the real key-level reaction or only additional confluence?
-- Does key-level type determine which entry models are legal?
+## Journey-to-key-level trading
 
-## SMT / cross-market context
+Excluded from first v0.1; reaction-from-level only initially.
 
-- What does `SMT` expand to in Romeo's own terminology?
-- What exact pair/group registry does Romeo use for ES/NQ/Dow, Gold/Silver, BTC/ETH and FX/DXY?
-- For each pair/group, is the expected relationship correlated, inverse, or context-dependent?
-- Which market is `the one that takes` and which is `the one that doesn't`, and what directional inference follows?
-- Does the non-take represent weakness, strength, or only divergence until confirmation?
-- What corresponding high/low definition is used across the pair?
-- What synchronization window is valid between the two markets' reference events?
-- Is a wick through sufficient, or must a close beyond the corresponding level occur?
-- What happens when both instruments take the level?
-- What happens when neither instrument takes the level?
-- Is SMT required only at key levels, or can it qualify the journey toward a key level?
-- Is SMT mandatory for any CRT setup family, or always optional context/confluence?
-- Can SMT fully substitute for a local Turtle Soup? Under exactly what conditions?
-- Is SMT an entry confirmation, manipulation detector, target selector, failure filter, or multiple roles depending on state?
-- Does true MSS need to form on the primary instrument, the comparison instrument, or either?
-- Which instrument's Model #1 is used for actual execution?
-- How is the instrument to trade selected after SMT appears?
-- How do different market sessions and holidays affect pair validity?
-- How stale may one market's data be before SMT becomes `UNKNOWN`?
-- How does Episode 8 use SMT as a CRT failure condition?
-- What does Episode 9 refine about `correct SMT usage`?
-- Does SMT alter the Candle 2 → Candle 3 transition?
+## Countertrend CRT
 
-## Context / liquidity
+Excluded from first v0.1; must become separate strategy variant if researched later.
 
-- What liquidity levels are required vs optional?
-- How is higher-timeframe direction/context established?
-- Is SMT required, optional confirmation, or a failure filter depending on setup type?
-- What explicit no-trade conditions exist?
+## Candle-2 trading
 
-## Entry / confirmation
+Deferred until base Candle-3 strategy is frozen and validated.
 
-- What exact event confirms entry?
-- Is displacement required? If so, how is it measured?
-- What exactly constitutes Romeo's `true market structure shift`?
-- What is the deterministic definition of Model #1?
-- What makes a candle `thick` or otherwise eligible for Model #1?
-- Are FVGs required or probability enhancers only?
+## Adaptive / regime rules
 
-## Invalidation / exit
+Deferred:
 
-- What invalidates a candidate before entry?
-- Where is stop loss placed for each entry model?
-- How is the target selected?
-- Are partials/breakeven/trailing part of the methodology?
-- When is `Candle 3` considered complete or failed?
+- `near 50%` thresholds;
+- strong-trend shallow retracement;
+- optional confluence scoring;
+- broad market-regime model.
 
-## Time / markets / candle construction
+No numerical threshold may be selected because it produces a prettier backtest.
 
-- What sessions/trading windows are valid?
-- What does Romeo mean operationally when saying time is more important than price?
-- What exact features define `time meets price`?
-- What timezone/session anchor defines Romeo's H4 candles?
-- What exact H4 start times are valid?
-- What is the canonical Daily candle open/close?
-- What is the canonical Weekly candle open/close?
-- Do Forex, indices, metals and crypto require different candle-boundary calendars?
-- How is DST handled for all parent and execution candles?
-- Which instrument classes and timeframe combinations are in scope?
-- Are H4/D1/W1 boundaries provider-native, New-York anchored, London anchored, or otherwise normalized?
+---
 
-## Backtesting / information-set safety
+# VERSIONED — doctrine evolution
 
-- For each phase label, what information was actually available at timestamp `t`?
-- Which retrospective labels are allowed for research annotation but prohibited as live signal inputs?
-- How do we ensure Candle 3 completion is not used to justify an entry that occurred during Candle 2?
-- How do we ensure KOD is never labeled from knowledge of the future target hit?
-- How do we ensure final parent-candle high/low/close/body/wicks are never used for an intrabar decision before those values existed?
-- What minimum event granularity is required to reconstruct candle snapshots faithfully: ticks, 1m bars, or another base interval?
-- How are provider bar-boundary discrepancies detected and prevented from changing CRT labels silently?
-- How do we prevent a key level from being labeled `important` only because a future reversal later occurred there?
-- How do we define destination/reaction roles ex ante rather than from the completed path?
-- How do we prevent pair-selection hindsight by fixing SMT relationships before the signal timestamp?
-- How do we ensure both instruments are compared using data available at the same causal timestamp?
-- How do we prevent stale/missing comparison data from becoming a false SMT non-take?
-- How are differing session calendars normalized without fabricating cross-market observations?
-- How are corresponding highs/lows chosen without selecting the pair of extremes that looks best after the outcome?
-- How do we prevent final Candle-3 direction/high/low/close from being used at Candle-3 open?
-- How do we separate `C3_ELIGIBLE`, `C3_ENTRY_CONFIRMED`, `C3_NO_SIGNAL`, and `C3_FAILED` without using future outcomes to label earlier states?
+## 2024 vs 2025 vs 2026
 
-## Corpus/versioning
+The engine must preserve doctrine versions instead of silently merging them:
 
-- Which 2024 foundation rules were refined, superseded or narrowed by 2025 CRT Secrets?
-- Which 2025 rules were refined or superseded by 2026 CRTology?
-- Should the engine support distinct doctrine versions instead of silently merging all public teaching into one strategy?
+```text
+CRT_FOUNDATION_2024
+CRT_SECRETS_2025
+CRTOLOGY_2026
+```
+
+The first candidate uses:
+
+```text
+CRT_SECRETS_2025
+```
+
+Any 2026 rule that changes a 2025 interpretation requires an explicit doctrine-diff / strategy-version decision.
+
+---
+
+# Information-set safety — mandatory, not open
+
+The following are already resolved engineering invariants:
+
+- no final HTF OHLC before close;
+- no future swing points;
+- no retrospective parent/key-level selection;
+- no retrospective KOD;
+- no target selected after outcome;
+- no Candle-3 final state at Candle-3 open;
+- synchronized causal timestamps for cross-market data;
+- stale/missing required data => `UNKNOWN`;
+- provider candle-boundary mismatch is an error, not silent acceptance;
+- every strategy decision must retain `information_available_at` and rule/evidence provenance.
+
+---
+
+# Phase 2 completion condition
+
+This ledger is clear enough to start formalization but **not** to execute the strategy.
+
+`CRT-C3-ALIGNED-v0.1` can move to `FROZEN_FOR_VALIDATION` only when every active-path P0 and selected-entry P1 debt is either:
+
+1. resolved deterministically with evidence + fixtures; or
+2. explicitly removed from the strategy path.
+
+There may be no unresolved placeholder on the order path.

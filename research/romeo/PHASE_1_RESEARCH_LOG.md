@@ -1,304 +1,349 @@
-# Phase 1 Research Log
+# Phase 1 Research Log — Final
 
-## 2026-08-12 — Pass 1: corpus discovery
+**Phase:** Romeo public corpus research and reconciliation  
+**Started:** 2026-08-12  
+**Completed:** 2026-08-12  
+**Final status:** **COMPLETE**  
+**Strategy status:** `CRT-C3-ALIGNED-v0.1-DRAFT` — NOT FROZEN / NON-EXECUTABLE
 
-Phase 1 has started. This pass establishes a provenance-first inventory of Romeo / @Romeotpt public material before any strategy rules are promoted into the formal CRT specification.
+## Research protocol
 
-### Research rules for this phase
-
-1. Prefer Romeo's own YouTube/Telegram/X material as primary evidence.
-2. Third-party summaries may be used for discovery and provisional notes only.
-3. A trading rule cannot become `VERIFIED` from a third-party summary alone.
-4. Preserve video IDs, titles, dates, durations, timestamps and contradictions.
-5. Separate claims made by the source from facts independently established by this project.
-6. Do not use profitability claims as evidence that a rule is valid.
-7. Do not code candidate strategy logic until its required semantics are sufficiently resolved.
-
-### Initial corpus discovery
-
-Current discovery identified the original 2024 foundation videos, the 2025 `CRT Secrets` public mentorship series through episode 10, a live tape-reading session, and a newer 2026 `CRTology` series beginning with `CRTology episode 1: SS`.
-
-The source registry is the machine-readable inventory. Items marked `DISCOVERED` still require a transcript/direct-video evidence pass before rule promotion.
-
-### First high-value research targets
-
-1. `What is CRT? Why do all other trading strategies suck?`
-2. `CRT secrets ep.1: One CRT model for life`
-3. `CRT secrets 3: The journey`
-4. `CRT secrets 4: Candle anatomy`
-5. `CRT secrets ep.5: Key level`
-6. `CRT secrets ep.6: SMT`
-7. `CRT secrets ep.7: Candle 3`
-8. `CRT secrets ep.8: When does CRT fail?`
-9. `CRT secrets ep.9: Connecting the dots`
-10. `CRTology episode 1: SS`
-
-These are prioritized because together they appear to define the object model (candle/range), setup sequence, timeframe relationship, context/key-level selection, confirmation, failure modes, and trade framing.
-
-### Provisional concepts observed during discovery
-
-These are hypotheses awaiting direct-source verification:
-
-- Every candle is treated as a range.
-- A candle/range can resolve through breakout or a Turtle Soup-type purge/rejection; inside bars require separate handling.
-- CRT is described as fractal across timeframes.
-- Candle 1 / Candle 2 / Candle 3 are associated with accumulation / manipulation / distribution.
-- Romeo repeatedly emphasizes selecting the candle/range first, then using context rather than trading patterns blindly.
-- Higher-timeframe context is paired with lower-timeframe execution/confirmation.
-- The 50% level of a CRT range is repeatedly referenced as an important target/reaction level.
-- Model #1, Turtle Soup, Kiss of Death, true market-structure shift, key levels and SMT are recurring components of the public system.
-- Time is repeatedly described as more important than price; exact time rules remain unresolved.
-
-None of the above is production logic yet.
-
-### Known evidence-quality limitations
-
-- The public YouTube channel HTML is difficult to enumerate directly through the current research interface.
-- Video Highlight exposes YouTube metadata and AI-generated summaries for many videos; these summaries are useful for discovery but explicitly warn that they may be inaccurate.
-- Romeo's public Telegram provides direct YouTube links/IDs for several videos and therefore serves as stronger provenance for existence/title association.
-- Some exact publication dates/durations still need direct metadata confirmation.
-
-### Next pass
-
-Perform timestamped evidence extraction for the foundation videos and CRT Secrets episodes, beginning with `What is CRT?`, then create candidate rule records with confidence and contradictions. Do not freeze `CRT-v0.1` until this evidence pass is complete.
+1. Prefer Romeo's own YouTube / Telegram / public material as primary evidence.
+2. Third-party summaries are discovery/provisional aids only.
+3. A strategy-critical rule cannot become `VERIFIED` from a third-party summary alone.
+4. Preserve source identity, timestamps where available, contradictions and confidence.
+5. Separate explicit source statements from project inference.
+6. Never use profitability to decide which interpretation of a contradiction is correct.
+7. Preserve the information set available at timestamp `t`; no retrospective signal labels.
+8. Quarantine unproven/private/repacked sources.
+9. Unknown strategy-critical semantics fail closed rather than becoming guessed defaults.
 
 ---
 
-## 2026-08-12 — Pass 2: Turtle Soup foundation
+## Pass 1 — Corpus discovery
 
-Analyzed `ROMEO-2024-TS — What is turtle soup?` using indexed timestamped transcript/summary material.
+Established the public-source registry and evidence protocol.
 
-### Result
+Corpus baseline includes:
 
-The safest source-supported abstraction is:
+- 2024 Turtle Soup foundation
+- 2024 CRT foundation
+- 2025 CRT Secrets Episodes 1–10
+- 2025 live tape-reading session
+- second public live tape-reading source registered for later fixture cross-validation
+- 2026 CRTology Episode 1 registered as a separate doctrine-generation source
 
-```text
-reference prior extreme
-      ↓
-price excursions beyond it
-      ↓
-continuation fails
-      ↓
-price reverses away
-```
+Output:
 
-Bearish and bullish variants are mirror images around an old high / old low.
-
-### Important boundary
-
-This video does **not** yet provide enough deterministic detail to implement a production entry. Exact reference-extreme eligibility, timing, confirmation, entry, stop and target rules remain unresolved.
-
-### Repository changes
-
-- Added `research/romeo/videos/ROMEO-2024-TS.md`
-- Updated `GLOSSARY.md`
-- Expanded `OPEN_QUESTIONS.md`
-- Marked `ROMEO-2024-TS` as `EVIDENCE_PASS_1` in the source registry
-- Created provisional candidates `TS-P001` through `TS-P007`
-
-### Architectural consequence
-
-Treat Turtle Soup as a **structural primitive** that later CRT context and execution models constrain, not as the entire strategy by itself.
-
-### Next source
-
-`ROMEO-2025-S2 — CRT secrets episode 2: The kiss of death` is the next evidence target because it explicitly presents Kiss of Death as a Turtle Soup model and should clarify how a structural sweep is converted into an actionable CRT setup.
+- `SOURCE_REGISTRY.csv`
+- source confidence/provenance discipline
+- initial glossary and open-question ledger
 
 ---
 
-## 2026-08-12 — Pass 3: Kiss of Death
+## Pass 2 — Turtle Soup foundation
 
-Analyzed `ROMEO-2025-S2 — CRT secrets episode 2: The kiss of death`.
+Source: `ROMEO-2024-TS`
 
-### Result
-
-Kiss of Death is source-backed as a specialized Turtle Soup within an already-active CRT journey. The demonstrated bearish path links Candle 1 range selection, movement through the range, a late Turtle Soup, optional FVG/old-high confluence, lower-timeframe Model #1 execution, 50% as an intermediate objective, and the opposite CRT extreme as a later objective.
-
-### Critical validation finding
-
-Romeo describes KOD as the **final Turtle Soup before the target is hit**. That wording is not directly safe to code because identifying the final event retrospectively would leak future information into historical signals.
-
-Therefore `last_turtle_soup_before_target` is explicitly prohibited as a backtest classifier. Later sources must provide real-time qualifying conditions that allow a KOD candidate to be recognized before the target is reached.
-
-### Repository changes
-
-- Added `research/romeo/videos/ROMEO-2025-S2.md`
-- Updated `GLOSSARY.md` with KOD, Candle 1/2/3, CRT 50%, opposite CRT extreme and FVG-confluence terms
-- Expanded `OPEN_QUESTIONS.md` with KOD-specific and look-ahead-bias questions
-- Marked `ROMEO-2025-S2` as `EVIDENCE_PASS_1` in `SOURCE_REGISTRY.csv`
-- Created provisional candidates `KOD-P001` through `KOD-P010`
-
-### Architectural consequence
-
-The emerging decomposition is:
+Safest abstraction:
 
 ```text
-parent CRT context
-      ↓
-Turtle Soup / KOD candidate
-      ↓
-confluence
-      ↓
-LTF entry model
-      ↓
-independent risk
-      ↓
-target management
+PRE-EXISTING REFERENCE EXTREME
+        ↓
+EXCURSION BEYOND EXTREME
+        ↓
+CONTINUATION FAILURE
+        ↓
+REVERSAL AWAY
 ```
 
-KOD detection and Model #1 entry detection must remain separate modules.
+Turtle Soup was classified as a reusable structural primitive, not a complete entry strategy.
 
-### Next source
-
-`ROMEO-2025-S3 — CRT secrets 3: The journey` should be analyzed next because it is the most likely source to clarify Candle 1→2→3 sequencing, target progression, and the ex-ante state needed to distinguish a late KOD from an arbitrary Turtle Soup.
+Critical unresolved semantics were recorded rather than inferred: reference selection, sweep threshold, close/failure confirmation, timeout, consumption, time/session, entry, stop and target.
 
 ---
 
-## 2026-08-12 — Pass 4: The Journey
+## Pass 3 — Kiss of Death
 
-Analyzed `ROMEO-2025-S3 — CRT secrets 3: The journey`.
+Source: `ROMEO-2025-S2`
 
-### Result
+KOD was reconciled as a specialized Turtle-Soup concept within an active CRT journey.
 
-Episode 3 reinforces CRT as a **stateful higher-timeframe journey with lower-timeframe internal events**, rather than a static candlestick pattern. It separates HTF context from LTF execution and presents Turtle Soup, true MSS, Model #1, and KOD as recurring lower-timeframe concepts along the path toward a higher-timeframe target.
-
-Romeo also recommends Candle 3 as the safer initial focus for learners while treating Candle 2 as more advanced/riskier. This is recorded as a pedagogical/setup-selection preference, not as evidence of superior expectancy.
-
-### Critical validation finding
-
-Phase labels themselves can create hindsight leakage. Historical annotation may easily label Candle 1/2/3 after a complete sequence, but a live/backtest signal must only use phase information inferable at timestamp `t`.
-
-The project now explicitly requires an `information_available_at` test for every CRT phase transition and continues to prohibit retrospective KOD labeling.
-
-### Repository changes
-
-- Added `research/romeo/videos/ROMEO-2025-S3.md`
-- Marked `ROMEO-2025-S3` as `EVIDENCE_PASS_1`
-- Updated `GLOSSARY.md` with CRT journey, true MSS, and HTF-context/LTF-execution semantics
-- Expanded `OPEN_QUESTIONS.md` with journey state-transition and information-set-safety questions
-- Created provisional candidates `JRN-P001` through `JRN-P010`
-
-### Architectural consequence
-
-The current research model is now explicitly hierarchical:
+Critical anti-look-ahead finding:
 
 ```text
-HIGHER-TIMEFRAME CRT STATE
-          ↓
-LOWER-TIMEFRAME JOURNEY EVENTS
-          ↓
-ENTRY MODEL
-          ↓
-INDEPENDENT RISK
+"last Turtle Soup before target"
 ```
 
-### Next source
+cannot be implemented retrospectively. A causal ex-ante classifier is required before KOD can enter an executable strategy.
 
-`ROMEO-2025-S4 — CRT secrets 4: Candle anatomy` is the next evidence target. It is expected to clarify candle mechanics, opening/closing time, timeframe construction and the live transition semantics needed to make the CRT state machine deterministic.
+Result: KOD excluded from the first v0.1 active path.
 
 ---
 
-## 2026-08-12 — Pass 5: Candle Anatomy
+## Pass 4 — The Journey
 
-Analyzed `ROMEO-2025-S4 — CRT secrets ep.4: Candle anatomy`.
+Source: `ROMEO-2025-S3`
 
-### Result
+CRT was formalized as a stateful higher-timeframe journey containing lower-timeframe events, rather than a static candlestick pattern.
 
-Episode 4 establishes the **trade/parent candle as a first-class object**. The analysis order is parent candle first, then context/narrative, then lower-timeframe technical patterns. Candle anatomy is explicitly tied to opening time, closing time and the price movement that occurs in between.
+Candle 3 became the preferred first research focus; Candle 2 was kept outside the first minimal strategy.
 
-The strongest new scope rule is the public foundational parent-candle whitelist `{H4, D1, W1}`. When expressing top-down hierarchy, the project uses `W1 → D1 → H4`; the whitelist is a set rather than a requirement to traverse every level on every trade.
-
-### Critical validation finding
-
-Final candle anatomy is future data for an intrabar decision. A historical signal occurring before the parent candle close may only consume a timestamped snapshot (`open`, `high_so_far`, `low_so_far`, `current_price`, known time boundaries), never the final close/high/low/body/wicks that formed later.
-
-This joins the existing KOD and Candle-phase safeguards as a formal anti-look-ahead constraint.
-
-### Repository changes
-
-- Added `research/romeo/videos/ROMEO-2025-S4.md`
-- Marked `ROMEO-2025-S4` as `EVIDENCE_PASS_1`
-- Updated `GLOSSARY.md` with Trade Candle, Candle Anatomy, Candle Snapshot, initial H4/D1/W1 scope and Candle Boundary
-- Expanded `OPEN_QUESTIONS.md` with H4/D1/W1 calendar, DST, execution-timeframe and intrabar-information questions
-- Created provisional candidates `ANA-P001` through `ANA-P008`
-
-### Architectural consequence
-
-The hierarchy is now:
-
-```text
-CALENDAR / TIME ENGINE
-        ↓
-TRADE-CANDLE SELECTOR
-        ↓
-PARENT CANDLE LIFECYCLE
-        ↓
-CRT JOURNEY STATE
-        ↓
-LTF INTERNAL EVENTS
-        ↓
-ENTRY QUALIFICATION
-        ↓
-INDEPENDENT RISK
-```
-
-The calendar/session engine is strategy-critical because incorrect bar boundaries can change the CRT itself.
-
-### Next source
-
-`ROMEO-2025-S5 — CRT secrets 5: Key level` is next. Parent-candle selection alone does not tell us **where** a valid interaction should occur; Episode 5 should help define the price/time location hierarchy needed to qualify meaningful Turtle Soup/KOD/entry events.
+All phase labels became subject to `information_available_at` / causal-timestamp rules.
 
 ---
 
-## 2026-08-12 — Pass 6: Key Level
+## Pass 5 — Candle Anatomy
 
-Analyzed `ROMEO-2025-S5 — CRT secrets ep.5: Key level`.
+Source: `ROMEO-2025-S4`
 
-### Result
+Key findings:
 
-Episode 5 establishes key level as a **context/location concept rather than an entry signal**. Romeo separates two valid opportunity families:
+- parent/trade candle is first-class;
+- open time, close time and intrabar path are part of candle anatomy;
+- foundational parent universe `{H4, D1, W1}`;
+- final candle high/low/close/body/wicks are prohibited before candle completion.
+
+This elevated the calendar/bar builder into a strategy-critical domain component.
+
+---
+
+## Pass 6 — Key Level
+
+Source: `ROMEO-2025-S5`
+
+Key level was classified as context/location, not entry.
+
+Two public opportunity roles were preserved:
 
 ```text
-A. JOURNEY TO KEY LEVEL
-B. REACTION FROM KEY LEVEL
+JOURNEY_TO_KEY_LEVEL
+REACTION_FROM_KEY_LEVEL
 ```
 
-He also warns that convincing lower-timeframe reversal patterns and MSS-like structures can form before the actual key level is reached, making pattern-first execution unsafe.
+Pattern-first lower-timeframe reversals before the true level were identified as a major false-positive risk.
 
-### Critical architectural finding
+Minimal v0.1 later narrowed to `REACTION_FROM_KEY_LEVEL` only.
 
-The detector ordering must become context-first:
+---
+
+## Pass 7 — SMT
+
+Source: `ROMEO-2025-S6`
+
+SMT was reconciled as synchronized cross-market context/confirmation rather than a direct order trigger.
+
+Engineering consequences:
+
+- explicit relationship registry;
+- synchronized causal replay;
+- stale/missing comparison data => `UNKNOWN`;
+- no pair-selection hindsight;
+- no `SMTEvent -> OrderIntent` path.
+
+A possible SMT substitution for a missing local Turtle Soup remained unresolved and was therefore disabled for first v0.1.
+
+---
+
+## Pass 8 — Candle 3
+
+Source: `ROMEO-2025-S7`
+
+Primary state transition:
 
 ```text
-PARENT CRT / W1→D1→H4 CONTEXT
-          ↓
-KEY LEVEL
-          ↓
-ROLE: DESTINATION OR REACTION ORIGIN
-          ↓
-LOCATION + TIME STATE
-          ↓
-LTF PATTERN / CONFIRMATION
-          ↓
-ENTRY
-          ↓
-RISK
+CANDLE 2 COMPLETE
+        ↓
+CANDLE 3 OPENS
+        ↓
+C3_ELIGIBLE
 ```
 
-A Turtle Soup, MSS, Model #1 or KOD candidate without valid location/context should not automatically become a trade candidate.
+Candle-3 open is a temporal eligibility gate, **not entry**.
 
-### KOD tension discovered
+Key-level context remains required before LTF confirmation. The exact confirmation/expiry semantics were retained as Phase-2 evidence debt.
 
-Episode 2 describes KOD as the final Turtle Soup before target delivery. Episode 5 associates KOD/Turtle-Soup behavior with a fake reversal before the actual key-level reaction. These may reflect nested CRT journeys at different timeframes, but the engine must not collapse them into one global KOD predicate until later evidence resolves the semantics.
+---
 
-### Repository changes
+## Pass 9 — CRT failure
 
-- Added `research/romeo/videos/ROMEO-2025-S5.md`
-- Marked `ROMEO-2025-S5` as `EVIDENCE_PASS_1`
-- Updated `GLOSSARY.md` with Key Level, Destination Key Level, Reaction-Origin Key Level, Fake MSS and Time Key Level
-- Expanded `OPEN_QUESTIONS.md` with key-level ranking, location-tolerance, consumption, true-vs-fake MSS and KOD-role questions
-- Created provisional candidates `KL-P001` through `KL-P009`
+Source: `ROMEO-2025-S8`
 
-### Next source
+Failure was decomposed into state/invalidation classes rather than binary lost trades:
 
-`ROMEO-2025-S6 — CRT secrets ep.6: SMT` is next because Episode 5 explicitly places SMT alongside the true market-structure-shift example. The next pass must determine whether SMT is required confirmation, optional confluence, a cross-asset selector, or a failure filter.
+- confirmed SMT conflict against remaining expectation;
+- Target 1 / 50% already consumed;
+- directional-context conflict;
+- incomplete/misread CRT state.
+
+Outcome analytics were expanded beyond win/loss:
+
+```text
+NO_ENTRY
+INVALIDATED_PRE_ENTRY
+STOPPED_BEFORE_T1
+T1_REACHED
+T1_REACHED_T2_REACHED
+T1_REACHED_T2_NOT_REACHED
+INVALIDATED_AFTER_ENTRY
+```
+
+Directionally aligned-only scope became the first-candidate policy.
+
+---
+
+## Pass 10 — Connecting the Dots
+
+Source: `ROMEO-2025-S9`
+
+Strongest end-to-end ordering recovered:
+
+```text
+HTF NARRATIVE
+  ↓
+PARENT CRT
+  ↓
+KEY LEVEL / LIQUIDITY CONTEXT
+  ↓
+TARGET + DIRECTION STATE
+  ↓
+SMT / MANIPULATION CONTEXT
+  ↓
+MODEL #1 OR TRUE MSS
+  ↓
+STRUCTURAL STOP
+  ↓
+PRICE / TIME EXIT
+  ↓
+RISK ENGINE
+```
+
+Key consequences:
+
+- context-first, entry-model-last;
+- Model #1 / true MSS become first public entry-family whitelist;
+- SMT filtered by HTF direction and still not direct entry;
+- structural stop reference tied to qualifying structural extreme in demonstrated framework;
+- target selected from pre-trade narrative;
+- `TradePlan` becomes immutable before risk approval.
+
+Exact Model #1 geometry, true MSS algorithm, stop buffer, target hierarchy and time exits remained unresolved.
+
+---
+
+## Pass 11 — A Clean Close
+
+Source: `ROMEO-2025-S10`
+
+Episode 10 was treated as a process/governance close, **not** a new `clean_close` entry signal.
+
+It reinforced:
+
+- correct key-level selection;
+- draw-liquidity awareness;
+- journaling;
+- mistake correction;
+- repeated review;
+- strategy discipline and avoiding strategy hopping.
+
+This strengthened the project's versioned promotion/journal architecture.
+
+---
+
+## Reconciliation pass
+
+After Episodes 1–10, Phase 1 moved from video-by-video research to doctrine reconciliation.
+
+Created:
+
+- `reconciliation/RULE_EVIDENCE_MATRIX.md`
+- `reconciliation/CONTRADICTION_MATRIX.md`
+- `reconciliation/BLOCKER_PRIORITY.md`
+- `reconciliation/P0_01_PARENT_CRT_SELECTOR.md`
+- `reconciliation/P0_02_KEY_LEVEL_SELECTOR.md`
+- `reconciliation/P0_03_CANDLE_CALENDAR.md`
+- `reconciliation/P0_04_TURTLE_SOUP_PRIMITIVE.md`
+- `reconciliation/P0_05_CONTEXT_DIRECTION.md`
+- `strategy/CRT_V0.1_SPEC.md`
+
+The five P0 topics were converted from vague unknowns into explicit causal contracts with named missing predicates.
+
+---
+
+## Closure Pass 1 — First-party text + live provenance
+
+Outputs:
+
+- live-session precommitment source established;
+- bearish `OLD_CRTH` reference subtype directly narrowed from first-party wording;
+- CRT highs/lows linked to the 50% / Turtle-Soup narrative;
+- context direction recognized as stateful, not a permanent weekly label;
+- causal fixture protocol established.
+
+No P0 was falsely closed.
+
+---
+
+## Closure Pass 2 — transcript / source recovery
+
+Outputs:
+
+- direction-flip clarification fixture added;
+- live source retained as precommitment evidence where chart state was inaccessible;
+- detailed unproven `Turtle Soup Method A to Z` source quarantined rather than treated as public Romeo doctrine;
+- no hidden chart content reconstructed from hindsight.
+
+No P0 was falsely closed.
+
+---
+
+## Closure Pass 3 — source inventory expansion
+
+Outputs:
+
+- incorrect `Daily Bias` attribution corrected as secondary/non-Romeo evidence;
+- Romeo first-party asset-class shorthand interpreted with high confidence as candidate H4 sequences:
+  - Forex `01/05/09/13/17/21`
+  - index futures `02/06/10/14/18/22`
+  - crypto `00/04/08/12/16/20`
+- shorthand remains non-verified for exact timezone/semantic role/venue handling;
+- explicit bullish `old CRTL` mirror was not found and therefore not invented;
+- scope-reduction options documented.
+
+No P0 was falsely closed.
+
+---
+
+## Final Phase 1 decision
+
+Phase 1 is complete because:
+
+- relevant public corpus baseline is indexed;
+- first-pass evidence notes exist through CRT Secrets Episode 10;
+- provenance and source quality are explicit;
+- contradictions are catalogued;
+- architecture-safe conclusions are separated from alpha-rule gaps;
+- unresolved strategy-critical semantics are named and fail closed;
+- a minimal Phase-2 doctrine boundary is documented;
+- no unsupported profitability or execution claim has been made.
+
+Canonical closeout:
+
+- `research/romeo/PHASE_1_COMPLETION_REPORT.md`
+- `research/romeo/reconciliation/P0_MINIMAL_DOCTRINE_DECISION.md`
+
+## Handoff
+
+Phase 2 begins with:
+
+```text
+CRT-C3-ALIGNED-v0.1-DRAFT
+```
+
+and must convert the remaining evidence debts into deterministic rules and fixtures before moving to:
+
+```text
+FROZEN_FOR_VALIDATION
+```
+
+Phase 1 completion does not authorize backtesting claims, paper trading, shadow trading or live execution.
