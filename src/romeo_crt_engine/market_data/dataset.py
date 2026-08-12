@@ -185,6 +185,14 @@ def build_manifest(
     )
 
 
+def _write_or_verify(path: Path, expected: bytes) -> None:
+    if path.exists():
+        if path.read_bytes() != expected:
+            raise ValueError(f"immutable dataset path contains different content: {path}")
+        return
+    path.write_bytes(expected)
+
+
 def write_dataset(
     *,
     root: Path,
@@ -197,14 +205,11 @@ def write_dataset(
         raw_dir = root / "raw" / manifest.provider / manifest.venue / manifest.symbol / "1m"
         raw_dir.mkdir(parents=True, exist_ok=True)
         raw_path = raw_dir / f"{artifact.archive_date.isoformat()}-{artifact.sha256}.zip"
-        if raw_path.exists() and raw_path.read_bytes() != artifact.content:
-            raise ValueError(f"content-addressed raw artifact collision: {raw_path}")
-        if not raw_path.exists():
-            raw_path.write_bytes(artifact.content)
+        _write_or_verify(raw_path, artifact.content)
 
     dataset_dir = root / "normalized" / manifest.dataset_version
-    dataset_dir.mkdir(parents=True, exist_ok=False)
-    (dataset_dir / "H1.jsonl").write_bytes(encode_bars_jsonl(h1))
-    (dataset_dir / "D1.jsonl").write_bytes(encode_bars_jsonl(d1))
-    (dataset_dir / "manifest.json").write_text(manifest.to_json(), encoding="utf-8")
+    dataset_dir.mkdir(parents=True, exist_ok=True)
+    _write_or_verify(dataset_dir / "H1.jsonl", encode_bars_jsonl(h1))
+    _write_or_verify(dataset_dir / "D1.jsonl", encode_bars_jsonl(d1))
+    _write_or_verify(dataset_dir / "manifest.json", manifest.to_json().encode("utf-8"))
     return dataset_dir
