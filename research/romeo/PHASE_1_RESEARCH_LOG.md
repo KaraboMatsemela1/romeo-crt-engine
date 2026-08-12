@@ -151,3 +151,47 @@ KOD detection and Model #1 entry detection must remain separate modules.
 ### Next source
 
 `ROMEO-2025-S3 — CRT secrets 3: The journey` should be analyzed next because it is the most likely source to clarify Candle 1→2→3 sequencing, target progression, and the ex-ante state needed to distinguish a late KOD from an arbitrary Turtle Soup.
+
+---
+
+## 2026-08-12 — Pass 4: The Journey
+
+Analyzed `ROMEO-2025-S3 — CRT secrets 3: The journey`.
+
+### Result
+
+Episode 3 reinforces CRT as a **stateful higher-timeframe journey with lower-timeframe internal events**, rather than a static candlestick pattern. It separates HTF context from LTF execution and presents Turtle Soup, true MSS, Model #1, and KOD as recurring lower-timeframe concepts along the path toward a higher-timeframe target.
+
+Romeo also recommends Candle 3 as the safer initial focus for learners while treating Candle 2 as more advanced/riskier. This is recorded as a pedagogical/setup-selection preference, not as evidence of superior expectancy.
+
+### Critical validation finding
+
+Phase labels themselves can create hindsight leakage. Historical annotation may easily label Candle 1/2/3 after a complete sequence, but a live/backtest signal must only use phase information inferable at timestamp `t`.
+
+The project now explicitly requires an `information_available_at` test for every CRT phase transition and continues to prohibit retrospective KOD labeling.
+
+### Repository changes
+
+- Added `research/romeo/videos/ROMEO-2025-S3.md`
+- Marked `ROMEO-2025-S3` as `EVIDENCE_PASS_1`
+- Updated `GLOSSARY.md` with CRT journey, true MSS, and HTF-context/LTF-execution semantics
+- Expanded `OPEN_QUESTIONS.md` with journey state-transition and information-set-safety questions
+- Created provisional candidates `JRN-P001` through `JRN-P010`
+
+### Architectural consequence
+
+The current research model is now explicitly hierarchical:
+
+```text
+HIGHER-TIMEFRAME CRT STATE
+          ↓
+LOWER-TIMEFRAME JOURNEY EVENTS
+          ↓
+ENTRY MODEL
+          ↓
+INDEPENDENT RISK
+```
+
+### Next source
+
+`ROMEO-2025-S4 — CRT secrets 4: Candle anatomy` is the next evidence target. It is expected to clarify candle mechanics, opening/closing time, timeframe construction and the live transition semantics needed to make the CRT state machine deterministic.
