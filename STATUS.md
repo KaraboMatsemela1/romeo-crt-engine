@@ -11,7 +11,7 @@ Updated: 2026-08-13
 | 4 — CRT detector | **COMPLETE FOR v0.1** | Frozen deterministic detector |
 | 5 — Backtester | **COMPLETE FOR v0.1** | Deterministic cost-aware simulator |
 | 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Terminal preregistered DEV decision |
-| 6B — Candidate revision | **IN PROGRESS — REST-v20 PRACTICE ACCOUNT REQUIRED** | Exact source-relevant universe + trusted OANDA datasets frozen before activity access |
+| 6B — Candidate revision | **IN PROGRESS — OANDA UNIVERSE FROZEN / HISTORICAL DATA QUALIFICATION NEXT** | Trusted multi-market DEV datasets + detector-only activity decision |
 | 7 — Paper trading | **BLOCKED** | Requires future validated paper promotion |
 | 8 — Learning engine | Not started | Requires sufficient deterministic labels |
 | 9 — Shadow trading | Not started | Requires paper readiness |
@@ -30,9 +30,11 @@ required   30
 decision   INSUFFICIENT_EVIDENCE
 ```
 
-The result is preserved. v0.1 OOS (`2023-01-01 .. 2025-08-31`) and CONFIRM (`2025-10-01 .. 2026-07-31`) remain unopened. Parameter optimization, paper, shadow and live trading remain unauthorized.
+v0.1 OOS (`2023-01-01 .. 2025-08-31`) and CONFIRM (`2025-10-01 .. 2026-07-31`) remain unopened. Parameter optimization and paper/shadow/live promotion remain unauthorized.
 
-## Phase 6B attempt 1 — bullish research path
+## Phase 6B research history
+
+### Bullish successor
 
 ```text
 candidate CRT-C3-D1-H1-M1-BULL-v0.2-RESEARCH
@@ -40,13 +42,9 @@ decision  EVIDENCE_INSUFFICIENT
 outcomes  NOT OPENED
 ```
 
-Primary-source work established that bullish CRT states exist, but the exact bullish rolling-parent CRTL lifecycle, C2 sweep/reclaim/double-sweep semantics, Model #1 confirmation, structural stop owner and setup-specific midpoint lifecycle could not be closed without symmetry assumptions.
+The bullish path was preserved without symmetry inference or historical outcome access.
 
-Canonical decision:
-
-- `research/romeo/phase6b/BULLISH_MODEL1_GATE_DECISION.md`
-
-## Phase 6B active successor — multi-market observation expansion
+### Active successor
 
 ```text
 candidate_version      CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH
@@ -56,122 +54,105 @@ signal_component       MID
 alpha changes          NONE AUTHORIZED
 ```
 
-The research question is whether the unchanged frozen bearish alpha produces a sufficient sample across an ex-ante Romeo-relevant market universe.
+The active question is whether the unchanged frozen bearish alpha produces enough deterministic opportunities across an ex-ante Romeo-relevant market universe to justify a later performance protocol.
 
-Precommitted market families, subject to actual OANDA account availability:
+## Runtime OANDA qualification
 
-```text
-US NAS 100 / NQ proxy
-US SPX 500 / ES proxy
-EUR/USD
-Gold/USD
-```
-
-Exact API symbols must be frozen before detector activity counts are opened and may not be selected from count/P&L results.
-
-## Completed Phase 6B engineering/governance
-
-### OANDA provider qualification
-
-Implemented:
-
-- account-specific instrument discovery;
-- token-authorized-account preflight with no account IDs printed/persisted;
-- redacted account-summary discovery;
-- M1 MID/BID/ASK candle parsing;
-- complete-candle checks;
-- duplicate/out-of-order rejection;
-- no synthetic gap filling;
-- practice-default credential-safe qualification command/workflow;
-- `P6B_OANDA_INSTRUMENT_DISCOVERY_V2` manifest.
-
-The redacted runtime manifest is designed to capture execution-relevant account/instrument metadata including home currency, margin/hedging/GSLO mode, unit precision, minimum/maximum sizes, commission and financing where returned. It deliberately omits account ID, token, balance and NAV.
-
-Canonical provider boundary:
-
-- `docs/adr/ADR-006-oanda-v20-multi-market-qualification.md`
-- `docs/adr/ADR-009-oanda-execution-evidence-boundary.md`
-
-### Provider-neutral data v2
-
-Implemented:
+### Qualification 001 — preserved failed account route
 
 ```text
-P6B_CANONICAL_PRICE_DATASET_V2
+P6B_OANDA_RUNTIME_QUALIFICATION_001 = ACCOUNT_NOT_V20_ELIGIBLE_FOR_REQUIRED_ENDPOINTS
 ```
 
-OANDA candle activity is typed as `PRICE_COUNT`; it is not fabricated as Binance base/quote volume or trade count. Price component and an explicit pre-frozen positive price quantum are part of detector-facing trusted identity.
+The first configured account was recognized by a valid practice token but returned HTTP 403 on required v20 account/instrument surfaces. No instrument universe or detector outcomes were opened.
+
+Canonical record:
+
+- `experiments/phase6b/P6B_OANDA_RUNTIME_QUALIFICATION_001.md`
+
+### Qualification 002 — successful practice account
+
+GitHub Actions run `31696424928`, attempt `2`, job `94438165028` completed successfully after the runtime account secret was changed.
+
+```text
+authorized practice accounts by token  5
+configured account authorized           yes
+account summary available               yes
+account home currency                   USD
+available instruments                   123
+precommitted source-family matches      4 / 4
+qualification artifact safe             true
+```
+
+Provider response identities:
+
+```text
+available instrument names SHA-256  2e77a962f559c51d37120ebe842ba62cd0c42e07f50fe845ced04df7ad0755d2
+raw instrument response SHA-256     e9ea9a83b2b0f66605f79a94e9c5ca6f21549dd1f1cbbe739077165fe604ea64
+raw account summary SHA-256         63cd8a2960941c199239250a12bd5954e7533113a9dfb8c9379236b4c42c9a22
+```
+
+Canonical records:
+
+- `experiments/phase6b/P6B_OANDA_RUNTIME_QUALIFICATION_002.json`
+- `experiments/phase6b/P6B_OANDA_RUNTIME_QUALIFICATION_002.md`
+
+## Frozen Phase-6B OANDA universe
+
+All four precommitted aliases matched, so all four are frozen. No post-discovery filtering is allowed for this candidate.
+
+| Source family | OANDA symbol | Type |
+|---|---|---|
+| EUR/USD | `EUR_USD` | CURRENCY |
+| Gold/USD | `XAU_USD` | METAL |
+| US NAS 100 / NQ proxy | `NAS100_USD` | CFD |
+| US SPX 500 / ES proxy | `SPX500_USD` | CFD |
+
+Canonical freeze:
+
+- `experiments/phase6b/P6B_OANDA_UNIVERSE_FREEZE_001.md`
+
+This clears the `>=2 accepted instruments` universe gate but does **not** open detector activity counts.
+
+## Provider/data engineering already complete
+
+Implemented and regression-covered before outcome access:
+
+- OANDA v20 provider adapter and redacted account/instrument discovery;
+- provider-neutral `P6B_CANONICAL_PRICE_DATASET_V2`;
+- M1 MID/BID/ASK parsing with MID frozen as the signal component;
+- no fabricated volume/trade-count semantics (`PRICE_COUNT` only);
+- paged M1 retrieval provenance with request/response SHA-256;
+- duplicate/out-of-order/conflicting-page rejection;
+- fail-closed gap taxonomy;
+- project-owned H1 and New-York-midnight D1 reconstruction;
+- exact v0.1 detector fixture parity under `CRT-DETECTOR-v0.2-MULTI-MARKET`;
+- frozen detector-only 2/2/30 activity protocol;
+- preserved BTCUSDT backtest regression boundary.
+
+## Price quantum — frozen pre-activity
+
+OANDA provider price quantum is defined from the provider price-precision contract and is explicitly **not** claimed to be an exchange tick or pip.
+
+| Symbol | displayPrecision | Frozen provider price quantum |
+|---|---:|---:|
+| `EUR_USD` | 5 | `0.00001` |
+| `XAU_USD` | 3 | `0.001` |
+| `NAS100_USD` | 1 | `0.1` |
+| `SPX500_USD` | 1 | `0.1` |
 
 Canonical decision:
 
-- `docs/adr/ADR-007-provider-neutral-canonical-price-data.md`
+- `docs/adr/ADR-010-oanda-provider-price-quantum.md`
 
-### Historical retrieval provenance
+Code/test support:
 
-Implemented before the real DEV download:
+- `src/romeo_crt_engine/market_data/oanda_price_quantum.py`
+- `tests/unit/test_oanda_price_quantum_phase6b.py`
 
-- deterministic <=5000-candle request windows;
-- 4500-minute default page size;
-- secret/account-redacted request fingerprints;
-- per-page raw-response SHA-256;
-- chronological page merge;
-- identical boundary deduplication;
-- conflicting boundary rejection;
-- retrieval-level provenance digest.
+## Detector-only activity protocol
 
-### Session-aware canonical aggregation
-
-Implemented mechanics:
-
-```text
-MARKET_CLOSED
-SESSION_BREAK
-HOLIDAY_OR_EARLY_CLOSE
-PROVIDER_MISSING
-UNKNOWN_GAP
-```
-
-Only evidenced closure/session/holiday categories may remove expected observations. Unknown/provider-missing gaps fail closed. H1 and New-York-midnight D1 are constructed from actual M1 observations without synthetic prices; DST wall-clock behavior is tested.
-
-Actual accepted-instrument session/holiday policies remain unfrozen until successful runtime instrument discovery.
-
-### Signal component
-
-Frozen before outcomes:
-
-```text
-OANDA signal OHLC = MID / price=M
-smoothing         = false
-canonical source  = M1
-```
-
-Bid/ask remain separate execution/friction evidence.
-
-Canonical decision:
-
-- `experiments/phase6b/P6B_OANDA_PRICE_COMPONENT_DECISION.md`
-
-### Detector compatibility
-
-`CRT-DETECTOR-v0.2-MULTI-MARKET` calls the frozen v0.1 evaluator and preserves v0.1 on every emitted `TradePlan`.
-
-Exact fixture parity is verified for:
-
-- decision state;
-- reason code;
-- rule trace;
-- evidence IDs;
-- causal-input digest;
-- TradePlan.
-
-Compatibility baseline is frozen pre-outcome:
-
-- `docs/adr/ADR-008-multi-market-detector-compatibility.md`
-- `strategy/CRT_V0.2_MULTI_MARKET_DETECTOR_COMPATIBILITY_MANIFEST.json`
-
-### Detector-only activity gate
-
-Frozen protocol:
+Frozen before any multi-market detector count:
 
 ```text
 protocol                         P6B-MULTI-MARKET-ACTIVITY-PROTOCOL-v1
@@ -183,70 +164,21 @@ backtester                       PROHIBITED
 P&L outcome access               PROHIBITED
 ```
 
-Machine-enforced decisions:
+The exact four-symbol universe now satisfies only the first threshold. No counts have been opened.
 
-```text
-INSUFFICIENT_ELIGIBLE_UNIVERSE
-INSUFFICIENT_MULTI_MARKET_SAMPLE
-SUFFICIENT_ACTIVITY_FOR_PERFORMANCE_PROTOCOL
-```
+## Current data-quality gate
 
-Even a sufficient activity result authorizes only the next execution-model/performance-protocol work; it does not authorize P&L.
+Next work is historical-data qualification for the four frozen symbols:
 
-Canonical artifacts:
+1. freeze/document regular provider availability windows and historical holiday/early-close evidence;
+2. retrieve bounded/sealed MID M1 data for `2019-01-01 .. 2022-12-31`;
+3. independently re-fetch selected sealed samples and compare values;
+4. classify every unexpected missing interval fail-closed;
+5. build deterministic H1 and New-York-midnight D1 without synthetic prices;
+6. freeze one trusted v2 dataset identity per instrument;
+7. only then open detector counts and apply the frozen 2/2/30 activity gate.
 
-- `experiments/phase6b/P6B_MULTI_MARKET_ACTIVITY_PROTOCOL_V1.md`
-- `strategy/P6B_MULTI_MARKET_ACTIVITY_GATE_FREEZE_MANIFEST.json`
-
-## Runtime qualification result — 2026-08-13
-
-The first credentialed OANDA **practice** qualification was executed through GitHub Actions without exposing or persisting secret values.
-
-Observed across three controlled attempts:
-
-```text
-required repository secrets present     yes
-authorized practice accounts by token    5
-configured account authorized by token   yes
-account-summary endpoint                  HTTP 403
-account-instrument endpoint               HTTP 403
-instrument universe opened                no
-detector activity counts opened           no
-P&L opened                                no
-```
-
-The token/account preflight establishes that this is not a missing-secret or simple token/account mismatch. The configured account is recognized by the token but is not usable on the v20 account/instrument surfaces required for this research route.
-
-Sealed runtime decision:
-
-```text
-P6B_OANDA_RUNTIME_QUALIFICATION_001 = ACCOUNT_NOT_V20_ELIGIBLE_FOR_REQUIRED_ENDPOINTS
-```
-
-Canonical runtime record:
-
-- `experiments/phase6b/P6B_OANDA_RUNTIME_QUALIFICATION_001.md`
-
-The temporary branch-scoped one-shot Actions trigger used to execute the pre-main qualification was removed immediately after the diagnostic runs; the workflow is manual-only again.
-
-## Current hard blocker
-
-The existing `OANDA_API_TOKEN` is valid against the practice environment. The next external action is to update **only** the runtime `OANDA_ACCOUNT_ID` secret to an OANDA practice account that is REST-v20/API eligible and authorized by that token, or provision such a practice account if necessary.
-
-Do not commit, print, or paste the account ID into repository artifacts.
-
-After the account secret is corrected:
-
-1. rerun OANDA practice instrument discovery;
-2. intersect the account universe with the precommitted four market families;
-3. if fewer than two are eligible, stop before detector counts as `INSUFFICIENT_ELIGIBLE_UNIVERSE`;
-4. freeze exact API symbols, metadata digests and inclusion/exclusion reasons;
-5. freeze accepted-instrument session/holiday and price-quantum contracts;
-6. retrieve/seal/re-fetch MID M1 DEV data for 2019–2022;
-7. build/freeze trusted v2 H1/D1 datasets;
-8. run the detector-only 2/2/30 activity protocol with the backtester disabled;
-9. if activity is insufficient, preserve the result and stop without P&L;
-10. only if activity passes, complete/freeze OANDA execution/cost/conversion simulation and preregister a full performance protocol.
+The repository connector did not permit executable session-timetable writes during this turn, so session/holiday implementation remains explicitly unresolved rather than silently inferred.
 
 ## Authorization
 
