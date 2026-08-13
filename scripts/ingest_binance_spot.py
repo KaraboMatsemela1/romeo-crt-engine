@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, date, datetime, timedelta
 from functools import partial
 from hashlib import sha256
+from io import BytesIO, TextIOWrapper
 from pathlib import Path
+from zipfile import BadZipFile, ZipFile
 
 from romeo_crt_engine.market_data.dataset import write_dataset
 from romeo_crt_engine.market_data.pipeline import build_trusted_binance_dataset
@@ -81,6 +84,80 @@ def _fetch_archives(
         return tuple(executor.map(fetch, days))
 
 
+def _diagnostic_timestamp(value: int) -> datetime:
+    scale = 1_000_000 if value >= 10**15 else 1_000
+    seconds, remainder = divmod(value, scale)
+    microseconds = remainder * (1_000_000 // scale)
+    return datetime.fromtimestamp(seconds, UTC).replace(microsecond=microseconds)
+
+
+def _archive_chronology_diagnostic(archive: RawArchive) -> str:
+    """Describe authenticated provider chronology without accepting it as trusted market data."""
+    try:
+        with ZipFile(BytesIO(archive.content)) as zipped:
+            csv_names = [name for name in zipped.namelist() if name.lower().endswith(".csv")]
+            if len(csv_names) != 1:
+                return f"csv_count={len(csv_names)}"
+            with zipped.open(csv_names[0]) as raw_file:
+                rows = list(csv.reader(TextIOWrapper(raw_file, encoding="utf-8", newline="")))
+    except BadZipFile:
+        return "invalid_zip=true"
+
+    day_start = datetime.combine(archive.archive_date, datetime.min.time(), tzinfo=UTC)
+    day_end = day_start + timedelta(days=1)
+    opens: list[datetime] = []
+    irregular_rows: list[str] = []
+    malformed_rows: list[str] = []
+
+    for row_number, row in enumerate(rows, start=1):
+        if len(row) != 12:
+            malformed_rows.append(f"row={row_number}:columns={len(row)}")
+            continue
+        try:
+            raw_open = int(row[0])
+            raw_close = int(row[6])
+        except ValueError:
+            malformed_rows.append(f"row={row_number}:invalid_timestamp")
+            continue
+        scale = 1_000_000 if raw_open >= 10**15 else 1_000
+        open_time = _diagnostic_timestamp(raw_open)
+        opens.append(open_time)
+        expected_close = raw_open + (60 * scale) - 1
+        if raw_close != expected_close:
+            duration_seconds = Decimal(raw_close - raw_open + 1) / Decimal(scale)
+            irregular_rows.append(
+                f"row={row_number}:open={open_time.isoformat()}:duration_seconds={duration_seconds}"
+            )
+
+    gaps: list[str] = []
+    if opens:
+        if opens[0] > day_start:
+            missing = int((opens[0] - day_start).total_seconds() // 60)
+            gaps.append(f"{day_start.isoformat()}..{opens[0].isoformat()}:{missing}m")
+        for previous, current in zip(opens, opens[1:], strict=False):
+            expected = previous + timedelta(minutes=1)
+            if current > expected:
+                missing = int((current - expected).total_seconds() // 60)
+                gaps.append(f"{expected.isoformat()}..{current.isoformat()}:{missing}m")
+            elif current < expected:
+                gaps.append(f"overlap:{previous.isoformat()}->{current.isoformat()}")
+        expected_after_last = opens[-1] + timedelta(minutes=1)
+        if expected_after_last < day_end:
+            missing = int((day_end - expected_after_last).total_seconds() // 60)
+            gaps.append(f"{expected_after_last.isoformat()}..{day_end.isoformat()}:{missing}m")
+
+    parts = [f"rows={len(rows)}"]
+    if opens:
+        parts.extend((f"first={opens[0].isoformat()}", f"last={opens[-1].isoformat()}"))
+    if gaps:
+        parts.append("gaps=[" + ";".join(gaps) + "]")
+    if irregular_rows:
+        parts.append("irregular=[" + ";".join(irregular_rows) + "]")
+    if malformed_rows:
+        parts.append("malformed=[" + ";".join(malformed_rows) + "]")
+    return " ".join(parts)
+
+
 def _validate_archive_shapes(archives: tuple[RawArchive, ...], *, symbol: str) -> None:
     """Report every provider-day shape defect before constructing a trusted multi-year series."""
     failures: list[str] = []
@@ -88,7 +165,8 @@ def _validate_archive_shapes(archives: tuple[RawArchive, ...], *, symbol: str) -
         try:
             parse_1m_archive(archive, symbol=symbol)
         except DataQualityError as error:
-            failures.append(f"{archive.filename}: {error}")
+            diagnostic = _archive_chronology_diagnostic(archive)
+            failures.append(f"{archive.filename}: {error} | {diagnostic}")
     if failures:
         joined = "\n".join(f"- {failure}" for failure in failures)
         raise RuntimeError(f"provider archive validation failed:\n{joined}")
