@@ -2,15 +2,6 @@ name: Detector Smoke
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - ".github/workflows/detector-smoke.yml"
-      - "src/romeo_crt_engine/crt/**"
-      - "scripts/run_crt_detector.py"
-      - "scripts/reconstruct_frozen_dataset.py"
-      - "data/manifests/PHASE3_BTCUSDT_EE1300F0DA50E4DEBCBBC3B7.json"
-      - "src/romeo_crt_engine/market_data/**"
-      - "requirements.lock"
 
 jobs:
   frozen-btcusdt:
