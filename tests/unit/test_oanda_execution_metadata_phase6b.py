@@ -52,13 +52,13 @@ def test_account_discovery_captures_execution_metadata_without_deriving_price_ti
 
     instrument = parse_account_instruments(payload, observed_at=observed_at)[0]
 
-    assert instrument.maximum_order_units == Decimal("100000000")
-    assert instrument.maximum_position_size == Decimal("50000000")
+    assert instrument.maximum_order_units == Decimal(100000000)
+    assert instrument.maximum_position_size == Decimal(50000000)
     assert instrument.margin_rate == Decimal("0.02")
     assert instrument.provider_unit_precision_step == Decimal("0.01")
     assert instrument.commission is not None
     assert instrument.commission.commission == Decimal("5.00")
-    assert instrument.commission.units_traded == Decimal("1000000")
+    assert instrument.commission.units_traded == Decimal(1000000)
     assert instrument.commission.minimum_commission == Decimal("0.50")
     assert instrument.financing is not None
     assert instrument.financing.long_rate == Decimal("-0.0123")
