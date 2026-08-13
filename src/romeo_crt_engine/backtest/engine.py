@@ -188,6 +188,31 @@ def _close_position(
     )
 
 
+def _record_rejection(
+    candidate: DetectorCandidate,
+    reason: RejectionReason,
+    rejections: list[PlanRejection],
+    journal: list[JournalEvent],
+) -> None:
+    plan = candidate.trade_plan
+    if plan is None:
+        raise ValueError("cannot reject a plan candidate without TradePlan")
+    rejection = PlanRejection(
+        candidate_id=candidate.candidate_id,
+        timestamp=plan.entry_time,
+        reason=reason,
+    )
+    rejections.append(rejection)
+    journal.append(
+        JournalEvent(
+            timestamp=plan.entry_time,
+            event_type=JournalEventType.PLAN_REJECTED,
+            candidate_id=candidate.candidate_id,
+            detail=reason.value,
+        )
+    )
+
+
 def _metrics(
     initial_equity: Decimal,
     trades: Sequence[CompletedTrade],
@@ -303,6 +328,7 @@ def run_backtest(
             (candidate for candidate in detector_run.candidates if candidate.trade_plan is not None),
             key=lambda candidate: (
                 candidate.trade_plan.entry_time.timestamp() if candidate.trade_plan else 0.0,
+                candidate.c1_open_time.timestamp(),
                 candidate.candidate_id,
             ),
         )
@@ -322,34 +348,18 @@ def run_backtest(
         if plan is None:
             continue
         if plan.direction is not Direction.BEARISH:
-            rejection = PlanRejection(
-                candidate_id=candidate.candidate_id,
-                timestamp=plan.entry_time,
-                reason=RejectionReason.UNSUPPORTED_DIRECTION,
-            )
-            rejections.append(rejection)
-            journal.append(
-                JournalEvent(
-                    timestamp=plan.entry_time,
-                    event_type=JournalEventType.PLAN_REJECTED,
-                    candidate_id=candidate.candidate_id,
-                    detail=rejection.reason.value,
-                )
+            _record_rejection(
+                candidate,
+                RejectionReason.UNSUPPORTED_DIRECTION,
+                rejections,
+                journal,
             )
         elif plan.entry_time.timestamp() not in available_closes:
-            rejection = PlanRejection(
-                candidate_id=candidate.candidate_id,
-                timestamp=plan.entry_time,
-                reason=RejectionReason.MISSING_ENTRY_CLOCK,
-            )
-            rejections.append(rejection)
-            journal.append(
-                JournalEvent(
-                    timestamp=plan.entry_time,
-                    event_type=JournalEventType.PLAN_REJECTED,
-                    candidate_id=candidate.candidate_id,
-                    detail=rejection.reason.value,
-                )
+            _record_rejection(
+                candidate,
+                RejectionReason.MISSING_ENTRY_CLOCK,
+                rejections,
+                journal,
             )
 
     rejected_ids = {rejection.candidate_id for rejection in rejections}
@@ -386,32 +396,60 @@ def run_backtest(
         open_positions = survivors
 
         closing_candidates = sorted(
-            plans_by_close.get(bar.close_time.timestamp(), ()),
-            key=lambda candidate: candidate.candidate_id,
+            (
+                candidate
+                for candidate in plans_by_close.get(bar.close_time.timestamp(), ())
+                if candidate.candidate_id not in rejected_ids
+            ),
+            key=lambda candidate: (candidate.c1_open_time.timestamp(), candidate.candidate_id),
         )
+        aligned_candidates: list[DetectorCandidate] = []
         for candidate in closing_candidates:
-            if candidate.candidate_id in rejected_ids:
-                continue
             plan = candidate.trade_plan
             if plan is None:
                 continue
-            if len(open_positions) >= config.max_concurrent_positions:
-                rejection = PlanRejection(
-                    candidate_id=candidate.candidate_id,
-                    timestamp=plan.entry_time,
-                    reason=RejectionReason.POSITION_LIMIT,
+            entry_reference, _, _ = trade_plan_decimal_prices(plan)
+            if entry_reference != bar.close:
+                _record_rejection(
+                    candidate,
+                    RejectionReason.ENTRY_REFERENCE_MISMATCH,
+                    rejections,
+                    journal,
                 )
-                rejections.append(rejection)
-                journal.append(
-                    JournalEvent(
-                        timestamp=plan.entry_time,
-                        event_type=JournalEventType.PLAN_REJECTED,
-                        candidate_id=candidate.candidate_id,
-                        detail=rejection.reason.value,
-                    )
-                )
+                rejected_ids.add(candidate.candidate_id)
                 continue
+            aligned_candidates.append(candidate)
 
+        if not aligned_candidates:
+            continue
+
+        available_slots = config.max_concurrent_positions - len(open_positions)
+        if available_slots <= 0:
+            for candidate in aligned_candidates:
+                _record_rejection(
+                    candidate,
+                    RejectionReason.POSITION_LIMIT,
+                    rejections,
+                    journal,
+                )
+                rejected_ids.add(candidate.candidate_id)
+            continue
+
+        if len(aligned_candidates) > available_slots:
+            for candidate in aligned_candidates:
+                _record_rejection(
+                    candidate,
+                    RejectionReason.SIMULTANEOUS_PLAN_CONFLICT,
+                    rejections,
+                    journal,
+                )
+                rejected_ids.add(candidate.candidate_id)
+            continue
+
+        for candidate in aligned_candidates:
+            plan = candidate.trade_plan
+            if plan is None:
+                continue
             quantity, risk_budget, estimated_loss = _size_short(
                 candidate,
                 equity=equity,
@@ -419,20 +457,13 @@ def run_backtest(
                 config=config,
             )
             if quantity <= 0:
-                rejection = PlanRejection(
-                    candidate_id=candidate.candidate_id,
-                    timestamp=plan.entry_time,
-                    reason=RejectionReason.SIZE_BELOW_MIN_STEP,
+                _record_rejection(
+                    candidate,
+                    RejectionReason.SIZE_BELOW_MIN_STEP,
+                    rejections,
+                    journal,
                 )
-                rejections.append(rejection)
-                journal.append(
-                    JournalEvent(
-                        timestamp=plan.entry_time,
-                        event_type=JournalEventType.PLAN_REJECTED,
-                        candidate_id=candidate.candidate_id,
-                        detail=rejection.reason.value,
-                    )
-                )
+                rejected_ids.add(candidate.candidate_id)
                 continue
 
             fill = _entry_fill(candidate, quantity, config)
