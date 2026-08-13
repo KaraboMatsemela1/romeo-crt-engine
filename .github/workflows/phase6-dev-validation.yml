@@ -1,25 +1,16 @@
 name: Phase 6 DEV Validation
 
-# The sealed P6-DEV-001 data identity has reproduced byte-for-byte on an independent
-# provider retrieval. DEV-only outcome access is authorized by P6_DEV_OUTCOME_ACCESS_GATE_001.
+# Phase 6 for v0.1 is complete with INSUFFICIENT_EVIDENCE.
+# Historical outcome evidence is sealed in P6_DEV_RESULT_001.*.
+# This workflow is retained only for deliberate manual reproduction of the sealed DEV data.
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - ".github/workflows/phase6-dev-validation.yml"
-      - "scripts/ingest_binance_spot.py"
-      - "src/romeo_crt_engine/market_data/**"
-      - "src/romeo_crt_engine/backtest/**"
-      - "experiments/phase6/P6_DATA_QUALITY_AMENDMENT_*.md"
-      - "experiments/phase6/P6_DEV_DATA_FREEZE_001.*"
-      - "experiments/phase6/P6_DEV_OUTCOME_ACCESS_GATE_001.md"
-      - "requirements.lock"
 
 env:
-  P6_DEV_OUTCOME_ACCESS_AUTHORIZED: "true"
+  P6_DEV_OUTCOME_ACCESS_AUTHORIZED: "false"
 
 jobs:
-  p6-dev-001:
+  reproduce-p6-dev-001-data:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -46,13 +37,11 @@ jobs:
             --download-workers 8 \
             --data-root /tmp/romeo-phase6-dev \
             > /tmp/p6-dev-ingest.txt
-          cat /tmp/p6-dev-ingest.txt
 
       - name: Verify sealed DEV data identity
         run: |
           dataset_dir=$(find /tmp/romeo-phase6-dev/normalized -mindepth 1 -maxdepth 1 -type d -print -quit)
           test -n "$dataset_dir"
-          echo "$dataset_dir" > /tmp/p6-dev-dataset-dir.txt
           python - "$dataset_dir/manifest.json" /tmp/p6-dev-ingest.txt experiments/phase6/P6_DEV_DATA_FREEZE_001.json <<'PY'
           import hashlib
           import json
@@ -60,13 +49,11 @@ jobs:
           from collections import Counter
           from pathlib import Path
 
-          manifest_path = Path(sys.argv[1])
-          ingest_lines = Path(sys.argv[2]).read_text().splitlines()
-          freeze = json.loads(Path(sys.argv[3]).read_text())
-          manifest_bytes = manifest_path.read_bytes()
+          manifest_bytes = Path(sys.argv[1]).read_bytes()
           manifest = json.loads(manifest_bytes)
+          freeze = json.loads(Path(sys.argv[3]).read_text())
           values = {}
-          for line in ingest_lines:
+          for line in Path(sys.argv[2]).read_text().splitlines():
               if '=' in line:
                   key, value = line.split('=', 1)
                   values[key] = value
@@ -81,23 +68,14 @@ jobs:
               for record in exclusions['records']
           ]
           methods = Counter(item['verification_method'] for item in manifest['provider_crosschecks'])
-          manifest_sha = hashlib.sha256(manifest_bytes).hexdigest()
 
-          assert manifest['quality_status'] == 'TRUSTED'
-          assert manifest['provider'] == 'BINANCE_PUBLIC_DATA'
-          assert manifest['venue'] == 'BINANCE_SPOT'
-          assert manifest['symbol'] == 'BTCUSDT'
           assert manifest['dataset_version'] == freeze['dataset_version']
-          assert manifest_sha == freeze['manifest_sha256']
+          assert hashlib.sha256(manifest_bytes).hexdigest() == freeze['manifest_sha256']
           assert manifest['normalized_sha256'] == freeze['normalized_sha256']
           assert manifest['market_data_code_sha256'] == freeze['market_data_code_sha256']
           assert manifest['dependency_lock_sha256'] == freeze['dependency_lock_sha256']
           assert manifest['instrument_metadata_version'] == freeze['instrument_metadata_version']
           assert manifest['instrument_metadata_observed_at'] == freeze['instrument_metadata_observed_at']
-          assert values['metadata_observed_at'] == freeze['instrument_metadata_observed_at']
-          assert len(manifest['raw_artifacts']) == freeze['raw_archive_count']
-          assert len(manifest['provider_crosschecks']) == freeze['raw_archive_count']
-          assert int(values['excluded_archive_count']) == len(freeze['excluded_archives'])
           assert excluded_records == freeze['excluded_archives']
           assert values['exclusion_ledger_sha256'] == freeze['exclusion_ledger_sha256']
           assert dict(sorted(methods.items())) == freeze['verification_methods']
@@ -105,115 +83,11 @@ jobs:
           assert manifest['h1_rows'] == freeze['h1_rows']
           assert manifest['d1_rows'] == freeze['d1_rows']
 
-          summary = {
-              'protocol_id': freeze['protocol_id'],
-              'window_id': freeze['window_id'],
-              'outcome_access_authorized': True,
-              'dataset_version': manifest['dataset_version'],
-              'manifest_sha256': manifest_sha,
-              'normalized_sha256': manifest['normalized_sha256'],
-              'market_data_code_sha256': manifest['market_data_code_sha256'],
-              'dependency_lock_sha256': manifest['dependency_lock_sha256'],
-              'instrument_metadata_version': manifest['instrument_metadata_version'],
-              'instrument_metadata_observed_at': manifest['instrument_metadata_observed_at'],
-              'raw_archive_count': len(manifest['raw_artifacts']),
-              'verification_methods': dict(sorted(methods.items())),
-              'excluded_archive_count': len(excluded_records),
-              'exclusion_ledger_sha256': values['exclusion_ledger_sha256'],
-              'm1_rows': manifest['m1_rows'],
-              'h1_rows': manifest['h1_rows'],
-              'd1_rows': manifest['d1_rows'],
-              'sealed_identity_reproduced': True,
-              'paper_trading_authorized': False,
-              'live_trading_authorized': False,
-          }
-          print('PHASE6_DEV_DATA_REPRODUCTION=' + json.dumps(summary, sort_keys=True, separators=(',', ':')))
+          print('P6_DEV_DATA_REPRODUCTION_OK=true')
+          print('dataset_version=' + manifest['dataset_version'])
+          print('manifest_sha256=' + freeze['manifest_sha256'])
+          print('outcome_access_authorized=false')
           PY
 
-      - name: Run frozen detector and all preregistered cost scenarios
-        if: env.P6_DEV_OUTCOME_ACCESS_AUTHORIZED == 'true'
-        run: |
-          dataset_dir=$(cat /tmp/p6-dev-dataset-dir.txt)
-          for scenario in ideal base stressed severe; do
-            python scripts/run_backtest.py \
-              --dataset-dir "$dataset_dir" \
-              --cost-scenario "$scenario" \
-              --initial-equity 100000 \
-              --risk-fraction 0.005 \
-              --max-concurrent-positions 1 \
-              > "/tmp/p6-dev-${scenario}.json"
-          done
-
-      - name: Emit compact P6-DEV-001 outcome evidence
-        if: env.P6_DEV_OUTCOME_ACCESS_AUTHORIZED == 'true'
-        run: |
-          python - <<'PY'
-          import hashlib
-          import json
-          from collections import Counter
-          from pathlib import Path
-
-          dataset_dir = Path(Path('/tmp/p6-dev-dataset-dir.txt').read_text().strip())
-          manifest_path = dataset_dir / 'manifest.json'
-          manifest_bytes = manifest_path.read_bytes()
-          manifest = json.loads(manifest_bytes)
-          methods = Counter(item['verification_method'] for item in manifest['provider_crosschecks'])
-          outputs = {
-              name: json.loads(Path(f'/tmp/p6-dev-{name}.json').read_text())
-              for name in ('ideal', 'base', 'stressed', 'severe')
-          }
-
-          detector_hashes = {result['detector_run_sha256'] for result in outputs.values()}
-          candidate_counts = {result['detector_candidate_count'] for result in outputs.values()}
-          plan_counts = {result['detector_trade_plan_count'] for result in outputs.values()}
-          statuses = {result['detector_status'] for result in outputs.values()}
-          simulator_versions = {result['simulator_version'] for result in outputs.values()}
-          assert detector_hashes and len(detector_hashes) == 1
-          assert len(candidate_counts) == 1
-          assert len(plan_counts) == 1
-          assert statuses == {'COMPLETE'}
-          assert simulator_versions == {'CRT-BACKTEST-v0.1.1'}
-
-          base_closed = outputs['base']['completed_trades']
-          activity_gate = 'DEV_SAMPLE_GATE_PASSED' if base_closed >= 30 else 'INSUFFICIENT_DEV_SAMPLE'
-          scenarios = {}
-          for name, result in outputs.items():
-              metrics = result['metrics']
-              scenarios[name] = {
-                  'config_sha256': result['config_sha256'],
-                  'run_sha256': result['run_sha256'],
-                  'completed_trades': result['completed_trades'],
-                  'rejections': result['rejections'],
-                  'open_at_end': result['open_at_end'],
-                  'final_realized_equity': result['final_realized_equity'],
-                  'win_rate': metrics['win_rate'],
-                  'average_r': metrics['average_r'],
-                  'expectancy_r': metrics['expectancy_r'],
-                  'gross_pnl': metrics['gross_pnl'],
-                  'net_pnl': metrics['net_pnl'],
-                  'profit_factor': metrics['profit_factor'],
-                  'max_realized_drawdown': metrics['max_realized_drawdown'],
-              }
-
-          summary = {
-              'protocol_id': 'P6-VALIDATION-PROTOCOL-v1',
-              'window_id': 'P6-DEV-001',
-              'dataset_version': manifest['dataset_version'],
-              'manifest_sha256': hashlib.sha256(manifest_bytes).hexdigest(),
-              'verification_methods': dict(sorted(methods.items())),
-              'm1_rows': manifest['m1_rows'],
-              'h1_rows': manifest['h1_rows'],
-              'd1_rows': manifest['d1_rows'],
-              'detector_run_sha256': next(iter(detector_hashes)),
-              'detector_candidate_count': next(iter(candidate_counts)),
-              'detector_trade_plan_count': next(iter(plan_counts)),
-              'simulator_version': next(iter(simulator_versions)),
-              'simulator_code_sha256': outputs['base']['simulator_code_sha256'],
-              'scenarios': scenarios,
-              'dev_activity_gate': activity_gate,
-              'oos_access_authorized_by_this_run': activity_gate == 'DEV_SAMPLE_GATE_PASSED',
-              'paper_trading_authorized': False,
-              'live_trading_authorized': False,
-          }
-          print('PHASE6_DEV_SUMMARY=' + json.dumps(summary, sort_keys=True, separators=(',', ':')))
-          PY
+      - name: Confirm outcome access remains disabled
+        run: test "$P6_DEV_OUTCOME_ACCESS_AUTHORIZED" = "false"
