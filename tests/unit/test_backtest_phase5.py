@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
@@ -11,6 +12,7 @@ from romeo_crt_engine.backtest.models import (
     SIMULATOR_VERSION,
     BacktestConfig,
     ExitReason,
+    RejectionReason,
 )
 from romeo_crt_engine.crt.detector import (
     DETECTOR_VERSION,
@@ -265,6 +267,59 @@ def test_base_costs_are_adverse_and_stop_sizing_respects_risk_budget() -> None:
     assert trade.total_fees > 0
     assert -trade.net_pnl <= trade.risk_budget
     assert trade.entry_fill.quantity % Decimal("0.01") == 0
+
+
+def test_entry_reference_must_match_canonical_confirmation_close() -> None:
+    dataset = _scenario_dataset(("106", "107", "99", "100"))
+    detector_run = detect_dataset(dataset)
+    candidate = detector_run.candidates[0]
+    plan = candidate.trade_plan
+    assert plan is not None
+    mismatched_plan = replace(plan, entry_price=107.0)
+    mismatched_candidate = replace(candidate, trade_plan=mismatched_plan)
+    mismatched_run = replace(
+        detector_run,
+        candidates=(mismatched_candidate,),
+        run_sha256=_digest("entry-reference-mismatch-run"),
+    )
+
+    result = run_backtest(
+        mismatched_run,
+        dataset,
+        quantity_step=Decimal("0.01"),
+        config=BacktestConfig(cost_model=IDEAL_COSTS),
+    )
+
+    assert result.completed_trades == ()
+    assert result.open_at_end == ()
+    assert len(result.rejections) == 1
+    assert result.rejections[0].reason is RejectionReason.ENTRY_REFERENCE_MISMATCH
+
+
+def test_simultaneous_plans_are_all_rejected_when_capacity_cannot_fit_group() -> None:
+    dataset = _scenario_dataset(("106", "107", "99", "100"))
+    detector_run = detect_dataset(dataset)
+    candidate = detector_run.candidates[0]
+    duplicate = replace(candidate, candidate_id="simultaneous-duplicate")
+    conflicting_run = replace(
+        detector_run,
+        candidates=(candidate, duplicate),
+        run_sha256=_digest("simultaneous-plan-run"),
+    )
+
+    result = run_backtest(
+        conflicting_run,
+        dataset,
+        quantity_step=Decimal("0.01"),
+        config=BacktestConfig(max_concurrent_positions=1, cost_model=IDEAL_COSTS),
+    )
+
+    assert result.completed_trades == ()
+    assert result.open_at_end == ()
+    assert len(result.rejections) == 2
+    assert {
+        rejection.reason for rejection in result.rejections
+    } == {RejectionReason.SIMULTANEOUS_PLAN_CONFLICT}
 
 
 def test_backtest_run_hash_is_deterministic_for_identical_inputs() -> None:
