@@ -1,0 +1,159 @@
+name: Phase 6 DEV Validation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/phase6-dev-validation.yml"
+
+jobs:
+  p6-dev-001:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Install locked environment
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps --no-build-isolation -e .
+
+      - name: Build preregistered P6-DEV-001 trusted dataset
+        run: |
+          python scripts/ingest_binance_spot.py \
+            --symbol BTCUSDT \
+            --start-utc-day 2019-01-01 \
+            --end-utc-day 2022-12-31 \
+            --verification-policy checksum-all-rest-monthly \
+            --download-workers 8 \
+            --data-root /tmp/romeo-phase6-dev \
+            > /tmp/p6-dev-ingest.txt
+          cat /tmp/p6-dev-ingest.txt
+
+      - name: Assert DEV data integrity and verification coverage
+        run: |
+          dataset_dir=$(find /tmp/romeo-phase6-dev/normalized -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -n "$dataset_dir"
+          echo "$dataset_dir" > /tmp/p6-dev-dataset-dir.txt
+          python - "$dataset_dir/manifest.json" <<'PY'
+          import json
+          import sys
+          from collections import Counter
+          from pathlib import Path
+
+          manifest = json.loads(Path(sys.argv[1]).read_text())
+          methods = Counter(item['verification_method'] for item in manifest['provider_crosschecks'])
+
+          assert manifest['quality_status'] == 'TRUSTED'
+          assert manifest['provider'] == 'BINANCE_PUBLIC_DATA'
+          assert manifest['venue'] == 'BINANCE_SPOT'
+          assert manifest['symbol'] == 'BTCUSDT'
+          assert manifest['m1_rows'] == 2_103_840
+          assert manifest['h1_rows'] == 35_064
+          assert manifest['d1_rows'] == 1_460
+          assert len(manifest['raw_artifacts']) == 1_461
+          assert len(manifest['provider_crosschecks']) == 1_461
+          assert methods['REST_KLINE_EXACT_MATCH_V1'] == 48
+          assert methods['PROVIDER_SHA256_CHECKSUM_V1'] == 1_413
+          PY
+
+      - name: Run frozen detector and all preregistered cost scenarios
+        run: |
+          dataset_dir=$(cat /tmp/p6-dev-dataset-dir.txt)
+          for scenario in ideal base stressed severe; do
+            python scripts/run_backtest.py \
+              --dataset-dir "$dataset_dir" \
+              --cost-scenario "$scenario" \
+              --initial-equity 100000 \
+              --risk-fraction 0.005 \
+              --max-concurrent-positions 1 \
+              > "/tmp/p6-dev-${scenario}.json"
+          done
+
+      - name: Emit compact P6-DEV-001 evidence
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          dataset_dir = Path(Path('/tmp/p6-dev-dataset-dir.txt').read_text().strip())
+          manifest_path = dataset_dir / 'manifest.json'
+          manifest_bytes = manifest_path.read_bytes()
+          manifest = json.loads(manifest_bytes)
+          methods = Counter(item['verification_method'] for item in manifest['provider_crosschecks'])
+
+          outputs = {
+              name: json.loads(Path(f'/tmp/p6-dev-{name}.json').read_text())
+              for name in ('ideal', 'base', 'stressed', 'severe')
+          }
+
+          detector_hashes = {result['detector_run_sha256'] for result in outputs.values()}
+          candidate_counts = {result['detector_candidate_count'] for result in outputs.values()}
+          plan_counts = {result['detector_trade_plan_count'] for result in outputs.values()}
+          statuses = {result['detector_status'] for result in outputs.values()}
+
+          assert detector_hashes and len(detector_hashes) == 1
+          assert candidate_counts == {1458}
+          assert len(plan_counts) == 1
+          assert statuses == {'COMPLETE'}
+
+          base_closed = outputs['base']['completed_trades']
+          activity_gate = 'DEV_SAMPLE_GATE_PASSED' if base_closed >= 30 else 'INSUFFICIENT_DEV_SAMPLE'
+
+          scenarios = {}
+          for name, result in outputs.items():
+              metrics = result['metrics']
+              scenarios[name] = {
+                  'config_sha256': result['config_sha256'],
+                  'run_sha256': result['run_sha256'],
+                  'completed_trades': result['completed_trades'],
+                  'rejections': result['rejections'],
+                  'open_at_end': result['open_at_end'],
+                  'final_realized_equity': result['final_realized_equity'],
+                  'win_rate': metrics['win_rate'],
+                  'average_r': metrics['average_r'],
+                  'expectancy_r': metrics['expectancy_r'],
+                  'gross_pnl': metrics['gross_pnl'],
+                  'net_pnl': metrics['net_pnl'],
+                  'profit_factor': metrics['profit_factor'],
+                  'max_realized_drawdown': metrics['max_realized_drawdown'],
+              }
+
+          summary = {
+              'protocol_id': 'P6-VALIDATION-PROTOCOL-v1',
+              'window_id': 'P6-DEV-001',
+              'window_start_utc_day': '2019-01-01',
+              'window_end_utc_day': '2022-12-31',
+              'dataset_version': manifest['dataset_version'],
+              'manifest_sha256': hashlib.sha256(manifest_bytes).hexdigest(),
+              'normalized_sha256': manifest['normalized_sha256'],
+              'market_data_code_sha256': manifest['market_data_code_sha256'],
+              'dependency_lock_sha256': manifest['dependency_lock_sha256'],
+              'instrument_metadata_version': manifest['instrument_metadata_version'],
+              'instrument_metadata_observed_at': manifest['instrument_metadata_observed_at'],
+              'price_tick_size': manifest['price_tick_size'],
+              'quantity_step': manifest['quantity_step'],
+              'raw_archive_count': len(manifest['raw_artifacts']),
+              'verification_methods': dict(sorted(methods.items())),
+              'm1_rows': manifest['m1_rows'],
+              'h1_rows': manifest['h1_rows'],
+              'd1_rows': manifest['d1_rows'],
+              'detector_run_sha256': next(iter(detector_hashes)),
+              'detector_candidate_count': next(iter(candidate_counts)),
+              'detector_trade_plan_count': next(iter(plan_counts)),
+              'simulator_code_sha256': outputs['base']['simulator_code_sha256'],
+              'scenarios': scenarios,
+              'dev_activity_gate': activity_gate,
+              'oos_access_authorized_by_this_run': activity_gate == 'DEV_SAMPLE_GATE_PASSED',
+              'paper_trading_authorized': False,
+              'live_trading_authorized': False,
+          }
+          print('PHASE6_DEV_SUMMARY=' + json.dumps(summary, sort_keys=True, separators=(',', ':')))
+          PY
