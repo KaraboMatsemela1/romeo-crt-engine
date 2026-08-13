@@ -6,18 +6,18 @@ Updated: 2026-08-13
 |---|---|---|
 | 0 — Engineering foundation | **COMPLETE** | Reproducible dev + CI + logging/storage/experiment contracts |
 | 1 — Romeo corpus / reconciliation | **COMPLETE** | Evidence-indexed corpus + reconciled doctrine + explicit evidence debts |
-| 2 — Formal CRT spec | **COMPLETE — FROZEN_FOR_VALIDATION** | Deterministic CRT v0.1 with no unresolved active-path predicates |
-| 3 — Market data | **COMPLETE** | Provider-backed trusted/reproducible D1/H1 dataset |
-| 4 — CRT detector | **COMPLETE** | Frozen fixtures + trusted-data detector integration reproduced causally |
+| 2 — Formal CRT spec | **COMPLETE — v0.1 FROZEN** | Deterministic CRT v0.1 with no unresolved active-path predicates |
+| 3 — Market data | **COMPLETE FOR BINANCE/BTCUSDT ROUTE** | Provider-backed trusted/reproducible D1/H1 dataset |
+| 4 — CRT detector | **COMPLETE FOR v0.1** | Frozen fixtures + trusted-data detector integration reproduced causally |
 | 5 — Backtester | **COMPLETE** | Deterministic cost-aware event-driven simulator |
-| 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Preregistered DEV gate reached a terminal written decision |
-| 6B — Candidate revision | **IN PROGRESS — EVIDENCE GATE OPEN** | One independently motivated successor reaches deterministic spec eligibility |
-| 7 — Paper trading | **BLOCKED FOR v0.1** | No paper promotion from insufficient validation evidence |
-| 8 — Learning engine | Not started | Requires a sufficiently evidenced deterministic baseline |
+| 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Preregistered BTCUSDT DEV gate reached terminal written decision |
+| 6B — Candidate revision | **IN PROGRESS — MULTI-MARKET PROVIDER/DATA QUALIFICATION** | One independently justified successor becomes eligible for preregistered validation |
+| 7 — Paper trading | **BLOCKED** | Requires explicit promotion from a future validation protocol |
+| 8 — Learning engine | Not started | Requires a sufficiently evidenced deterministic baseline and labels |
 | 9 — Shadow trading | Not started | Requires paper/production-like readiness |
 | 10 — Controlled live | **NOT AUTHORIZED** | Explicit approval + canary gates |
 
-## Current validation disposition
+## Frozen historical v0.1 disposition
 
 ```text
 Strategy    CRT-C3-D1-H1-M1-BEAR-v0.1
@@ -30,58 +30,20 @@ Shadow      NOT AUTHORIZED
 Live        NOT AUTHORIZED
 ```
 
-`CRT-BACKTEST-v0.1.1` is a Phase-6 data-gap compatibility patch to the v0.1 simulator. It permits ordered/non-overlapping H1 input across explicitly governed market-data gaps and does not change entry, stop, target, sizing, friction, or same-bar execution semantics.
+`CRT-BACKTEST-v0.1.1` is the Phase-6 data-gap compatibility patch to the v0.1 simulator. It permits ordered/non-overlapping H1 input across explicitly governed market-data gaps and does not change entry, stop, target, sizing, friction, or same-bar execution semantics.
 
-The next legitimate project track is **new evidence-backed candidate research/revision**, not Phase 7.
+## Phase 6 — sealed result
 
-## Phase 6B — candidate revision
-
-Phase 6B is now **IN PROGRESS** on a separately versioned research track.
-
-The precommitted successor research target is:
+The preregistered validation chronology was:
 
 ```text
-CRT-C3-D1-H1-M1-BULL-v0.2-RESEARCH
+DEV         2019-01-01 .. 2022-12-31
+OOS         2023-01-01 .. 2025-08-31
+QUARANTINE  2025-09-01 .. 2025-09-30
+CONFIRM     2025-10-01 .. 2026-07-31
 ```
 
-Selection rationale is recorded in:
-
-- `research/romeo/phase6b/PHASE_6B_CANDIDATE_SELECTION.md`
-- `research/romeo/phase6b/BULLISH_MODEL1_EVIDENCE_GATE.md`
-- `research/romeo/phase6b/PRIMARY_SOURCE_PASS_001.md`
-- `docs/checklists/phase-6b.md`
-
-This is deliberately **not yet an executable or frozen v0.2 strategy**. It isolates the pre-existing bullish-representativeness debt while retaining the already deterministic D1 -> H1 route. H4/W1 expansion remains deferred because H4 clock anchors are unresolved, and True MSS remains deferred because its Romeo-specific structural algorithm is not deterministic enough yet.
-
-The first source-verification pass confirmed first-party provenance for Episode 1 and found strong independent secondary corroboration of a bullish Model #1 inverse, but the accessible first-party YouTube representation did not expose transcript text. The exact bullish parent manipulation/reclaim predicate, setup-specific midpoint target semantics and exact structural stop owner therefore remain open.
-
-Current gate:
-
-```text
-Phase 6B candidate selection          COMPLETE
-Gate 6B-1 primary-source evidence    OPEN
-v0.2 deterministic specification     BLOCKED
-v0.2 alpha implementation            BLOCKED
-v0.2 historical outcome access       NOT AUTHORIZED
-v0.1 OOS / CONFIRM access            NOT AUTHORIZED
-Phase 7 paper trading                BLOCKED
-```
-
-No rule may be added merely to increase the four-trade v0.1 DEV sample. The new candidate must earn its predicates from evidence before any fresh historical outcome is opened.
-
-## Phase 6 — final result
-
-The protocol was frozen before new historical outcomes were opened:
-
-```text
-P6-VALIDATION-PROTOCOL-v1
-DEV       2019-01-01 .. 2022-12-31
-OOS       2023-01-01 .. 2025-08-31
-QUARANTINE 2025-09-01 .. 2025-09-30
-CONFIRM   2025-10-01 .. 2026-07-31
-```
-
-Sequential access was enforced. DEV was opened only after its trusted dataset identity had first been sealed and then reproduced byte-for-byte on an independent provider retrieval. OOS and CONFIRM were never opened.
+Sequential access was enforced. DEV was opened only after its trusted dataset identity was sealed and independently reproduced. OOS and CONFIRM remain unopened.
 
 ### Frozen DEV dataset
 
@@ -92,115 +54,171 @@ normalized_sha256        46682c2d793dbdd0a0939862f444d19b4817559c8989a7fde031598
 M1 rows                  2,074,680
 H1 rows                     34,578
 complete NY D1               1,418
-raw UTC daily archives       1,461
-excluded UTC archives           20
-REST exact verification         48
-checksum verification         1,413
-```
-
-Data-quality governance:
-
-- `P6-DATA-QUALITY-AMENDMENT-001`: independently evidenced Binance trading suspension on 2019-03-12 02:00–08:00 UTC.
-- `P6-DATA-QUALITY-AMENDMENT-002`: 20 checksum-authenticated incomplete/malformed UTC archives conservatively excluded whole from normalization.
-- no missing market observations were synthesized or filled.
-
-### DEV activity gate
-
-Workflow run `31682441984`, job `94390737742`, produced:
-
-```text
-rolling detector candidates   1,416
+rolling detector candidates  1,416
 valid TradePlans                  4
 BASE closed trades                4
 required DEV minimum             30
-activity gate     INSUFFICIENT_DEV_SAMPLE
 ```
 
-Therefore the preregistered protocol requires:
+Therefore:
 
 ```text
-Phase-6 disposition               INSUFFICIENT_EVIDENCE
-parameter optimization            PROHIBITED
-OOS outcome access                NOT AUTHORIZED
-CONFIRM outcome access            NOT AUTHORIZED
-paper promotion                   NOT AUTHORIZED
+activity gate                      INSUFFICIENT_DEV_SAMPLE
+Phase-6 disposition                INSUFFICIENT_EVIDENCE
+parameter optimization             PROHIBITED
+OOS outcome access                 NOT AUTHORIZED
+CONFIRM outcome access             NOT AUTHORIZED
+paper promotion                    NOT AUTHORIZED
 ```
 
-### Descriptive four-trade cost results
+The four cost-scenario results remain preserved for audit but are statistically insufficient for edge claims. No sensitivity optimization, walk-forward inference, Monte Carlo inference, OOS run, or CONFIRM run was performed after the activity gate failed.
 
-These values are preserved for audit but are statistically insufficient for edge claims.
-
-| Scenario | Trades | Win rate | Expectancy R | Net P&L | Profit factor | Final equity |
-|---|---:|---:|---:|---:|---:|---:|
-| IDEAL | 4 | 50% | -0.0130 | -31.03 | 0.969 | 99,968.97 |
-| BASE | 4 | 50% | -0.1264 | -256.36 | 0.743 | 99,743.64 |
-| STRESSED | 4 | 50% | -0.1963 | -395.18 | 0.604 | 99,604.82 |
-| SEVERE | 4 | 50% | -0.2659 | -533.42 | 0.465 | 99,466.58 |
-
-No sensitivity optimization, walk-forward inference, Monte Carlo inference, OOS run, or CONFIRM run was performed because the activity gate failed.
-
-Canonical Phase-6 artifacts:
+Canonical Phase-6 artifacts include:
 
 - `experiments/phase6/P6_VALIDATION_PROTOCOL_V1.md`
-- `experiments/phase6/P6_DATA_QUALITY_AMENDMENT_001.md`
-- `experiments/phase6/P6_DATA_QUALITY_AMENDMENT_002.md`
 - `experiments/phase6/P6_DEV_DATA_FREEZE_001.json`
-- `experiments/phase6/P6_DEV_DATA_FREEZE_001.md`
-- `experiments/phase6/P6_DEV_OUTCOME_ACCESS_GATE_001.md`
 - `experiments/phase6/P6_DEV_RESULT_001.json`
 - `experiments/phase6/P6_DEV_RESULT_001.md`
 - `docs/reviews/PHASE_6_GATE_REVIEW.md`
 - `docs/PHASE_6_COMPLETION_REPORT.md`
-- `docs/checklists/phase-6.md`
 
-## Interpretation boundary
+## Phase 6B — candidate revision
 
-The Phase-6 result does **not** prove that all CRT trading is unprofitable and does not evaluate Romeo's entire discretionary methodology.
+Phase 6B is **IN PROGRESS**. It does not mutate v0.1 and does not authorize access to the unopened v0.1 OOS/CONFIRM outcomes.
 
-It establishes the narrower result that the exact deterministic reproduction candidate:
+### Successor attempt 1 — bullish D1 -> H1 Model #1
+
+Research candidate:
 
 ```text
-CRT-C3-D1-H1-M1-BEAR-v0.1
+CRT-C3-D1-H1-M1-BULL-v0.2-RESEARCH
 ```
 
-is too selective on BTCUSDT over the preregistered four-year DEV window to support statistical validation or promotion.
+Final evidence-gate disposition:
 
-v0.1 must not be relaxed in place after seeing this result. Any attempt to increase activity requires a new version backed by additional source evidence or a separately proven implementation defect.
+```text
+Gate 6B-1 = EVIDENCE_INSUFFICIENT
+```
 
-## Frozen historical handoff retained
+The source review established that bullish CRT states are genuinely part of Romeo's doctrine and strongly corroborated a bullish Model #1 inverse. However, the accessible primary-source record did not close all required order-path semantics without relying on symmetry assumptions, including the exact rolling-parent CRTL lifecycle, bullish Candle-2 sweep/reclaim and double-sweep handling, exact confirmation reference/timing, structural stop owner, and setup-specific midpoint lifecycle.
 
-Strategy freeze artifacts remain:
+No bullish strategy outcome was opened. This is an evidence insufficiency result, not a profitability rejection.
 
-- `strategy/CRT_V0.1_FREEZE_MANIFEST.json`
-- `strategy/CRT_V0.1_DETECTOR_FREEZE_MANIFEST.json`
-- `strategy/CRT_V0.1_BACKTEST_FREEZE_MANIFEST.json`
+Canonical artifacts:
 
-Earlier engineering evidence remains valid:
+- `research/romeo/phase6b/PHASE_6B_CANDIDATE_SELECTION.md`
+- `research/romeo/phase6b/BULLISH_MODEL1_EVIDENCE_GATE.md`
+- `research/romeo/phase6b/PRIMARY_SOURCE_PASS_001.md`
+- `research/romeo/phase6b/PRIMARY_SOURCE_PASS_002.md`
+- `research/romeo/phase6b/BULLISH_MODEL1_GATE_DECISION.md`
 
-- Phase 3 established provider-backed immutable/verified market data.
-- Phase 4 established deterministic frozen-strategy detection and fixture parity.
-- Phase 5 established causal event-driven simulation and preserved the zero-activity September 2025 quarantine result.
-- Phase 6 established a larger trusted DEV sample and correctly stopped because the frozen candidate produced only four trades.
+### Successor attempt 2 — frozen bearish alpha across a broader market universe
+
+Active research candidate:
+
+```text
+CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH
+```
+
+This route changes the **observation/validation market universe**, not the frozen alpha predicates.
+
+Rationale:
+
+- ADR-005 deliberately selected Binance BTCUSDT as the first engineering/validation route and explicitly prohibits generalizing its result to forex, index, metal, or other instruments;
+- Romeo's evidence corpus is multi-market;
+- expanding the market universe can be preregistered without weakening the strategy merely because BTCUSDT generated four DEV trades.
+
+No alpha-rule change is authorized for this successor.
+
+Canonical selection:
+
+- `research/romeo/phase6b/MULTI_MARKET_CANDIDATE_SELECTION.md`
+
+## Gate 6B-MM-1 — OANDA v20 provider/data qualification
+
+OANDA v20 is the current candidate provider for non-Binance market-data qualification.
+
+Implemented on the Phase-6B branch:
+
+- provider-specific adapter `src/romeo_crt_engine/market_data/providers/oanda_v20.py`;
+- account-specific instrument discovery parsing;
+- provider-specific M1 candle parsing for midpoint/bid/ask price components;
+- complete-candle filtering;
+- duplicate/out-of-order protection;
+- no synthetic filling of market/session gaps;
+- OANDA candle activity retained as `price_count`, not misrepresented as exchange/trade volume;
+- precision/pip/trade-size metadata captured without inventing a historical tick size;
+- secret-free deterministic request fingerprints;
+- OANDA practice/live endpoint separation;
+- environment variable names only in `.env.example`;
+- provider unit tests;
+- ADR-006 documenting the qualification contract.
+
+### Critical calendar boundary
+
+OANDA provider-native default daily alignment must **not** redefine the frozen CRT strategy calendar.
+
+The required route is:
+
+```text
+OANDA M1/H1 observations
+        ↓
+UTC provider chronology
+        ↓
+explicit market/session-gap classification
+        ↓
+project-owned New-York-midnight D1 aggregation
+        ↓
+frozen bearish CRT strategy
+```
+
+### Runtime qualification still required
+
+The exact instrument list is account/regulatory-division dependent and must be discovered from the actual OANDA practice account at runtime. No account ID or API token is committed to the repository.
+
+The initial source-relevant family whitelist, subject to actual account availability, is:
+
+```text
+US NAS 100 / NQ proxy
+US SPX 500 / ES proxy
+EUR/USD
+Gold/USD
+```
+
+This list must be converted into an exact frozen API-symbol manifest **before** any strategy outcome access. Instruments may not be kept/dropped based on preliminary trade count or P&L.
+
+Outstanding Gate 6B-MM-1 work:
+
+1. confirm the latest branch passes Ruff, MyPy, pytest and Backtest Smoke;
+2. run account-specific instrument discovery with runtime-only practice credentials;
+3. freeze the signal price component and execution bid/ask policy;
+4. implement/freeze session-gap taxonomy and calendars for accepted instruments;
+5. prove New-York-midnight D1 aggregation across DST and closures;
+6. resolve executable tick/price quantum without assuming display precision is a historical tick size;
+7. implement sealed API-response/re-fetch provenance;
+8. freeze the exact first instrument universe before outcomes;
+9. conduct an independent provider/data gate review.
+
+Only then may a new multi-market validation protocol be preregistered.
 
 ## Current authorization
 
 ```text
-P6_OOS_OUTCOME_ACCESS_AUTHORIZED     = false
-P6_CONFIRM_OUTCOME_ACCESS_AUTHORIZED = false
-PARAMETER_OPTIMIZATION_AUTHORIZED    = false
-PAPER_TRADING_AUTHORIZED             = false
-SHADOW_TRADING_AUTHORIZED            = false
-LIVE_TRADING_AUTHORIZED              = false
+V0_1_MUTATION_AUTHORIZED              = false
+V0_1_OOS_OUTCOME_ACCESS_AUTHORIZED    = false
+V0_1_CONFIRM_OUTCOME_ACCESS_AUTHORIZED= false
+PARAMETER_OPTIMIZATION_AUTHORIZED     = false
+MULTI_MARKET_OUTCOME_ACCESS_AUTHORIZED= false
+PAPER_TRADING_AUTHORIZED              = false
+SHADOW_TRADING_AUTHORIZED             = false
+LIVE_TRADING_AUTHORIZED               = false
 ```
 
-## Immediate next actions — candidate revision track
+## Immediate next actions
 
-1. Preserve v0.1 and all Phase-6 evidence unchanged.
-2. Complete Gate 6B-1 primary-source verification for the selected bullish D1 -> H1 Model #1 research target.
-3. Do not write executable bullish alpha until the required parent, entry, stop, target and expiry predicates are source-closed.
-4. If Gate 6B-1 passes, create a new strategy version rather than mutating v0.1.
-5. Build new positive/negative fixtures and deterministic rule contracts before looking at fresh validation outcomes.
-6. Repeat detector/backtester compatibility and preregistered validation gates for the new candidate.
-7. Keep OOS/CONFIRM from v0.1 untouched unless a future explicit governance protocol authorizes otherwise.
-8. Do not start Phase 7 paper trading unless a future candidate independently passes validation gates.
-9. Keep live trading disabled.
+1. Complete CI/static verification for the OANDA qualification adapter.
+2. Add the provider/session gap policy and canonical aggregation tests that do not require credentials.
+3. Prepare a runtime-only OANDA qualification command that never prints or persists account credentials.
+4. When practice credentials are available at runtime, discover the exact account instrument universe and freeze the eligible source-relevant symbols before any strategy outcomes.
+5. Preregister a new multi-market validation protocol only after the provider/data gate passes.
+6. Keep v0.1 OOS/CONFIRM unopened and Phase 7 blocked.
