@@ -2,17 +2,22 @@ from __future__ import annotations
 
 import argparse
 import subprocess
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, date, datetime, timedelta
+from functools import partial
 from hashlib import sha256
 from pathlib import Path
 
 from romeo_crt_engine.market_data.dataset import write_dataset
 from romeo_crt_engine.market_data.pipeline import build_trusted_binance_dataset
 from romeo_crt_engine.market_data.providers.binance_public import (
-    crosscheck_bars_with_rest,
+    RawArchive,
     fetch_daily_archive,
     fetch_exchange_info,
-    parse_1m_archive,
+)
+from romeo_crt_engine.market_data.verification import (
+    VerificationPolicy,
+    build_provider_verification_evidence,
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -59,6 +64,21 @@ def _days(start: date, end: date) -> tuple[date, ...]:
     return tuple(start + timedelta(days=offset) for offset in range(count))
 
 
+def _fetch_archives(
+    symbol: str,
+    days: tuple[date, ...],
+    *,
+    workers: int,
+) -> tuple[RawArchive, ...]:
+    if workers <= 0:
+        raise ValueError("download workers must be > 0")
+    fetch = partial(fetch_daily_archive, symbol)
+    if workers == 1:
+        return tuple(fetch(day) for day in days)
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        return tuple(executor.map(fetch, days))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Build a trusted BTCUSDT-style dataset from Binance daily 1m archives."
@@ -68,18 +88,37 @@ def main() -> None:
     parser.add_argument("--end-utc-day", type=_date, required=True)
     parser.add_argument("--data-root", type=Path, default=PROJECT_ROOT / "data")
     parser.add_argument("--lock-file", type=Path, default=PROJECT_ROOT / "requirements.lock")
+    parser.add_argument(
+        "--verification-policy",
+        choices=[policy.value for policy in VerificationPolicy],
+        default=VerificationPolicy.REST_EVERY_ARCHIVE.value,
+        help=(
+            "Provider verification contract. The default preserves Phase-3 REST verification "
+            "for every archive; long validation windows may use checksum-all-rest-monthly."
+        ),
+    )
+    parser.add_argument(
+        "--download-workers",
+        type=int,
+        default=1,
+        help="Concurrent Binance archive downloads. Output ordering remains chronological.",
+    )
     args = parser.parse_args()
 
     retrieved_at = datetime.now(UTC)
     git_revision = _git_sha()
     metadata = fetch_exchange_info(args.symbol, observed_at=retrieved_at)
-    archives = tuple(
-        fetch_daily_archive(args.symbol, day)
-        for day in _days(args.start_utc_day, args.end_utc_day)
+    requested_days = _days(args.start_utc_day, args.end_utc_day)
+    archives = _fetch_archives(
+        args.symbol,
+        requested_days,
+        workers=args.download_workers,
     )
-    provider_crosschecks = tuple(
-        crosscheck_bars_with_rest(parse_1m_archive(archive, symbol=args.symbol))
-        for archive in archives
+    policy = VerificationPolicy(args.verification_policy)
+    provider_crosschecks = build_provider_verification_evidence(
+        archives,
+        symbol=args.symbol,
+        policy=policy,
     )
 
     dataset = build_trusted_binance_dataset(
@@ -103,6 +142,8 @@ def main() -> None:
     print(f"manifest_sha256={dataset.manifest.manifest_sha256}")
     print(f"receipt_sha256={dataset.receipt.receipt_sha256}")
     print(f"git_revision={dataset.receipt.git_revision}")
+    print(f"verification_policy={policy.value}")
+    print(f"archive_count={len(archives)}")
     print(f"output={output}")
 
 
