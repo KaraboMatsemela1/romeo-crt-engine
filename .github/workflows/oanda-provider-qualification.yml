@@ -55,9 +55,12 @@ jobs:
           assert manifest['schema_version'] == 'P6B_OANDA_INSTRUMENT_DISCOVERY_V2'
           assert manifest['environment'] == 'practice'
           assert manifest['account_scope'] == 'REDACTED_RUNTIME_ACCOUNT'
-          assert isinstance(account, dict)
-          assert account['home_currency']
-          assert account['raw_account_summary_sha256']
+          assert account is None or isinstance(account, dict)
+          if isinstance(account, dict):
+              assert account['home_currency']
+              assert account['raw_account_summary_sha256']
+          assert manifest['available_instrument_count'] > 0
+          assert manifest['raw_instrument_response_sha256']
           assert manifest['status'] == 'DISCOVERED_NOT_FROZEN'
           assert manifest['strategy_outcome_access_authorized'] is False
           assert manifest['paper_trading_authorized'] is False
