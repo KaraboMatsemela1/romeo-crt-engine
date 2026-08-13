@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from datetime import datetime
 from enum import StrEnum
 
-from romeo_crt_engine.market_data.closures import VenueClosure, exact_gap_is_approved
+from romeo_crt_engine.market_data.closures import ApprovedGap, gap_is_approved
 from romeo_crt_engine.market_data.models import MinuteBar
 
 
@@ -30,7 +30,7 @@ def validate_minute_series(
     bars: Sequence[MinuteBar],
     *,
     as_of: datetime | None = None,
-    allowed_closures: tuple[VenueClosure, ...] = (),
+    allowed_closures: tuple[ApprovedGap, ...] = (),
 ) -> None:
     if not bars:
         raise DataQualityError(DataQualityCode.EMPTY, "minute series must not be empty")
@@ -63,7 +63,7 @@ def validate_minute_series(
             if (
                 prior_close is not None
                 and bar.open_time != prior_close
-                and not exact_gap_is_approved(prior_close, bar.open_time, allowed_closures)
+                and not gap_is_approved(prior_close, bar.open_time, allowed_closures)
             ):
                 raise DataQualityError(
                     DataQualityCode.GAP,
