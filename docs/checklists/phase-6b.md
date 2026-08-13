@@ -1,7 +1,8 @@
 # Phase 6B — Candidate Revision Checklist
 
-**Status:** **IN PROGRESS**  
-**Selected research target:** `CRT-C3-D1-H1-M1-BULL-v0.2-RESEARCH`  
+**Status:** **IN PROGRESS — MULTI-MARKET PROVIDER/DATA GATE**  
+**Active research target:** `CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH`  
+**Preserved failed research path:** `CRT-C3-D1-H1-M1-BULL-v0.2-RESEARCH` -> `EVIDENCE_INSUFFICIENT`  
 **Phase 7:** **BLOCKED UNTIL A FUTURE CANDIDATE PASSES VALIDATION**
 
 ## A. Preserve predecessor evidence
@@ -13,111 +14,179 @@
 - [x] Keep parameter optimization disabled for v0.1.
 - [x] Keep paper, shadow and live trading unauthorized.
 
-## B. Candidate-selection precommitment
+## B. First successor precommitment — bullish D1 -> H1 Model #1
 
 - [x] Review the post-Phase-2 evidence-debt ledger.
 - [x] Review deferred direction, timeframe, entry-family, SMT, KOD and management variants.
 - [x] Reject H4/W1 expansion while H4 anchors remain unresolved.
 - [x] Reject True MSS expansion while the Romeo-specific structural algorithm remains unresolved.
-- [x] Reject SMT/KOD/countertrend/journey-to-level bundling for the first successor.
+- [x] Reject SMT/KOD/countertrend/journey-to-level bundling.
 - [x] Prohibit tuning v0.1 numerical parameters merely to increase trade count.
-- [x] Select one isolated successor research hypothesis before any v0.2 outcome access.
-- [x] Record `CRT-C3-D1-H1-M1-BULL-v0.2-RESEARCH` as the selected research target.
+- [x] Precommit `CRT-C3-D1-H1-M1-BULL-v0.2-RESEARCH` before any bullish outcome access.
+- [x] Perform primary-source verification passes.
+- [x] Preserve strong evidence that bullish CRT states exist and the broad `CRTH/L -> 50%` doctrine exists.
+- [x] Refuse to promote secondary/symmetry assumptions into exact bullish alpha rules.
+- [x] Produce written Gate 6B-1 decision: **`EVIDENCE_INSUFFICIENT`**.
+- [x] Confirm no bullish historical strategy outcome was opened.
+- [x] Close the bullish primary-source tracking issue with the insufficient-evidence result.
 
-## C. Gate 6B-1 — bullish primary-source evidence
+### Unresolved bullish predicates preserved for future re-entry
 
-- [ ] Verify bullish `old CRTL` / parent-reference semantics from primary source material.
-- [ ] Verify bullish Candle-2 sweep/reclaim semantics.
-- [ ] Verify whether double-sided parent sweeps invalidate the bullish setup.
-- [ ] Verify bullish midpoint/T1 consumption semantics.
-- [ ] Verify bullish Model #1 candle direction and reference interaction.
-- [ ] Verify exact bullish Model #1 confirmation reference.
-- [ ] Verify confirmation timing and expiry within Candle 3.
-- [ ] Verify FVG role for the selected Model #1 subtype.
-- [ ] Verify bullish structural stop reference.
-- [ ] Decide whether the one-tick execution buffer is inherited unchanged as direction-neutral execution policy.
-- [ ] Verify parent 50% as the selected setup's pre-trade target.
-- [ ] Resolve all contradictions against the canonical evidence matrix.
-- [ ] Record neutral source observations with timestamp/post provenance.
-- [ ] Produce Gate 6B-1 written decision: `EVIDENCE_SUFFICIENT_TO_SPECIFY` or `EVIDENCE_INSUFFICIENT`.
+These remain intentionally unresolved rather than silently defaulted:
 
-## D. Gate 6B-2 — deterministic v0.2 specification
+- [ ] exact old-`CRTL` / rolling-parent reference lifecycle;
+- [ ] exact bullish Candle-2 sweep/reclaim rule;
+- [ ] double-sided sweep treatment;
+- [ ] exact Model #1 confirmation reference/timing from primary evidence;
+- [ ] exact bullish structural stop owner;
+- [ ] setup-specific midpoint consumption/expiry semantics;
+- [ ] direction-neutral inheritance decision for all project parameters.
 
-**Blocked until Gate 6B-1 passes.**
+Canonical decision: `research/romeo/phase6b/BULLISH_MODEL1_GATE_DECISION.md`.
 
-- [ ] Assign final strategy version ID.
-- [ ] Write `CRT_V0.2_SPEC.md` without modifying the v0.1 specification.
-- [ ] Define every order-path predicate deterministically.
-- [ ] Separate source-derived rules from project parameters.
-- [ ] Define `UNKNOWN -> NO_SIGNAL` for all critical state.
-- [ ] Freeze calendar/version dependencies.
-- [ ] Freeze target and stop semantics before outcome access.
-- [ ] Define exact strategy expiry.
-- [ ] Create a v0.2 evidence/rule matrix.
-- [ ] Conduct independent freeze review.
+## C. Second successor selection — frozen bearish alpha, broader market universe
 
-## E. Gate 6B-2 fixtures
+- [x] Select the lower-ambiguity successor after the bullish evidence gate failed.
+- [x] Preserve the frozen bearish D1 -> H1 Model #1 strategy semantics.
+- [x] Record that ADR-005 makes BTCUSDT an initial route whose result must not be generalized to forex/indices/metals.
+- [x] Use Romeo-relevant market families as the ex-ante universe motivation, not historical profitability.
+- [x] Precommit `CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH`.
+- [x] Prohibit instrument selection based on preliminary trade count/P&L.
+- [x] Keep SMT inactive; related-market examples do not create an SMT order path.
+- [x] Select OANDA v20 for provider qualification, subject to account/division instrument availability.
 
-- [ ] Create at least 3 positive bullish fixtures before historical outcome testing.
-- [ ] Create at least 5 negative bullish fixture classes before historical outcome testing.
-- [ ] Include no-sweep rejection.
-- [ ] Include double-sweep/ambiguous rejection.
-- [ ] Include target-consumed rejection.
-- [ ] Include Model #1 geometry rejection.
-- [ ] Include no-confirmation-before-expiry rejection.
-- [ ] Include causal timestamp assertions.
-- [ ] Demonstrate deterministic repeated fixture results.
+Canonical selection: `research/romeo/phase6b/MULTI_MARKET_CANDIDATE_SELECTION.md`.
 
-## F. Gate 6B-3 — implementation and compatibility
+## D. Gate 6B-MM-1 — OANDA provider/data qualification
 
-**Blocked until strategy/fixture freeze.**
+### Provider contract and parser
 
-- [ ] Implement v0.2 contracts separately from `v0_1.py`.
-- [ ] Preserve v0.1 regression suite unchanged.
-- [ ] Add v0.2 unit tests.
-- [ ] Add v0.2 detector tests.
-- [ ] Confirm no future D1/H1 information leaks into decisions.
-- [ ] Confirm detector emits immutable TradePlans.
-- [ ] Confirm simulator consumes v0.2 plans without reimplementing alpha validity.
-- [ ] Confirm costs, sizing, same-bar handling and gap behavior are not changed to improve results.
-- [ ] Freeze detector implementation/version if parity passes.
-- [ ] Freeze simulator compatibility/version if required.
+- [x] Add provider-specific OANDA v20 adapter.
+- [x] Support account-specific instrument discovery parsing.
+- [x] Support M1 candle response parsing for midpoint/bid/ask components.
+- [x] Require provider identity and M1 granularity.
+- [x] Reject duplicate/out-of-order timestamps.
+- [x] Skip incomplete tail candles by default.
+- [x] Preserve market/session gaps instead of filling them.
+- [x] Store OANDA `volume` as `price_count`, not exchange/trade volume.
+- [x] Capture display precision, pip location, trade-unit precision and minimum trade size without inventing a historical tick size.
+- [x] Add deterministic secret-free request fingerprinting.
+- [x] Keep bearer token out of returned objects/provenance fingerprints.
+- [x] Add practice/live endpoint constants while keeping live trading independently disabled.
+- [x] Add OANDA environment variable names with empty values only.
+- [x] Add ADR-006 documenting provider/calendar/metadata boundaries.
+- [x] Add unit tests for the provider parser and safety behavior.
 
-## G. Gate 6B-4 — new validation preregistration
+### CI / static verification
 
-**No validation outcome access until complete.**
+- [x] Backtest smoke remained green after the initial provider change.
+- [x] Diagnose initial CI failure as Ruff-only style findings.
+- [x] Apply focused Ruff fixes without strategy/data-semantic changes.
+- [ ] Confirm Ruff passes on the latest head.
+- [ ] Confirm MyPy passes on the latest head.
+- [ ] Confirm full pytest suite passes on the latest head.
+- [ ] Confirm Backtest Smoke passes on the latest head.
 
-- [ ] Define a new v0.2 DEV window policy.
-- [ ] Define a new v0.2 OOS window policy.
-- [ ] Define a new final-confirmatory window policy.
-- [ ] Explicitly decide whether any v0.1 reserved window may be reused; default is **NO AUTHORIZATION**.
-- [ ] Freeze minimum sample/activity gates before results.
-- [ ] Freeze friction scenarios before results.
-- [ ] Freeze sensitivity plan before results.
-- [ ] Freeze walk-forward / robustness gates before results.
+### Runtime provider qualification — blocked until credentials are supplied at execution time
+
+- [ ] Query the actual OANDA practice account instrument universe.
+- [ ] Map source market families to exact available API symbols.
+- [ ] Record account/division-specific metadata without committing account ID/token.
+- [ ] Freeze the first accepted instrument list before strategy outcome access.
+- [ ] Retrieve bounded M1 samples for each candidate instrument.
+- [ ] Implement pagination/retrieval manifest for multi-page history.
+- [ ] Re-fetch sealed historical slices and compare provider values.
+- [ ] Freeze raw-response/request/normalization provenance contract.
+
+### Calendar and gap semantics
+
+- [x] Explicitly reject OANDA's default 17:00 New-York daily alignment as the strategy D1 definition.
+- [x] Require project-owned New-York-midnight D1 construction.
+- [ ] Define OANDA market-closed/session-break/holiday/provider-missing/unknown-gap taxonomy in code.
+- [ ] Add provider/session calendar fixtures for accepted instruments.
+- [ ] Add DST fixtures around New-York wall-clock D1 boundaries.
+- [ ] Demonstrate H1 and D1 aggregation from OANDA observations without synthetic prices.
+- [ ] Cross-check project D1 aggregation against an explicitly aligned provider query where appropriate.
+
+### Price/execution metadata decisions
+
+- [ ] Freeze signal-detection price component (`M`, `B`, or `A`) before outcomes.
+- [ ] Freeze bid/ask use for execution-friction validation.
+- [ ] Resolve executable tick/price quantum without assuming `displayPrecision == historical tick size`.
+- [ ] Resolve quantity/position-size translation for each instrument type.
+- [ ] Record short-capability/account-instrument execution boundary separately from alpha validity.
+
+## E. Gate 6B-MM-2 — pre-outcome universe freeze
+
+**Blocked until Gate 6B-MM-1 provider/data qualification is complete.**
+
+Initial source-relevant family whitelist, subject to actual account availability:
+
+```text
+US NAS 100 / NQ proxy
+US SPX 500 / ES proxy
+EUR/USD
+Gold/USD
+```
+
+Before detector execution:
+
+- [ ] freeze exact API instrument symbols;
+- [ ] freeze inclusion/exclusion reasons before outcomes;
+- [ ] freeze required historical coverage;
+- [ ] freeze provider/data version for every instrument;
+- [ ] prohibit dropping an instrument because its strategy result is poor;
+- [ ] prohibit adding an instrument after seeing favorable preliminary results.
+
+## F. Gate 6B-MM-3 — new multi-market validation preregistration
+
+**No strategy outcome access until this gate is complete.**
+
+- [ ] Define new development window(s) based on verified provider coverage.
+- [ ] Define new OOS window(s).
+- [ ] Define a new final-confirmatory window.
+- [ ] Keep v0.1 reserved OOS/CONFIRM untouched unless separately authorized by explicit governance.
+- [ ] Freeze per-instrument minimum activity gates.
+- [ ] Freeze pooled minimum activity gates.
+- [ ] Prevent one instrument from silently dominating the pooled conclusion.
+- [ ] Freeze asset-class-appropriate friction assumptions before results.
+- [ ] Freeze sensitivity/robustness plan before results.
+- [ ] Freeze multiple-comparison controls before results.
 - [ ] Freeze Monte Carlo eligibility threshold before results.
-- [ ] Freeze promotion/rejection decision rules before results.
-- [ ] Independently review leakage and overfit controls.
-- [ ] Seal data identity before outcome access.
+- [ ] Freeze promotion/rejection/insufficient-evidence decision rules.
+- [ ] Independently review leakage, selection bias and overfit controls.
+- [ ] Seal all dataset identities before detector/backtest access.
+
+## G. Detector/backtester compatibility
+
+- [ ] Demonstrate frozen v0.1 strategy logic can consume the provider-neutral canonical D1/H1 bars without alpha changes.
+- [ ] Preserve all v0.1 regression tests unchanged.
+- [ ] Confirm immutable `TradePlan` output remains the detector/backtester boundary.
+- [ ] Confirm no provider-specific logic enters the strategy validity predicates.
+- [ ] Confirm execution/cost changes are versioned separately from alpha validity.
+- [ ] Freeze the multi-market detector/simulator compatibility chain before outcomes.
 
 ## H. Promotion boundary
 
-- [ ] Do not start Phase 7 unless a candidate receives `PROMOTE_TO_PAPER_CANDIDATE` from its own validation protocol.
+- [ ] Do not start Phase 7 unless a future candidate receives `PROMOTE_TO_PAPER_CANDIDATE` from its own preregistered validation protocol.
 - [ ] Do not treat sufficient trade count as proof of edge.
-- [ ] Do not treat positive DEV P&L as permission to skip OOS/confirmatory gates.
-- [ ] Do not combine bearish and bullish candidates without separately defining interaction/portfolio semantics.
+- [ ] Do not treat positive DEV or pooled P&L as permission to skip OOS/confirmatory gates.
 - [ ] Keep hard risk controls independent from strategy scoring.
 - [ ] Keep live trading disabled until the full roadmap authorizes it.
 
 ## Current handoff
 
 ```text
-Phase 6B                       IN PROGRESS
-Candidate selection            COMPLETE
-Selected research hypothesis   BULLISH D1 -> H1 MODEL #1
-Primary-source evidence gate   OPEN
-v0.2 specification             BLOCKED
-v0.2 implementation            BLOCKED
-v0.2 historical backtest       BLOCKED
-Phase 7                        BLOCKED
+Phase 6B                           IN PROGRESS
+Bullish successor                 EVIDENCE_INSUFFICIENT / PRESERVED
+Active successor                  BEARISH D1 -> H1 MODEL #1 / MULTI-MARKET
+Alpha changes                     NONE AUTHORIZED
+OANDA provider adapter            IMPLEMENTED
+OANDA provider ADR                PROPOSED
+Latest CI                         RECHECKING AFTER RUFF FIX
+Actual OANDA instrument discovery NOT RUN — runtime credentials absent
+Multi-market strategy outcomes    NOT AUTHORIZED
+v0.1 OOS / CONFIRM                UNOPENED
+Phase 7                           BLOCKED
+Live trading                      NOT AUTHORIZED
 ```
