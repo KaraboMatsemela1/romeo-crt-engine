@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from romeo_crt_engine.market_data.aggregate import build_complete_new_york_d1, build_h1
+from romeo_crt_engine.market_data.closures import closures_for
 from romeo_crt_engine.market_data.dataset import (
     DatasetManifest,
     IngestionReceipt,
@@ -47,24 +48,29 @@ def build_trusted_binance_dataset(
         raise ValueError("at least one archive is required")
 
     ordered_archives = tuple(sorted(archives, key=lambda archive: archive.archive_date))
+    closures = closures_for(
+        provider=metadata.provider,
+        venue=metadata.venue,
+        symbol=metadata.symbol,
+    )
     minute_parts = [parse_1m_archive(archive, symbol=metadata.symbol) for archive in ordered_archives]
     minute_bars = tuple(bar for part in minute_parts for bar in part)
-    validate_minute_series(minute_bars, as_of=created_at)
+    validate_minute_series(minute_bars, as_of=created_at, allowed_closures=closures)
 
     raw_hashes = {archive.sha256 for archive in ordered_archives}
     evidence_hashes = {evidence.source_sha256 for evidence in provider_crosschecks}
     if evidence_hashes != raw_hashes or len(provider_crosschecks) != len(ordered_archives):
-        raise ValueError("trusted promotion requires exactly one provider cross-check per archive")
+        raise ValueError("trusted promotion requires exactly one provider verification per archive")
     for evidence in provider_crosschecks:
         if (
             evidence.provider != metadata.provider
             or evidence.venue != metadata.venue
             or evidence.symbol != metadata.symbol
         ):
-            raise ValueError("provider cross-check identity does not match instrument metadata")
+            raise ValueError("provider verification identity does not match instrument metadata")
 
-    h1_bars = build_h1(minute_bars)
-    d1_bars = build_complete_new_york_d1(h1_bars)
+    h1_bars = build_h1(minute_bars, allowed_closures=closures)
+    d1_bars = build_complete_new_york_d1(h1_bars, allowed_closures=closures)
     raw_artifacts = tuple(
         RawArtifact(
             archive_date=archive.archive_date.isoformat(),
