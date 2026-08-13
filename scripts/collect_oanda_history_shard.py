@@ -27,6 +27,8 @@ from romeo_crt_engine.market_data.providers.oanda_v20 import PRACTICE_BASE_URL
 FROZEN_INSTRUMENTS = ("EUR_USD", "XAU_USD", "NAS100_USD", "SPX500_USD")
 FROZEN_YEARS = (2019, 2020, 2021, 2022)
 REQUEST_DELAY_SECONDS = 0.55
+RECONCILIATION_SCHEMA_VERSION = "P6B_OANDA_RECONCILIATION_EVIDENCE_V2"
+OBSERVATION_POLICY_VERSION = "P6B_OANDA_OBSERVATION_POLICY_V2"
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -70,6 +72,22 @@ def _page_record(page: object) -> dict[str, object]:
     }
 
 
+def _assert_false_flags(document: dict[str, object]) -> None:
+    false_flags = (
+        "trusted_dataset_authorized",
+        "detector_execution_authorized",
+        "tradeplan_count_access_authorized",
+        "backtester_authorized",
+        "pnl_outcome_access_authorized",
+        "paper_trading_authorized",
+        "shadow_trading_authorized",
+        "live_trading_authorized",
+    )
+    for flag in false_flags:
+        if document.get(flag) is not False:
+            raise ValueError(f"{flag} must remain false")
+
+
 def _assert_manifest_safe(manifest: dict[str, object]) -> None:
     if manifest.get("schema_version") != "P6B_OANDA_HISTORY_SHARD_V1":
         raise ValueError("unexpected shard manifest schema")
@@ -82,19 +100,7 @@ def _assert_manifest_safe(manifest: dict[str, object]) -> None:
     if not isinstance(refetch, dict) or refetch.get("status") != "EXACT_PROVIDER_VALUE_MATCH":
         raise ValueError("independent re-fetch must exactly match provider values")
 
-    false_flags = (
-        "trusted_dataset_authorized",
-        "detector_execution_authorized",
-        "tradeplan_count_access_authorized",
-        "backtester_authorized",
-        "pnl_outcome_access_authorized",
-        "paper_trading_authorized",
-        "shadow_trading_authorized",
-        "live_trading_authorized",
-    )
-    for flag in false_flags:
-        if manifest.get(flag) is not False:
-            raise ValueError(f"{flag} must remain false")
+    _assert_false_flags(manifest)
 
     serialized = json.dumps(manifest, sort_keys=True)
     forbidden = (
@@ -108,6 +114,77 @@ def _assert_manifest_safe(manifest: dict[str, object]) -> None:
     for marker in forbidden:
         if marker in serialized:
             raise ValueError(f"forbidden persisted marker found: {marker}")
+
+
+def _build_reconciliation_evidence(manifest: dict[str, object]) -> dict[str, object]:
+    missing = manifest.get("missing_intervals")
+    refetch = manifest.get("refetch")
+    if not isinstance(missing, list):
+        raise ValueError("raw shard manifest lacks exact missing-interval inventory")
+    if not isinstance(refetch, dict):
+        raise ValueError("raw shard manifest lacks refetch evidence")
+
+    evidence: dict[str, object] = {
+        "schema_version": RECONCILIATION_SCHEMA_VERSION,
+        "observation_policy_version": OBSERVATION_POLICY_VERSION,
+        "parent_protocol": "P6B-OANDA-HISTORY-QUALIFICATION-V1",
+        "provider": manifest.get("provider"),
+        "environment": "practice",
+        "account_scope": "REDACTED_RUNTIME_ACCOUNT",
+        "instrument": manifest.get("instrument"),
+        "year": manifest.get("year"),
+        "price_component": "MID",
+        "granularity": "M1",
+        "requested_start_utc": manifest.get("requested_start_utc"),
+        "requested_end_utc": manifest.get("requested_end_utc"),
+        "complete_candle_count": manifest.get("complete_candle_count"),
+        "normalized_provider_values_sha256": manifest.get(
+            "normalized_provider_values_sha256"
+        ),
+        "missing_interval_count": manifest.get("missing_interval_count"),
+        "missing_minutes": manifest.get("missing_minutes"),
+        "missing_intervals_sha256": manifest.get("missing_intervals_sha256"),
+        "missing_intervals": missing,
+        "refetch": {
+            "start_utc": refetch.get("start_utc"),
+            "end_utc": refetch.get("end_utc"),
+            "provider_value_sha256": refetch.get("provider_value_sha256"),
+            "status": refetch.get("status"),
+        },
+        "classification_contract": {
+            "allowed_terminal_states": [
+                "EXPECTED_MARKET_CLOSURE",
+                "NO_PRICE_OBSERVATION",
+            ],
+            "fail_closed_state": "UNRESOLVED_PROVIDER_GAP",
+            "synthetic_prices_authorized": False,
+            "forward_fill_authorized": False,
+            "timestamp_shape_only_classification_authorized": False,
+        },
+        "reconciliation_status": "PENDING_CLASSIFICATION",
+        "trusted_dataset_authorized": False,
+        "detector_execution_authorized": False,
+        "tradeplan_count_access_authorized": False,
+        "backtester_authorized": False,
+        "pnl_outcome_access_authorized": False,
+        "paper_trading_authorized": False,
+        "shadow_trading_authorized": False,
+        "live_trading_authorized": False,
+    }
+    _assert_false_flags(evidence)
+    serialized = json.dumps(evidence, sort_keys=True).lower()
+    for marker in (
+        "authorization",
+        "bearer ",
+        "oanda_api_token",
+        "oanda_account_id",
+        '"balance"',
+        '"nav"',
+        ".jsonl.gz",
+    ):
+        if marker in serialized:
+            raise ValueError(f"forbidden reconciliation evidence marker found: {marker}")
+    return evidence
 
 
 def main() -> int:
@@ -146,6 +223,7 @@ def main() -> int:
     stem = f"{instrument}_{year}_MID_M1"
     values_path = output_dir / f"{stem}.jsonl.gz"
     manifest_path = output_dir / f"{stem}.manifest.json"
+    reconciliation_path = output_dir / f"{stem}.reconciliation-v2.json"
 
     normalized_sha = normalized_m1_sha256(retrieval.candles)
     jsonl_content_sha = write_m1_jsonl_gz(values_path, retrieval.candles)
@@ -220,6 +298,11 @@ def main() -> int:
     _assert_manifest_safe(manifest)
     manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n", encoding="utf-8")
 
+    reconciliation = _build_reconciliation_evidence(manifest)
+    reconciliation_path.write_text(
+        json.dumps(reconciliation, sort_keys=True, indent=2) + "\n", encoding="utf-8"
+    )
+
     print(f"history_shard={instrument}/{year}")
     print(f"complete_candles={len(retrieval.candles)}")
     print(f"pages={len(retrieval.pages)}")
@@ -227,8 +310,11 @@ def main() -> int:
     print(f"missing_minutes={manifest['missing_minutes']}")
     print("manifest_self_check=PASS")
     print("refetch=EXACT_PROVIDER_VALUE_MATCH")
+    print("reconciliation_evidence_safe=true")
+    print("reconciliation_status=PENDING_CLASSIFICATION")
     print(f"values={values_path}")
     print(f"manifest={manifest_path}")
+    print(f"reconciliation={reconciliation_path}")
     print("detector_execution_authorized=false")
     print("pnl_outcome_access_authorized=false")
     return 0
