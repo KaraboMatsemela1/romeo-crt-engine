@@ -1,0 +1,26 @@
+{
+  "manifest_version": "CRT_V0.1_VALIDATION_PROTOCOL_FREEZE_V1",
+  "protocol_id": "P6-VALIDATION-PROTOCOL-v1",
+  "strategy_version": "CRT-C3-D1-H1-M1-BEAR-v0.1",
+  "detector_version": "CRT-DETECTOR-v0.1",
+  "simulator_version": "CRT-BACKTEST-v0.1",
+  "phase6_branch_base_main_sha": "015d23f78064264ceb660d57b3ec4a11f0c59524",
+  "protocol_initial_commit_sha": "4eec1d31ef88f83be84d6f8859dc725a5a3a6848",
+  "window_registry_commit_sha": "ee58c2cb9ac6d5c06dc1d88df8ed4ed7db26f898",
+  "protocol_blob_sha": "bcdc2e0f8c56b89fac17e873cc0b14e70c38ab02",
+  "window_registry_blob_sha": "ecb25016e3718e218774b556e7ec0a04cc9a50af",
+  "new_phase6_outcomes_observed_before_protocol_freeze": false,
+  "quarantined_prior_window": "P6-QUARANTINE-2025-09",
+  "sequential_access": [
+    "P6-DEV-001",
+    "P6-OOS-001",
+    "P6-CONFIRM-001"
+  ],
+  "paper_trading_authorized": false,
+  "live_trading_authorized": false,
+  "notes": [
+    "September 2025 Phase-5 engineering evidence is excluded from Phase-6 inferential validation.",
+    "Frozen v0.1 strategy/detector/simulator must not be changed in place because of Phase-6 outcomes.",
+    "Any strategy-rule revision becomes a new candidate version with new validation governance."
+  ]
+}
