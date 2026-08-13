@@ -21,6 +21,7 @@ from romeo_crt_engine.backtest.models import (
     PlanRejection,
     RejectionReason,
     SimulatedFill,
+    simulator_code_sha256,
     trade_plan_decimal_prices,
 )
 from romeo_crt_engine.crt.detector import DetectorCandidate, DetectorDataset, DetectorRun
@@ -258,6 +259,8 @@ def _metrics(
 def _run_hash(
     run: DetectorRun,
     config: BacktestConfig,
+    simulator_code_sha: str,
+    quantity_step: Decimal,
     trades: Sequence[CompletedTrade],
     rejections: Sequence[PlanRejection],
     open_at_end: Sequence[OpenAtEnd],
@@ -265,8 +268,10 @@ def _run_hash(
 ) -> str:
     payload = {
         "simulator_version": SIMULATOR_VERSION,
+        "simulator_code_sha256": simulator_code_sha,
         "detector_run_sha256": run.run_sha256,
         "config_sha256": config.config_sha256,
+        "quantity_step": str(quantity_step),
         "trades": [
             {
                 "candidate_id": trade.candidate_id,
@@ -322,6 +327,7 @@ def run_backtest(
     _require_quantity_step(quantity_step)
     _validate_binding(detector_run, dataset)
     _validate_h1(dataset.h1, detector_run)
+    code_sha = simulator_code_sha256()
 
     plan_candidates = tuple(
         sorted(
@@ -511,14 +517,26 @@ def run_backtest(
             )
 
     metrics = _metrics(config.initial_equity, completed)
-    run_sha = _run_hash(detector_run, config, completed, rejections, open_at_end, equity)
+    run_sha = _run_hash(
+        detector_run,
+        config,
+        code_sha,
+        quantity_step,
+        completed,
+        rejections,
+        open_at_end,
+        equity,
+    )
     return BacktestResult(
         simulator_version=SIMULATOR_VERSION,
+        simulator_code_sha256=code_sha,
         strategy_version=detector_run.strategy_version,
         detector_version=detector_run.detector_version,
+        detector_run_sha256=detector_run.run_sha256,
         dataset_version=detector_run.dataset.dataset_version,
         dataset_manifest_sha256=detector_run.dataset.manifest_sha256,
         symbol=detector_run.dataset.symbol,
+        quantity_step=quantity_step,
         config=config,
         completed_trades=tuple(completed),
         rejections=tuple(rejections),
