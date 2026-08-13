@@ -1,0 +1,57 @@
+{
+  "schema_version": "PHASE6_VALIDATION_WINDOWS_V1",
+  "protocol": "experiments/phase6/VALIDATION_PROTOCOL_V0_1.md",
+  "frozen_baseline": {
+    "strategy": "CRT-C3-D1-H1-M1-BEAR-v0.1",
+    "detector": "CRT-DETECTOR-v0.1",
+    "simulator": "CRT-BACKTEST-v0.1"
+  },
+  "selection_policy": "complete UTC calendar periods fixed before Phase-6 outcome retrieval",
+  "partitions": [
+    {
+      "id": "P6-DEV-001",
+      "role": "DEVELOPMENT_DIAGNOSTIC",
+      "start_utc_day": "2023-01-01",
+      "end_utc_day": "2024-12-31",
+      "outcome_exposure": "UNOBSERVED_UNDER_PHASE6_PROTOCOL"
+    },
+    {
+      "id": "P6-OOS-001",
+      "role": "OUT_OF_SAMPLE",
+      "start_utc_day": "2025-01-01",
+      "end_utc_day": "2025-12-31",
+      "outcome_exposure": "PARTIALLY_EXPOSED",
+      "known_exposure": [
+        {
+          "period": "2025-09-01/2025-09-30",
+          "reason": "Phase-5 preregistered integration smoke",
+          "observed_result": "27 rolling candidates, 0 TradePlans, 0 closed trades"
+        }
+      ]
+    },
+    {
+      "id": "P6-CONF-001",
+      "role": "UNTOUCHED_CONFIRMATORY",
+      "start_utc_day": "2026-01-01",
+      "end_utc_day": "2026-06-30",
+      "outcome_exposure": "MUST_REMAIN_UNOBSERVED_UNTIL_CONFIRMATORY_GATE"
+    }
+  ],
+  "sample_size_policy": {
+    "0_29_closed_trades": "INSUFFICIENT_EVIDENCE",
+    "30_99_closed_trades": "EXPLORATORY_ONLY_NO_PAPER_PROMOTION",
+    "100_199_closed_trades": "LIMITED_INFERENCE",
+    "200_plus_closed_trades": "ELIGIBLE_FOR_FULL_ROBUSTNESS_REVIEW"
+  },
+  "cost_scenarios": ["IDEAL", "BASE", "STRESSED", "SEVERE"],
+  "primary_cost_scenario": "BASE",
+  "allowed_final_decisions": [
+    "REJECT",
+    "REVISE_AS_NEW_VERSION",
+    "INSUFFICIENT_EVIDENCE",
+    "PROMOTE_TO_PAPER_CANDIDATE"
+  ],
+  "paper_trading_authorized": false,
+  "shadow_trading_authorized": false,
+  "live_trading_authorized": false
+}
