@@ -1,0 +1,65 @@
+{
+  "schema_version": "P6B_DETECTOR_COMPATIBILITY_FREEZE_V1",
+  "status": "FROZEN_COMPATIBILITY_BASELINE",
+  "frozen_at": "2026-08-13",
+  "candidate_version": "CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH",
+  "alpha_strategy_version": "CRT-C3-D1-H1-M1-BEAR-v0.1",
+  "detector_version": "CRT-DETECTOR-v0.2-MULTI-MARKET",
+  "signal_price_component": "MID",
+  "strategy_outcome_access_authorized": false,
+  "paper_trading_authorized": false,
+  "live_trading_authorized": false,
+  "frozen_inputs": {
+    "alpha_strategy_git_blob_sha": "9f593c0617ace919b8edda0c62f8ced849b086e2",
+    "legacy_detector_git_blob_sha": "79af887aac5e7e009bc6f04f5329504855393d26",
+    "multi_market_detector_git_blob_sha": "798dc20d9b0899140d7dfc90ad215739d7d4d018",
+    "provider_neutral_price_data_v2_git_blob_sha": "f9850a9324d8db81cacc6228f5f0a4ca31c197cf",
+    "parity_test_git_blob_sha": "8d6547dc05228f39dc88153a33a44092d8459e2b"
+  },
+  "parity_contract": {
+    "fixtures": "tests/strategy/fixtures/crt_v0_1_cases.json",
+    "decision_state_equal": true,
+    "reason_code_equal": true,
+    "rule_trace_equal": true,
+    "evidence_ids_equal": true,
+    "causal_input_sha256_equal": true,
+    "trade_plan_equal": true,
+    "trade_plan_strategy_version": "CRT-C3-D1-H1-M1-BEAR-v0.1"
+  },
+  "verification": {
+    "ci_run_id": 31692427030,
+    "ci_conclusion": "success",
+    "ruff": "success",
+    "mypy": "success",
+    "pytest": "success",
+    "preserved_backtest_smoke_run_id": 31692486146,
+    "preserved_backtest_smoke_conclusion": "success"
+  },
+  "binding_rules": [
+    "Provider-backed detector data must use P6B_CANONICAL_PRICE_DATASET_V2 and quality_status TRUSTED.",
+    "The active candidate accepts MID signal data only.",
+    "A positive pre-frozen price_quantum is mandatory before detector evaluation.",
+    "The detector must call the frozen v0.1 alpha evaluator rather than reimplement strategy validity.",
+    "Every emitted TradePlan must retain strategy_version CRT-C3-D1-H1-M1-BEAR-v0.1.",
+    "Provider activity metadata is not an alpha input.",
+    "No detector compatibility change may be selected from provider-backed strategy outcomes."
+  ],
+  "revalidation_triggers": [
+    "change to detector_v2.py",
+    "change to crt/v0_1.py",
+    "change to provider-neutral OHLC/time semantics",
+    "change to signal price component",
+    "change to price-quantum handling",
+    "change to candidate-to-TradePlan rule mapping"
+  ],
+  "not_frozen_by_this_manifest": [
+    "OANDA account instrument universe",
+    "instrument-specific session and holiday policies",
+    "provider API retrieval/re-fetch provenance",
+    "instrument price quantum values",
+    "quantity-step and position-size translation",
+    "bid/ask execution and friction model",
+    "multi-market validation windows and decision gates",
+    "simulator compatibility for provider-backed execution"
+  ]
+}
