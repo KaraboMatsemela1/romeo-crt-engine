@@ -1,0 +1,1 @@
+"""Preregistered research-validation gates."""
