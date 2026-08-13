@@ -8,6 +8,7 @@ from datetime import UTC, date, datetime, timedelta
 from functools import partial
 from hashlib import sha256
 from io import BytesIO, TextIOWrapper
+from itertools import pairwise
 from pathlib import Path
 from zipfile import BadZipFile, ZipFile
 
@@ -124,7 +125,7 @@ def _archive_chronology_diagnostic(archive: RawArchive) -> str:
         opens.append(open_time)
         expected_close = raw_open + (60 * scale) - 1
         if raw_close != expected_close:
-            duration_seconds = Decimal(raw_close - raw_open + 1) / Decimal(scale)
+            duration_seconds = (raw_close - raw_open + 1) / scale
             irregular_rows.append(
                 f"row={row_number}:open={open_time.isoformat()}:duration_seconds={duration_seconds}"
             )
@@ -134,7 +135,7 @@ def _archive_chronology_diagnostic(archive: RawArchive) -> str:
         if opens[0] > day_start:
             missing = int((opens[0] - day_start).total_seconds() // 60)
             gaps.append(f"{day_start.isoformat()}..{opens[0].isoformat()}:{missing}m")
-        for previous, current in zip(opens, opens[1:], strict=False):
+        for previous, current in pairwise(opens):
             expected = previous + timedelta(minutes=1)
             if current > expected:
                 missing = int((current - expected).total_seconds() // 60)
