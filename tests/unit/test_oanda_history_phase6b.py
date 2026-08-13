@@ -16,15 +16,16 @@ from romeo_crt_engine.market_data.providers.oanda_v20 import OandaPriceCandle
 
 
 def _candle(open_time: datetime, *, close: str = "1.1002") -> OandaPriceCandle:
+    close_price = Decimal(close)
     return OandaPriceCandle(
         instrument="EUR_USD",
         price_component="M",
         open_time=open_time,
         close_time=open_time + timedelta(minutes=1),
         open=Decimal("1.1000"),
-        high=Decimal("1.1005"),
-        low=Decimal("1.0995"),
-        close=Decimal(close),
+        high=max(Decimal("1.1005"), close_price),
+        low=min(Decimal("1.0995"), close_price),
+        close=close_price,
         price_count=5,
         complete=True,
         source_sha256="a" * 64,
