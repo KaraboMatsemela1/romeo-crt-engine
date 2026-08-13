@@ -14,7 +14,9 @@ from romeo_crt_engine.market_data.providers.binance_public import (
     RawArchive,
     fetch_daily_archive,
     fetch_exchange_info,
+    parse_1m_archive,
 )
+from romeo_crt_engine.market_data.quality import DataQualityError
 from romeo_crt_engine.market_data.verification import (
     VerificationPolicy,
     build_provider_verification_evidence,
@@ -79,6 +81,15 @@ def _fetch_archives(
         return tuple(executor.map(fetch, days))
 
 
+def _validate_archive_shapes(archives: tuple[RawArchive, ...], *, symbol: str) -> None:
+    """Fail with provider archive identity before constructing a multi-year trusted series."""
+    for archive in archives:
+        try:
+            parse_1m_archive(archive, symbol=symbol)
+        except DataQualityError as error:
+            raise RuntimeError(f"provider archive {archive.filename} failed: {error}") from error
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Build a trusted BTCUSDT-style dataset from Binance daily 1m archives."
@@ -114,6 +125,7 @@ def main() -> None:
         requested_days,
         workers=args.download_workers,
     )
+    _validate_archive_shapes(archives, symbol=args.symbol)
     policy = VerificationPolicy(args.verification_policy)
     provider_crosschecks = build_provider_verification_evidence(
         archives,
