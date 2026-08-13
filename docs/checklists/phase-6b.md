@@ -1,6 +1,6 @@
 # Phase 6B — Candidate Revision Checklist
 
-**Status:** **IN PROGRESS — HISTORICAL OANDA DATA QUALIFICATION**  
+**Status:** **IN PROGRESS — LOCAL RAW OANDA COLLECTION READY**  
 **Active research target:** `CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH`  
 **Underlying frozen alpha:** `CRT-C3-D1-H1-M1-BEAR-v0.1`  
 **Preserved failed research path:** `CRT-C3-D1-H1-M1-BULL-v0.2-RESEARCH` -> `EVIDENCE_INSUFFICIENT`  
@@ -51,8 +51,15 @@ Protocol: `P6B-OANDA-HISTORY-QUALIFICATION-V1`.
 - [x] Reject approved closure evidence that leaves raw missing minutes unexplained.
 - [x] Reject approved closure evidence that extends into provider-observed minutes.
 - [x] Regression-test exact reconciliation and preserve BTCUSDT behavior.
-- [ ] Collect complete sealed raw DEV M1 history for all four instruments.
-- [ ] Execute 4/4 independent re-fetch comparisons per instrument.
+- [x] Implement practice-only local yearly-shard collector.
+- [x] Restrict collector to the frozen four symbols and years 2019-2022.
+- [x] Persist credentials only in runtime environment; manifests retain redacted account scope.
+- [x] Preserve page provenance, raw missing intervals and mapped re-fetch result per shard.
+- [x] Add local collection runbook and Git-ignore raw output directory.
+- [ ] Execute first full shard: `EUR_USD / 2019` locally.
+- [ ] Validate first full-shard manifest/redaction.
+- [ ] Collect remaining 15 raw shards.
+- [ ] Achieve 4/4 independent re-fetch comparisons per instrument.
 - [ ] Inventory every missing interval.
 - [ ] Reconcile every removed expected observation to date-valid session/holiday evidence.
 - [ ] Leave unresolved/provider-missing intervals fail-closed.
@@ -63,11 +70,13 @@ Canonical artifacts:
 
 - `experiments/phase6b/P6B_OANDA_HISTORY_QUALIFICATION_PROTOCOL_V1.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_SHARD_EXECUTION_V1.md`
+- `experiments/phase6b/P6B_OANDA_LOCAL_COLLECTION_RUNBOOK_V1.md`
 - `experiments/phase6b/P6B_OANDA_HISTORICAL_SESSION_EVIDENCE_001.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_SMOKE_001.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_COLLECTION_GATE_001.md`
 - `research/romeo/phase6b/PRIMARY_SOURCE_PASS_003.md`
 - `src/romeo_crt_engine/market_data/gap_reconciliation_v2.py`
+- `scripts/collect_oanda_history_shard.py`
 - `tests/unit/test_history_qualification_v2_phase6b.py`
 
 ## E. Detector-only activity protocol
@@ -92,6 +101,9 @@ Alpha changes                  NONE AUTHORIZED
 Frozen OANDA universe          4 SYMBOLS
 Historical M1 smoke            PASS 4/4, 60/60 EACH
 Yearly raw collection plan     FROZEN 16 SHARDS
+Local shard collector          READY
+Local raw artifact path        GIT-IGNORED
+First full shard               EUR_USD / 2019 PENDING LOCAL EXECUTION
 Exact raw-gap reconciliation   IMPLEMENTED + TESTED
 Full raw 2019-2022 M1          PENDING
 Historical gap reconciliation  PENDING RAW INVENTORY
