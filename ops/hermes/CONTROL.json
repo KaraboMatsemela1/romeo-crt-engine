@@ -1,0 +1,23 @@
+{
+  "schema_version": "ROMEO_HERMES_CONTROL_V1",
+  "enabled": true,
+  "repository": "KaraboMatsemela1/romeo-crt-engine",
+  "branch": "agent/phase-6b-candidate-revision",
+  "poll_interval_seconds": 300,
+  "task_directory": "ops/hermes/tasks",
+  "auto_execute_ready_tasks": true,
+  "executor": "HERMES_LOCAL",
+  "result_channel": {
+    "type": "github_issue_comment",
+    "issue_number": 14,
+    "prefix": "[HERMES_RESULT]"
+  },
+  "local_state_path": "~/.hermes/state/romeo-crt-engine-control.json",
+  "stop_on_failure": true,
+  "security": {
+    "never_persist_secrets": true,
+    "never_upload_raw_oanda_m1": true,
+    "require_clean_or_stashed_repo_before_checkout": true,
+    "require_ff_only_pull": true
+  }
+}
