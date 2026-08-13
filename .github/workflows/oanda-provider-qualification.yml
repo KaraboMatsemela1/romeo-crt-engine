@@ -55,32 +55,42 @@ jobs:
           pip install --no-deps --no-build-isolation -e .
       - name: Fetch XAU_USD 2022 and probe short gaps at S5
         run: python scripts/collect_oanda_history_shard.py --instrument XAU_USD --year 2022 --output-dir /tmp/history --probe-s5-short-gaps
-      - name: Validate redacted V2 reconciliation evidence
+      - name: Validate redacted S5 reconciliation evidence
         run: |
-          python - /tmp/history/XAU_USD_2022_MID_M1.reconciliation-v2.json <<'PY'
+          python - <<'PY'
           import json
           from pathlib import Path
-          e=json.loads(Path('/tmp/history/XAU_USD_2022_MID_M1.reconciliation-v2.json').read_text())
-          assert e['schema_version']=='P6B_OANDA_RECONCILIATION_EVIDENCE_V2'
-          assert e['instrument']=='XAU_USD' and e['year']==2022
-          assert e['refetch']['status']=='EXACT_PROVIDER_VALUE_MATCH'
-          assert e['detector_execution_authorized'] is False
-          assert e['pnl_outcome_access_authorized'] is False
-          serialized=json.dumps(e,sort_keys=True).lower()
+          base=json.loads(Path('/tmp/history/XAU_USD_2022_MID_M1.reconciliation-v2.json').read_text())
+          s5=json.loads(Path('/tmp/history/XAU_USD_2022_MID_M1.s5-gap-evidence-v1.json').read_text())
+          assert base['schema_version']=='P6B_OANDA_RECONCILIATION_EVIDENCE_V2'
+          assert base['instrument']=='XAU_USD' and base['year']==2022
+          assert base['refetch']['status']=='EXACT_PROVIDER_VALUE_MATCH'
+          assert s5['instrument']=='XAU_USD' and s5['year']==2022
+          assert s5['source_missing_intervals_sha256']==base['missing_intervals_sha256']
+          assert s5['eligible_gap_count']==s5['no_price_observation_gap_count']+s5['unresolved_provider_gap_count']
+          assert base['detector_execution_authorized'] is False
+          assert base['pnl_outcome_access_authorized'] is False
+          assert s5['detector_execution_authorized'] is False
+          assert s5['pnl_outcome_access_authorized'] is False
+          serialized=(json.dumps(base,sort_keys=True)+json.dumps(s5,sort_keys=True)).lower()
           for marker in ('authorization','bearer ','oanda_api_token','oanda_account_id','"balance"','"nav"','.jsonl.gz'):
               assert marker not in serialized
           print('s5_reconciliation_pilot_validation=PASS')
-          print('reconciliation_status='+str(e['reconciliation_status']))
-          print('missing_intervals='+str(e['missing_interval_count']))
-          print('missing_minutes='+str(e['missing_minutes']))
+          print('s5_eligible_gaps='+str(s5['eligible_gap_count']))
+          print('s5_no_price_gaps='+str(s5['no_price_observation_gap_count']))
+          print('s5_no_price_minutes='+str(s5['no_price_observation_minutes']))
+          print('s5_unresolved_gaps='+str(s5['unresolved_provider_gap_count']))
+          print('s5_unresolved_minutes='+str(s5['unresolved_provider_gap_minutes']))
           print('detector_execution_authorized=false')
           print('pnl_outcome_access_authorized=false')
           PY
-      - name: Upload reconciliation evidence only
+      - name: Upload reconciliation and S5 evidence only
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: p6b-reconciliation-XAU_USD-2022-s5-pilot
-          path: /tmp/history/XAU_USD_2022_MID_M1.reconciliation-v2.json
+          name: p6b-reconciliation-XAU_USD-2022-s5-pilot-v2
+          path: |
+            /tmp/history/XAU_USD_2022_MID_M1.reconciliation-v2.json
+            /tmp/history/XAU_USD_2022_MID_M1.s5-gap-evidence-v1.json
           if-no-files-found: error
           retention-days: 30
           compression-level: 9
