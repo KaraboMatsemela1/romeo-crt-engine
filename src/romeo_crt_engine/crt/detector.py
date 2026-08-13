@@ -147,14 +147,14 @@ def _required_text(document: Mapping[str, Any], key: str) -> str:
 def _required_int(document: Mapping[str, Any], key: str) -> int:
     value = document.get(key)
     if isinstance(value, bool) or not isinstance(value, int):
-        raise ValueError(f"manifest field {key} must be an integer")
+        raise TypeError(f"manifest field {key} must be an integer")
     return value
 
 
 def identity_from_manifest_bytes(payload: bytes) -> DetectorDatasetIdentity:
     document_raw = json.loads(payload)
     if not isinstance(document_raw, dict):
-        raise ValueError("trusted dataset manifest must be a JSON object")
+        raise TypeError("trusted dataset manifest must be a JSON object")
     document = cast(dict[str, Any], document_raw)
     return DetectorDatasetIdentity(
         dataset_version=_required_text(document, "dataset_version"),
@@ -198,7 +198,7 @@ def load_canonical_jsonl(path: Path) -> tuple[CanonicalBar, ...]:
             continue
         raw = json.loads(line)
         if not isinstance(raw, dict):
-            raise ValueError(f"{path} line {line_number} must be a JSON object")
+            raise TypeError(f"{path} line {line_number} must be a JSON object")
         bars.append(_canonical_bar_from_record(cast(dict[str, Any], raw)))
     return tuple(bars)
 
@@ -267,14 +267,9 @@ def _h1_for_window(h1: Sequence[CanonicalBar], c3: CanonicalBar) -> tuple[Closed
 
 
 def _candidate_id(dataset_version: str, c1: CanonicalBar, c2: CanonicalBar, c3: CanonicalBar) -> str:
-    payload = "|".join(
-        (
-            STRATEGY_VERSION,
-            dataset_version,
-            c1.open_time.isoformat(),
-            c2.open_time.isoformat(),
-            c3.open_time.isoformat(),
-        )
+    payload = (
+        f"{STRATEGY_VERSION}|{dataset_version}|{c1.open_time.isoformat()}|"
+        f"{c2.open_time.isoformat()}|{c3.open_time.isoformat()}"
     )
     return sha256(payload.encode("utf-8")).hexdigest()[:24]
 
