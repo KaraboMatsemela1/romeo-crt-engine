@@ -62,7 +62,7 @@ def _market_data_code_digest() -> str:
 def _document(path: Path) -> dict[str, Any]:
     raw = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(raw, dict):
-        raise ValueError("frozen dataset manifest must be a JSON object")
+        raise TypeError("frozen dataset manifest must be a JSON object")
     return cast(dict[str, Any], raw)
 
 
