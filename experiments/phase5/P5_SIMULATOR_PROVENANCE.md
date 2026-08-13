@@ -23,4 +23,6 @@ backtest_run_sha256
 
 The deterministic regression suite requires identical source/data/config/quantity inputs to reproduce the same run SHA and requires quantity-step drift to create a different run SHA.
 
+Phase-5 freeze evidence must come from CI and provider-backed smoke runs attached to the exact final branch head. Earlier green runs remain useful history but cannot substitute for a failing or untested final source tree.
+
 This provenance contract is an integrity property only. It is not a profitability claim.
