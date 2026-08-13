@@ -84,5 +84,13 @@ jobs:
           print(f"refetch_provider_value_sha256={manifest['refetch']['provider_value_sha256']}")
           PY
 
+      - name: Upload credential-free manifest only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: p6b-eurusd-2019-manifest
+          path: /tmp/oanda_raw/EUR_USD_2019_MID_M1.manifest.json
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Print credential-free raw-gap manifest
         run: cat /tmp/oanda_raw/EUR_USD_2019_MID_M1.manifest.json
