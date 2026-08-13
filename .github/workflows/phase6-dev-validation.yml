@@ -1,7 +1,7 @@
 name: Phase 6 DEV Validation
 
-# P6-DEV-001 is preregistered. Detector/P&L access remains disabled until a fresh
-# provider retrieval reproduces the sealed DEV data identity exactly.
+# The sealed P6-DEV-001 data identity has reproduced byte-for-byte on an independent
+# provider retrieval. DEV-only outcome access is authorized by P6_DEV_OUTCOME_ACCESS_GATE_001.
 on:
   workflow_dispatch:
   pull_request:
@@ -12,10 +12,11 @@ on:
       - "src/romeo_crt_engine/backtest/**"
       - "experiments/phase6/P6_DATA_QUALITY_AMENDMENT_*.md"
       - "experiments/phase6/P6_DEV_DATA_FREEZE_001.*"
+      - "experiments/phase6/P6_DEV_OUTCOME_ACCESS_GATE_001.md"
       - "requirements.lock"
 
 env:
-  P6_DEV_OUTCOME_ACCESS_AUTHORIZED: "false"
+  P6_DEV_OUTCOME_ACCESS_AUTHORIZED: "true"
 
 jobs:
   p6-dev-001:
@@ -107,7 +108,7 @@ jobs:
           summary = {
               'protocol_id': freeze['protocol_id'],
               'window_id': freeze['window_id'],
-              'outcome_access_authorized': False,
+              'outcome_access_authorized': True,
               'dataset_version': manifest['dataset_version'],
               'manifest_sha256': manifest_sha,
               'normalized_sha256': manifest['normalized_sha256'],
