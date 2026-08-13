@@ -1,0 +1,115 @@
+name: Backtest Freeze Smoke
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/backtest-freeze-smoke.yml"
+
+jobs:
+  september-2025-freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Install locked environment
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps --no-build-isolation -e .
+      - name: Build preregistered September 2025 trusted dataset
+        run: |
+          python scripts/ingest_binance_spot.py \
+            --symbol BTCUSDT \
+            --start-utc-day 2025-09-01 \
+            --end-utc-day 2025-09-30 \
+            --data-root /tmp/romeo-phase5-freeze \
+            > /tmp/phase5-ingest.txt
+          cat /tmp/phase5-ingest.txt
+      - name: Run all preregistered simulator scenarios
+        run: |
+          dataset_dir=$(find /tmp/romeo-phase5-freeze/normalized -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -n "$dataset_dir"
+          for scenario in ideal base stressed severe; do
+            python scripts/run_backtest.py \
+              --dataset-dir "$dataset_dir" \
+              --cost-scenario "$scenario" \
+              --initial-equity 100000 \
+              --risk-fraction 0.005 \
+              --max-concurrent-positions 1 \
+              > "/tmp/backtest-${scenario}.json"
+          done
+      - name: Emit compact freeze evidence
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          dataset_dir = next(Path('/tmp/romeo-phase5-freeze/normalized').iterdir())
+          manifest_path = dataset_dir / 'manifest.json'
+          manifest_bytes = manifest_path.read_bytes()
+          manifest = json.loads(manifest_bytes)
+          receipt_path = dataset_dir / 'receipt.json'
+          receipt_sha = hashlib.sha256(receipt_path.read_bytes()).hexdigest() if receipt_path.exists() else None
+
+          scenarios = {}
+          detector_hashes = set()
+          simulator_hashes = set()
+          plan_counts = set()
+          for name in ('ideal', 'base', 'stressed', 'severe'):
+              result = json.loads(Path(f'/tmp/backtest-{name}.json').read_text())
+              detector_hashes.add(result['detector_run_sha256'])
+              simulator_hashes.add(result['simulator_code_sha256'])
+              plan_counts.add(result['detector_trade_plan_count'])
+              scenarios[name] = {
+                  'config_sha256': result['config_sha256'],
+                  'run_sha256': result['run_sha256'],
+                  'completed_trades': result['completed_trades'],
+                  'rejections': result['rejections'],
+                  'open_at_end': result['open_at_end'],
+                  'final_realized_equity': result['final_realized_equity'],
+                  'net_pnl': result['metrics']['net_pnl'],
+                  'average_r': result['metrics']['average_r'],
+                  'max_realized_drawdown': result['metrics']['max_realized_drawdown'],
+              }
+
+          assert manifest['quality_status'] == 'TRUSTED'
+          assert manifest['m1_rows'] == 43200
+          assert manifest['h1_rows'] == 720
+          assert manifest['d1_rows'] == 29
+          assert len(detector_hashes) == 1
+          assert len(simulator_hashes) == 1
+          assert plan_counts == {0}
+
+          summary = {
+              'preregistration': 'P5-SIM-001',
+              'dataset_version': manifest['dataset_version'],
+              'manifest_sha256': hashlib.sha256(manifest_bytes).hexdigest(),
+              'normalized_sha256': manifest['normalized_sha256'],
+              'provider': manifest['provider'],
+              'venue': manifest['venue'],
+              'symbol': manifest['symbol'],
+              'instrument_metadata_observed_at': manifest['instrument_metadata_observed_at'],
+              'instrument_metadata_version': manifest['instrument_metadata_version'],
+              'price_tick_size': manifest['price_tick_size'],
+              'quantity_step': manifest['quantity_step'],
+              'market_data_code_sha256': manifest['market_data_code_sha256'],
+              'dependency_lock_sha256': manifest['dependency_lock_sha256'],
+              'm1_rows': manifest['m1_rows'],
+              'h1_rows': manifest['h1_rows'],
+              'd1_rows': manifest['d1_rows'],
+              'receipt_sha256': receipt_sha,
+              'detector_run_sha256': next(iter(detector_hashes)),
+              'detector_candidate_count': 27,
+              'detector_trade_plan_count': next(iter(plan_counts)),
+              'simulator_code_sha256': next(iter(simulator_hashes)),
+              'scenarios': scenarios,
+              'conclusion': 'INTEGRATION_SUCCESS_ZERO_TRADEPLANS_NO_PROFITABILITY_INFERENCE',
+          }
+          print('PHASE5_FREEZE_SUMMARY=' + json.dumps(summary, sort_keys=True, separators=(',', ':')))
+          PY

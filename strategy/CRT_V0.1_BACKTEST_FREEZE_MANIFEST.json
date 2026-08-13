@@ -1,0 +1,82 @@
+{
+  "schema_version": "PHASE5_BACKTEST_FREEZE_V1",
+  "status": "FROZEN_FOR_VALIDATION_INTEGRATION",
+  "strategy": {
+    "version": "CRT-C3-D1-H1-M1-BEAR-v0.1",
+    "semantics_changed_in_phase5": false
+  },
+  "detector": {
+    "version": "CRT-DETECTOR-v0.1",
+    "semantics_changed_in_phase5": false
+  },
+  "simulator": {
+    "version": "CRT-BACKTEST-v0.1",
+    "execution_assumption_version": "SYNTHETIC_LINEAR_SHORT_RESEARCH_V1",
+    "source_head": "dbd29ae17ed067511d4c256398bc088903577691",
+    "source_sha_required_per_run": true,
+    "quantity_step_required_in_run_identity": true,
+    "same_bar_policy": "STOP_FIRST_CONSERVATIVE",
+    "stop_gap_policy": "WORSE_BAR_OPEN",
+    "favorable_target_gap_improvement": false,
+    "force_close_at_dataset_end": false,
+    "entry_activation": "AFTER_CONFIRMATION_H1_CLOSE",
+    "entry_reference_must_equal_confirmation_close": true,
+    "simultaneous_plan_policy": "FAIL_CLOSED_IF_GROUP_EXCEEDS_AVAILABLE_CAPACITY"
+  },
+  "research_risk_control": {
+    "initial_equity": "100000",
+    "risk_fraction": "0.005",
+    "max_concurrent_positions": 1,
+    "quantity_rounding": "DOWN_TO_STEP"
+  },
+  "cost_models": {
+    "P5-COST-IDEAL-V1": {"fee_bps_per_side": "0", "half_spread_bps_per_side": "0", "slippage_bps_per_side": "0"},
+    "P5-COST-BASE-V1": {"fee_bps_per_side": "10", "half_spread_bps_per_side": "1", "slippage_bps_per_side": "2"},
+    "P5-COST-STRESSED-V1": {"fee_bps_per_side": "15", "half_spread_bps_per_side": "3", "slippage_bps_per_side": "5"},
+    "P5-COST-SEVERE-V1": {"fee_bps_per_side": "20", "half_spread_bps_per_side": "5", "slippage_bps_per_side": "10"}
+  },
+  "simulator_integrity": {
+    "target_after_confirmation_regression": true,
+    "structural_stop_regression": true,
+    "same_bar_ambiguity_regression": true,
+    "stop_gap_regression": true,
+    "target_gap_regression": true,
+    "open_at_end_censoring_regression": true,
+    "cost_adversity_regression": true,
+    "risk_budget_rounding_regression": true,
+    "entry_reference_mismatch_regression": true,
+    "simultaneous_plan_conflict_regression": true,
+    "deterministic_run_hash_regression": true,
+    "quantity_step_run_identity_regression": true
+  },
+  "preregistered_integration_result": {
+    "experiment_id": "P5-SIM-001",
+    "window": "2025-09-01..2025-09-30 UTC",
+    "m1_rows": 43200,
+    "h1_rows": 720,
+    "d1_rows": 29,
+    "rolling_candidates": 27,
+    "trade_plans": 0,
+    "completed_trades_all_cost_scenarios": 0,
+    "conclusion": "INTEGRATION_SUCCESS_ZERO_TRADEPLANS_NO_PROFITABILITY_INFERENCE",
+    "result_path": "experiments/phase5/P5_SIMULATION_WINDOW_001_RESULTS.json"
+  },
+  "quality_evidence": {
+    "final_ci_run": 31670117944,
+    "final_ci_job": 94352804983,
+    "final_ci_result": "SUCCESS",
+    "final_provider_replay_run": 31670117938,
+    "final_provider_replay_job": 94352804834,
+    "final_provider_replay_result": "SUCCESS"
+  },
+  "limitations": {
+    "spot_observation_short_execution_is_synthetic": true,
+    "historical_bid_ask_spread_available": false,
+    "historical_margin_funding_liquidation_model_present": false,
+    "preregistered_month_has_tradeplans": false,
+    "profitability_established": false
+  },
+  "paper_trading_authorized": false,
+  "shadow_trading_authorized": false,
+  "live_trading_authorized": false
+}
