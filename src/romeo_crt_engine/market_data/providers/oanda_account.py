@@ -81,7 +81,7 @@ def parse_authorized_account_ids(payload: bytes) -> tuple[str, ...]:
 
     if len(set(account_ids)) != len(account_ids):
         raise DataQualityError(
-            DataQualityCode.PROVIDER_DUPLICATE,
+            DataQualityCode.PROVIDER_SCHEMA,
             "duplicate OANDA authorized-account ID",
         )
     return tuple(account_ids)
