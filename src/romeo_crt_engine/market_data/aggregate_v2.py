@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 from romeo_crt_engine.market_data.models import BarTimeframe
 from romeo_crt_engine.market_data.price_data_v2 import (
     ActivityMeasure,
+    ActivitySemantic,
     CanonicalPriceBarV2,
 )
 from romeo_crt_engine.market_data.session_policy_v2 import (
@@ -20,9 +21,7 @@ from romeo_crt_engine.market_data.session_policy_v2 import (
 NEW_YORK = ZoneInfo("America/New_York")
 
 
-def _validate_m1_identity(
-    bars: tuple[CanonicalPriceBarV2, ...],
-) -> tuple[str, str, str, object, str]:
+def _validate_m1_identity(bars: tuple[CanonicalPriceBarV2, ...]) -> None:
     if not bars:
         raise ValueError("price aggregation requires M1 observations")
     first = bars[0]
@@ -50,7 +49,6 @@ def _validate_m1_identity(
         if previous_open is not None and bar.open_time <= previous_open:
             raise ValueError("M1 observations must be strictly ordered and unique")
         previous_open = bar.open_time
-    return identity
 
 
 def _expected_minute_opens(
@@ -93,7 +91,7 @@ def _window_bars(
     return tuple(by_open[timestamp] for timestamp in expected_opens)
 
 
-def _activity_map(bar: CanonicalPriceBarV2) -> dict[object, Decimal]:
+def _activity_map(bar: CanonicalPriceBarV2) -> dict[ActivitySemantic, Decimal]:
     return {measure.semantic: measure.value for measure in bar.activity}
 
 
@@ -107,8 +105,11 @@ def _aggregate_activity(
     for values in maps[1:]:
         common.intersection_update(values)
     return tuple(
-        ActivityMeasure(semantic=semantic, value=sum((values[semantic] for values in maps), Decimal(0)))
-        for semantic in sorted(common, key=lambda item: str(item))
+        ActivityMeasure(
+            semantic=semantic,
+            value=sum((values[semantic] for values in maps), Decimal(0)),
+        )
+        for semantic in sorted(common, key=lambda item: item.value)
     )
 
 
