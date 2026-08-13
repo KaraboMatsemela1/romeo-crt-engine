@@ -9,6 +9,7 @@ from pathlib import Path
 from romeo_crt_engine.market_data.oanda_qualification import (
     build_instrument_discovery_manifest,
 )
+from romeo_crt_engine.market_data.providers.oanda_account import fetch_account_summary
 from romeo_crt_engine.market_data.providers.oanda_v20 import (
     LIVE_BASE_URL,
     PRACTICE_BASE_URL,
@@ -26,8 +27,9 @@ def _environment(value: str) -> str:
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Discover the runtime OANDA account instrument universe and emit a credential-free "
-            "Phase-6B qualification manifest. This command does not run strategy outcomes."
+            "Discover runtime OANDA account/instrument execution metadata and emit a "
+            "credential-free Phase-6B qualification manifest. This command does not run "
+            "strategy outcomes."
         )
     )
     parser.add_argument(
@@ -65,6 +67,12 @@ def main() -> int:
 
     observed_at = datetime.now(UTC)
     base_url = PRACTICE_BASE_URL if environment == "practice" else LIVE_BASE_URL
+    account = fetch_account_summary(
+        base_url=base_url,
+        account_id=account_id,
+        token=token,
+        observed_at=observed_at,
+    )
     instruments = fetch_account_instruments(
         base_url=base_url,
         account_id=account_id,
@@ -75,6 +83,7 @@ def main() -> int:
         instruments,
         environment=environment,
         observed_at=observed_at,
+        account=account,
     )
 
     output = Path(args.output)
@@ -93,8 +102,13 @@ def main() -> int:
         if isinstance(item, dict) and item.get("status") == "MATCHED"
     )
 
+    account_profile = manifest["account_profile"]
+    if not isinstance(account_profile, dict):
+        raise TypeError("qualification manifest account_profile is invalid")
+
     print(f"provider={manifest['provider']}")
     print(f"environment={environment}")
+    print(f"account_home_currency={account_profile['home_currency']}")
     print(f"available_instrument_count={manifest['available_instrument_count']}")
     print(f"source_family_matches={matched_count}/{len(matches)}")
     print(f"manifest={output}")
