@@ -69,6 +69,12 @@ def _validate_binding(run: DetectorRun, dataset: DetectorDataset) -> None:
 
 
 def _validate_h1(bars: Sequence[CanonicalBar], run: DetectorRun) -> None:
+    """Validate ordered, non-overlapping trusted H1 events.
+
+    Forward time gaps are permitted here because the trusted market-data boundary is responsible
+    for proving any venue closure. The simulator must not require synthetic bars to make the event
+    clock gapless. Overlap or reversal remains invalid.
+    """
     previous_close: float | None = None
     for bar in bars:
         if bar.timeframe is not BarTimeframe.H1:
@@ -80,8 +86,8 @@ def _validate_h1(bars: Sequence[CanonicalBar], run: DetectorRun) -> None:
         ):
             raise ValueError("H1 identity does not match detector run")
         open_timestamp = bar.open_time.timestamp()
-        if previous_close is not None and open_timestamp != previous_close:
-            raise ValueError("H1 event clock must be gapless and ordered")
+        if previous_close is not None and open_timestamp < previous_close:
+            raise ValueError("H1 event clock must be ordered and non-overlapping")
         previous_close = bar.close_time.timestamp()
 
 
