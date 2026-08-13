@@ -1,0 +1,45 @@
+name: Detector Smoke
+
+on:
+  workflow_dispatch:
+
+jobs:
+  frozen-btcusdt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Install locked environment
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps --no-build-isolation -e .
+      - name: Reconstruct exact frozen Phase-3 dataset
+        run: |
+          python scripts/reconstruct_frozen_dataset.py --data-root /tmp/romeo-phase4-data
+      - name: Run CRT detector on frozen dataset
+        run: |
+          python scripts/run_crt_detector.py \
+            --dataset-dir /tmp/romeo-phase4-data/normalized/ee1300f0da50e4debcbbc3b7 \
+            --require-dataset-version ee1300f0da50e4debcbbc3b7 \
+            --require-manifest-sha256 eaf828ee3acc8adf9e3b931cc6a55d385b0be61b58ae72f01205b3f6034a2141 \
+            > /tmp/phase4-detector.json
+          cat /tmp/phase4-detector.json
+      - name: Assert expected compact-window integration result
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          result = json.loads(Path('/tmp/phase4-detector.json').read_text())
+          assert result['strategy_version'] == 'CRT-C3-D1-H1-M1-BEAR-v0.1'
+          assert result['detector_version'] == 'CRT-DETECTOR-v0.1'
+          assert result['dataset_version'] == 'ee1300f0da50e4debcbbc3b7'
+          assert result['status'] == 'INSUFFICIENT_D1_HISTORY'
+          assert result['candidate_count'] == 0
+          assert result['trade_plan_count'] == 0
+          PY

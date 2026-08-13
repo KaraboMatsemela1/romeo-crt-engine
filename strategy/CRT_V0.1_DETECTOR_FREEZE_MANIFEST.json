@@ -1,0 +1,58 @@
+{
+  "schema_version": "PHASE4_DETECTOR_FREEZE_V1",
+  "status": "FROZEN_FOR_BACKTEST_INTEGRATION",
+  "strategy": {
+    "version": "CRT-C3-D1-H1-M1-BEAR-v0.1",
+    "doctrine": "CRT_SECRETS_2025",
+    "freeze_parameter_version": "P2_FREEZE_2026_08_12",
+    "source_path": "src/romeo_crt_engine/crt/v0_1.py",
+    "semantics_changed_in_phase4": false
+  },
+  "detector": {
+    "version": "CRT-DETECTOR-v0.1",
+    "source_path": "src/romeo_crt_engine/crt/detector.py",
+    "contract_path": "docs/DETECTOR.md",
+    "runner_path": "scripts/run_crt_detector.py",
+    "causal_c3_final_daily_ohlc_used": false,
+    "pnl_or_fill_logic_present": false,
+    "risk_or_broker_authority_present": false
+  },
+  "trusted_dataset": {
+    "dataset_version": "ee1300f0da50e4debcbbc3b7",
+    "manifest_sha256": "eaf828ee3acc8adf9e3b931cc6a55d385b0be61b58ae72f01205b3f6034a2141",
+    "normalized_sha256": "86f6f69176e68655032f3d12910572214de2fa04266c5615146ae03e9f414fc2",
+    "provider": "BINANCE_PUBLIC_DATA",
+    "venue": "BINANCE_SPOT",
+    "symbol": "BTCUSDT",
+    "h1_rows": 48,
+    "d1_rows": 1
+  },
+  "phase2_fixture_parity": {
+    "fixture_path": "tests/strategy/fixtures/crt_v0_1_cases.json",
+    "case_count": 7,
+    "expected_trade_plan_cases": 1,
+    "expected_no_signal_cases": 6,
+    "detector_entrypoint_parity_required": true,
+    "future_c3_daily_ohlc_mutation_regression_required": true
+  },
+  "provider_backed_integration": {
+    "workflow": "Detector Smoke",
+    "workflow_run_id": 31667680273,
+    "job_id": 94345649883,
+    "result": "SUCCESS",
+    "reconstruction_receipt_sha256": "4554c8e30828a4283c9f28ed78b40829ddd1142f5ad382ddcb551034e92b974a",
+    "detector_run_sha256": "26820611750f54736a0caf8755a293f744915e2fd3e241e8247aaef3a723f866",
+    "expected_status": "INSUFFICIENT_D1_HISTORY",
+    "expected_candidate_count": 0,
+    "expected_trade_plan_count": 0,
+    "interpretation": "The compact frozen dataset has one complete New-York D1 and cannot form C1/C2/C3. This is an integration-window result, not NO_SIGNAL or a profitability result."
+  },
+  "phase5_boundary": {
+    "allowed_input": "immutable detector TradePlan records and deterministic rejections",
+    "detector_may_be_rewritten_from_backtest_pnl": false,
+    "profitability_established": false,
+    "paper_trading_authorized": false,
+    "shadow_trading_authorized": false,
+    "live_trading_authorized": false
+  }
+}

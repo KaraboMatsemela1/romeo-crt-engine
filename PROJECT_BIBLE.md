@@ -1,7 +1,7 @@
 # Romeo CRT Engine — Project Bible
 
 **Repository:** `KaraboMatsemela1/romeo-crt-engine`  
-**Status:** Phases 0–2 complete / `CRT-C3-D1-H1-M1-BEAR-v0.1` frozen for validation  
+**Status:** Phases 0–4 complete / `CRT-DETECTOR-v0.1` frozen for Phase-5 backtest integration  
 **Live trading:** **NOT AUTHORIZED**
 
 This document is the canonical source of truth for the project. If implementation, research notes, an AI agent, or a proposed strategy conflicts with this document, the conflict must be surfaced and resolved explicitly rather than silently encoded.
@@ -592,9 +592,9 @@ Do not overwrite or hide failed experiments.
 Phase 0  Engineering foundation     COMPLETE
 Phase 1  Romeo corpus acquisition   COMPLETE
 Phase 2  Formal strategy spec       COMPLETE — FROZEN_FOR_VALIDATION
-Phase 3  Market data                READY TO START
-Phase 4  CRT detector               NOT STARTED
-Phase 5  Backtester                 NOT STARTED
+Phase 3  Market data                COMPLETE
+Phase 4  CRT detector               COMPLETE — CRT-DETECTOR-v0.1 FROZEN
+Phase 5  Backtester                 READY TO START
 Phase 6  Validation                 NOT STARTED
 Phase 7  Paper trading              NOT STARTED
 Phase 8  Learning engine            NOT STARTED
@@ -602,31 +602,37 @@ Phase 9  Shadow trading             NOT STARTED
 Phase 10 Controlled live            NOT AUTHORIZED
 ```
 
-The frozen first candidate is:
+The current frozen handoff is:
 
 ```text
-CRT-C3-D1-H1-M1-BEAR-v0.1
+strategy  CRT-C3-D1-H1-M1-BEAR-v0.1
+detector  CRT-DETECTOR-v0.1
+dataset   ee1300f0da50e4debcbbc3b7
 ```
 
-Its active-path rules, explicit project parameters and exclusions are canonical in `strategy/CRT_V0.1_SPEC.md` and `strategy/CRT_V0.1_FREEZE_MANIFEST.json`.
+The active-path strategy rules, project parameters and exclusions remain canonical in `strategy/CRT_V0.1_SPEC.md` and `strategy/CRT_V0.1_FREEZE_MANIFEST.json`.
 
-The pre-Phase-3 gate review closed the remaining foundation contracts and corrected C3/H1 DST calendar implementation defects without changing frozen strategy semantics.
+Phase 3 established provider-backed immutable/verified market data and froze dataset `ee1300f0da50e4debcbbc3b7` as a compact detector-integration fixture.
 
-The largest current missing asset is now a trusted, reproducible market-data layer and real-data detector reproduction for the frozen route. Profitability has not been established.
+Phase 4 now enforces trusted-manifest/content equality, exhaustive rolling C1/C2/C3 enumeration, future-C3 D1 leakage protection, frozen-fixture parity and deterministic candidate/rejection explanations. Its machine-readable handoff is `strategy/CRT_V0.1_DETECTOR_FREEZE_MANIFEST.json`.
+
+The compact frozen dataset contains only one complete New-York D1, so its correct real-data detector integration result is `INSUFFICIENT_D1_HISTORY` with zero candidates. This is not `NO_SIGNAL` and is not a profitability result.
+
+The largest current missing asset is now a deterministic cost-aware event-driven backtester plus a larger separately versioned trusted historical sample suitable for simulation. Profitability has not been established.
 
 ---
 
 ## 26. Immediate next actions
 
-1. Build Phase-3 raw/normalized market-data contracts for the frozen D1/H1 route.
-2. Select and document the first provider/instrument/venue route.
-3. Implement New-York wall-clock D1/H1 construction with absolute-time DST correctness and data-quality tests.
-4. Freeze instrument/symbol/venue metadata and dataset versions.
-5. Implement Phase-4 detector primitives against `CRT-C3-D1-H1-M1-BEAR-v0.1` only after trusted data exists.
-6. Reproduce the committed machine-readable positive and negative fixtures without LLM judgement.
-7. Add source-derived market fixtures as trusted data permits.
-8. Only after data/detector integrity gates pass begin meaningful historical simulation.
-9. Preserve the frozen v0.1 parameters while running later sensitivity and OOS validation.
+1. Build Phase-5 event-clock, account, order, fill, position and journal contracts around immutable `TradePlan` outputs from `CRT-DETECTOR-v0.1`.
+2. Preserve the frozen strategy/detector while implementing simulation; do not reimplement strategy validity inside the backtester.
+3. Define deterministic same-bar stop/target ordering, gap handling, partial-fill policy and finite-dataset-end treatment.
+4. Define conservative spread, commission and slippage assumptions for BTCUSDT Spot, explicitly acknowledging the first archive route has no historical bid/ask spread.
+5. Build a larger separately versioned trusted BTCUSDT historical dataset before interpreting performance statistics.
+6. Add no-lookahead regression tests for entry availability, stop/target observation timing, HTF closure and dataset boundaries.
+7. Record strategy, detector, dataset, simulator and cost-model versions in every simulated trade/result.
+8. Run simulator-integrity fixtures before calculating strategy edge metrics.
+9. Only after simulator/data integrity gates pass begin Phase-6 OOS/walk-forward/sensitivity/friction/Monte-Carlo validation.
 10. Do not promote to paper/shadow/live without their explicit gates.
 
 ---
