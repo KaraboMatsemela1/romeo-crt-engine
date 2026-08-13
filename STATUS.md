@@ -11,7 +11,7 @@ Updated: 2026-08-13
 | 4 — CRT detector | **COMPLETE FOR v0.1** | Frozen deterministic detector |
 | 5 — Backtester | **COMPLETE FOR v0.1** | Deterministic cost-aware simulator |
 | 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Terminal preregistered DEV decision |
-| 6B — Candidate revision | **IN PROGRESS — HISTORICAL DATA QUALIFICATION** | Trusted multi-market DEV datasets + detector-only activity decision |
+| 6B — Candidate revision | **IN PROGRESS — LOCAL RAW OANDA COLLECTION READY** | Trusted multi-market DEV datasets + detector-only activity decision |
 | 7 — Paper trading | **BLOCKED** | Requires future validated paper promotion |
 | 8 — Learning engine | Not started | Requires sufficient deterministic labels |
 | 9 — Shadow trading | Not started | Requires paper readiness |
@@ -46,9 +46,42 @@ The exact frozen OANDA universe is `EUR_USD`, `XAU_USD`, `NAS100_USD`, and `SPX5
 
 Historical qualification is governed by `P6B-OANDA-HISTORY-QUALIFICATION-V1`. The fixed 2019 MID/M1 smoke passed for all four symbols with 60/60 complete candles each.
 
-The complete collection execution is now precommitted as four UTC calendar-year shards per frozen instrument (`16` total execution units). This is an operational memory/retry boundary only and does not change the parent historical-data protocol.
+Complete collection is precommitted as four UTC calendar-year shards per frozen instrument (`16` total execution units). Exact raw-gap reconciliation is implemented and regression-tested: approved closure evidence must cover raw missing intervals exactly, may not leave unexplained minutes, and may not extend into provider-observed minutes.
 
-Exact raw-gap reconciliation is implemented and regression-tested: approved closure evidence must cover raw missing intervals exactly, may not leave unexplained minutes, and may not extend into provider-observed minutes.
+## Local collection path
+
+The repository now contains a practice-only local collector:
+
+- `scripts/collect_oanda_history_shard.py`
+- `experiments/phase6b/P6B_OANDA_LOCAL_COLLECTION_RUNBOOK_V1.md`
+
+The collector:
+
+- accepts only the four frozen symbols and the years 2019-2022;
+- reads `OANDA_ACCOUNT_ID` and `OANDA_API_TOKEN` only from the local runtime environment;
+- uses OANDA practice only;
+- retrieves MID/M1 with the frozen 4500-minute page width;
+- uses a conservative request delay for new-connection limits;
+- preserves page request/raw-response provenance;
+- enumerates every raw missing interval as `UNRECONCILED`;
+- performs the preregistered yearly independent re-fetch and requires exact provider-value equality;
+- persists no account ID, token, balance, or NAV;
+- never imports or invokes detector/backtest/order code;
+- keeps detector/TradePlan/P&L/paper/shadow/live authorization false.
+
+Local raw outputs are Git-ignored at:
+
+```text
+artifacts/phase6b/oanda_raw/
+```
+
+The first full shard to execute is:
+
+```text
+EUR_USD / 2019
+```
+
+It remains **PENDING LOCAL EXECUTION** because the OANDA runtime credentials are available on the user's local/Hermes environment rather than this connected execution environment.
 
 Complete raw DEV collection, historical gap reconciliation, trusted H1/New-York-D1 dataset identities, and detector activity counts remain pending.
 
@@ -57,11 +90,13 @@ Canonical detail:
 - `docs/checklists/phase-6b.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_QUALIFICATION_PROTOCOL_V1.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_SHARD_EXECUTION_V1.md`
+- `experiments/phase6b/P6B_OANDA_LOCAL_COLLECTION_RUNBOOK_V1.md`
 - `experiments/phase6b/P6B_OANDA_HISTORICAL_SESSION_EVIDENCE_001.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_SMOKE_001.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_COLLECTION_GATE_001.md`
 - `research/romeo/phase6b/PRIMARY_SOURCE_PASS_003.md`
 - `src/romeo_crt_engine/market_data/gap_reconciliation_v2.py`
+- `scripts/collect_oanda_history_shard.py`
 
 ## Authorization
 
