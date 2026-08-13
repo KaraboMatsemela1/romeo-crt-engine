@@ -9,6 +9,7 @@ class GapCategory(StrEnum):
     MARKET_CLOSED = "MARKET_CLOSED"
     SESSION_BREAK = "SESSION_BREAK"
     HOLIDAY_OR_EARLY_CLOSE = "HOLIDAY_OR_EARLY_CLOSE"
+    NO_PRICE_OBSERVATION = "NO_PRICE_OBSERVATION"
     PROVIDER_MISSING = "PROVIDER_MISSING"
     UNKNOWN_GAP = "UNKNOWN_GAP"
 
@@ -18,6 +19,7 @@ APPROVED_EXPECTED_GAP_CATEGORIES = frozenset(
         GapCategory.MARKET_CLOSED,
         GapCategory.SESSION_BREAK,
         GapCategory.HOLIDAY_OR_EARLY_CLOSE,
+        GapCategory.NO_PRICE_OBSERVATION,
     }
 )
 
@@ -89,7 +91,7 @@ def minute_is_expected(
     timestamp: datetime,
     gaps: tuple[MarketGapV2, ...],
 ) -> bool:
-    """Return False only when a minute is covered by an approved expected gap."""
+    """Return False only when a minute is covered by an approved evidenced omission."""
 
     if timestamp.utcoffset() != timedelta(0):
         raise ValueError("timestamp must be UTC")
