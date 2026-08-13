@@ -117,9 +117,12 @@ def _validate_h1_series(
             raise DataQualityError(DataQualityCode.IDENTITY_MISMATCH, "H1 identity mismatch")
         if bar.close_time - bar.open_time != timedelta(hours=1):
             raise DataQualityError(DataQualityCode.PROVIDER_SCHEMA, "H1 must span 3600 seconds")
-        if prior_close is not None and bar.open_time != prior_close:
-            if not exact_gap_is_approved(prior_close, bar.open_time, allowed_closures):
-                raise DataQualityError(DataQualityCode.GAP, "H1 series has an unapproved gap")
+        if (
+            prior_close is not None
+            and bar.open_time != prior_close
+            and not exact_gap_is_approved(prior_close, bar.open_time, allowed_closures)
+        ):
+            raise DataQualityError(DataQualityCode.GAP, "H1 series has an unapproved gap")
         prior_close = bar.close_time
 
 
