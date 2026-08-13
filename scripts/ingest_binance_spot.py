@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from functools import partial
 from hashlib import sha256
@@ -20,7 +22,7 @@ from romeo_crt_engine.market_data.providers.binance_public import (
     fetch_exchange_info,
     parse_1m_archive,
 )
-from romeo_crt_engine.market_data.quality import DataQualityError
+from romeo_crt_engine.market_data.quality import DataQualityCode, DataQualityError
 from romeo_crt_engine.market_data.verification import (
     VerificationPolicy,
     build_provider_verification_evidence,
@@ -28,6 +30,26 @@ from romeo_crt_engine.market_data.verification import (
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MARKET_DATA_ROOT = PROJECT_ROOT / "src" / "romeo_crt_engine" / "market_data"
+ARCHIVE_EXCLUSION_POLICY_ID = "P6-DATA-QUALITY-AMENDMENT-002"
+ARCHIVE_EXCLUSION_SCHEMA = "P6_ARCHIVE_EXCLUSIONS_V1"
+
+
+@dataclass(frozen=True, slots=True)
+class ArchiveExclusionDiagnostic:
+    archive_date: date
+    filename: str
+    source_sha256: str
+    error_code: str
+    diagnostic: str
+
+    def to_record(self) -> dict[str, str]:
+        return {
+            "archive_date": self.archive_date.isoformat(),
+            "filename": self.filename,
+            "source_sha256": self.source_sha256,
+            "error_code": self.error_code,
+            "diagnostic": self.diagnostic,
+        }
 
 
 def _date(value: str) -> date:
@@ -159,18 +181,42 @@ def _archive_chronology_diagnostic(archive: RawArchive) -> str:
     return " ".join(parts)
 
 
-def _validate_archive_shapes(archives: tuple[RawArchive, ...], *, symbol: str) -> None:
-    """Report every provider-day shape defect before constructing a trusted multi-year series."""
-    failures: list[str] = []
+def _classify_archive_exclusions(
+    archives: tuple[RawArchive, ...],
+    *,
+    symbol: str,
+) -> tuple[frozenset[str], tuple[ArchiveExclusionDiagnostic, ...]]:
+    """Conservatively exclude authenticated daily archives that fail the strict parser."""
+    exclusions: list[ArchiveExclusionDiagnostic] = []
+    allowed_codes = {DataQualityCode.INCOMPLETE_BUCKET, DataQualityCode.PROVIDER_SCHEMA}
     for archive in archives:
         try:
             parse_1m_archive(archive, symbol=symbol)
         except DataQualityError as error:
-            diagnostic = _archive_chronology_diagnostic(archive)
-            failures.append(f"{archive.filename}: {error} | {diagnostic}")
-    if failures:
-        joined = "\n".join(f"- {failure}" for failure in failures)
-        raise RuntimeError(f"provider archive validation failed:\n{joined}")
+            if error.code not in allowed_codes:
+                raise
+            exclusions.append(
+                ArchiveExclusionDiagnostic(
+                    archive_date=archive.archive_date,
+                    filename=archive.filename,
+                    source_sha256=archive.sha256,
+                    error_code=error.code.value,
+                    diagnostic=_archive_chronology_diagnostic(archive),
+                )
+            )
+    return frozenset(item.source_sha256 for item in exclusions), tuple(exclusions)
+
+
+def _exclusion_ledger(
+    diagnostics: tuple[ArchiveExclusionDiagnostic, ...],
+) -> tuple[str, str]:
+    payload = {
+        "schema_version": ARCHIVE_EXCLUSION_SCHEMA,
+        "policy_id": ARCHIVE_EXCLUSION_POLICY_ID,
+        "records": [item.to_record() for item in diagnostics],
+    }
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return encoded, sha256(encoded.encode("utf-8")).hexdigest()
 
 
 def main() -> None:
@@ -188,7 +234,8 @@ def main() -> None:
         default=VerificationPolicy.REST_EVERY_ARCHIVE.value,
         help=(
             "Provider verification contract. The default preserves Phase-3 REST verification "
-            "for every archive; long validation windows may use checksum-all-rest-monthly."
+            "for every strict-parser-eligible archive; validation windows may use "
+            "checksum-all-rest-monthly."
         ),
     )
     parser.add_argument(
@@ -208,12 +255,18 @@ def main() -> None:
         requested_days,
         workers=args.download_workers,
     )
-    _validate_archive_shapes(archives, symbol=args.symbol)
+    excluded_source_hashes, exclusion_diagnostics = _classify_archive_exclusions(
+        archives,
+        symbol=args.symbol,
+    )
+    exclusion_json, exclusion_sha = _exclusion_ledger(exclusion_diagnostics)
+
     policy = VerificationPolicy(args.verification_policy)
     provider_crosschecks = build_provider_verification_evidence(
         archives,
         symbol=args.symbol,
         policy=policy,
+        excluded_source_hashes=excluded_source_hashes,
     )
 
     dataset = build_trusted_binance_dataset(
@@ -224,6 +277,7 @@ def main() -> None:
         dependency_lock_sha256=_file_digest(args.lock_file),
         git_revision=git_revision,
         created_at=retrieved_at,
+        excluded_source_hashes=excluded_source_hashes,
     )
     output = write_dataset(
         root=args.data_root,
@@ -239,6 +293,9 @@ def main() -> None:
     print(f"git_revision={dataset.receipt.git_revision}")
     print(f"verification_policy={policy.value}")
     print(f"archive_count={len(archives)}")
+    print(f"excluded_archive_count={len(exclusion_diagnostics)}")
+    print(f"exclusion_ledger_sha256={exclusion_sha}")
+    print(f"archive_exclusions_json={exclusion_json}")
     print(f"output={output}")
 
 
