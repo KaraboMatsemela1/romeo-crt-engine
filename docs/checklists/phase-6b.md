@@ -1,6 +1,6 @@
 # Phase 6B — Candidate Revision Checklist
 
-**Status:** **IN PROGRESS — RECONCILIATION EVIDENCE V2**  
+**Status:** **IN PROGRESS — GAP CLASSIFICATION V2**  
 **Active research target:** `CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH`  
 **Underlying frozen alpha:** `CRT-C3-D1-H1-M1-BEAR-v0.1`  
 **Preserved failed research path:** `CRT-C3-D1-H1-M1-BULL-v0.2-RESEARCH` -> `EVIDENCE_INSUFFICIENT`  
@@ -65,12 +65,31 @@ Observation/reconciliation correction: `P6B_OANDA_OBSERVATION_POLICY_V2`.
 - [x] Freeze V2 observation states: `EXPECTED_MARKET_CLOSURE`, `NO_PRICE_OBSERVATION`, `UNRESOLVED_PROVIDER_GAP`.
 - [x] Keep synthetic prices, forward fill and timestamp-shape-only classification prohibited.
 - [x] Extend the collector to emit credential-free `P6B_OANDA_RECONCILIATION_EVIDENCE_V2` with exact missing-interval coordinates and provenance hashes.
-- [ ] Persist V2 reconciliation evidence for all 16 shards in CI artifacts.
-- [ ] Inventory every missing interval from the persisted V2 evidence set.
+- [x] Persist V2 reconciliation evidence for all 16 shards in CI artifacts.
+- [x] Inventory every missing interval from the persisted V2 evidence set.
 - [ ] Reconcile every omitted observation to date-valid session/holiday evidence or finer-granularity `NO_PRICE_OBSERVATION` evidence.
 - [ ] Leave unresolved/provider-missing intervals fail-closed.
 - [ ] Build trusted H1 and New-York-midnight D1 datasets only for independently `TRUSTED` instruments.
 - [ ] Freeze one detector-facing `P6B_CANONICAL_PRICE_DATASET_V2` identity per trusted instrument.
+
+### Sealed V2 evidence inventory
+
+```text
+complete M1 candles       5,529,393
+missing intervals           122,626
+missing minutes           2,885,967
+V2 evidence shards            16/16
+raw price artifacts        EPHEMERAL / DELETED
+```
+
+Per instrument:
+
+```text
+EUR_USD      1,428,155 complete M1 | 37,770 gaps | 675,685 missing minutes
+XAU_USD      1,394,064 complete M1 | 17,967 gaps | 709,776 missing minutes
+NAS100_USD   1,392,496 complete M1 | 11,111 gaps | 711,344 missing minutes
+SPX500_USD   1,314,678 complete M1 | 55,778 gaps | 789,162 missing minutes
+```
 
 Canonical artifacts:
 
@@ -103,15 +122,16 @@ Detector execution remains blocked until trusted historical datasets exist.
 ## Current handoff
 
 ```text
-Phase 6B                         IN PROGRESS — RECONCILIATION EVIDENCE V2
+Phase 6B                         IN PROGRESS — GAP CLASSIFICATION V2
 Alpha changes                    NONE AUTHORIZED
 Frozen OANDA universe            4 SYMBOLS
 Historical M1 smoke              PASS 4/4, 60/60 EACH
 Yearly raw validation            PASS 16/16
 Independent refetch              PASS 4/4 PER INSTRUMENT
 Raw artifacts                    EPHEMERAL / DELETED AFTER VALIDATION
-V2 reconciliation evidence       CI PERSISTENCE IN PROGRESS
-Historical gap reconciliation    PENDING V2 EVIDENCE INVENTORY
+V2 reconciliation evidence       PASS 16/16 PERSISTED
+Exact missing-interval inventory PASS 122,626 INTERVALS
+Historical gap classification    IN PROGRESS / FAIL-CLOSED
 Trusted H1 / NY-D1 datasets      PENDING
 Detector activity counts         NOT OPENED
 Multi-market P&L                 NOT AUTHORIZED
