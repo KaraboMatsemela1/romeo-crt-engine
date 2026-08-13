@@ -4,17 +4,52 @@ import json
 from datetime import UTC, datetime
 from decimal import Decimal
 
+import pytest
+
 from romeo_crt_engine.market_data.oanda_qualification import (
     build_instrument_discovery_manifest,
 )
-from romeo_crt_engine.market_data.providers.oanda_account import parse_account_summary
+from romeo_crt_engine.market_data.providers.oanda_account import (
+    parse_account_summary,
+    parse_authorized_account_ids,
+)
 from romeo_crt_engine.market_data.providers.oanda_v20 import OandaInstrumentRecord
+from romeo_crt_engine.market_data.quality import DataQualityError
 
 OBSERVED_AT = datetime(2026, 8, 13, 11, 15, tzinfo=UTC)
 
 
 def _payload(value: object) -> bytes:
     return json.dumps(value, separators=(",", ":")).encode()
+
+
+def test_authorized_account_preflight_parses_ids_for_in_memory_comparison() -> None:
+    account_ids = parse_authorized_account_ids(
+        _payload(
+            {
+                "accounts": [
+                    {"id": "001-001-EXAMPLE-ONE", "tags": []},
+                    {"id": "001-001-EXAMPLE-TWO", "tags": []},
+                ]
+            }
+        )
+    )
+
+    assert account_ids == ("001-001-EXAMPLE-ONE", "001-001-EXAMPLE-TWO")
+
+
+def test_authorized_account_preflight_rejects_duplicate_ids() -> None:
+    payload = _payload(
+        {
+            "accounts": [
+                {"id": "001-001-EXAMPLE", "tags": []},
+                {"id": "001-001-EXAMPLE", "tags": []},
+            ]
+        }
+    )
+
+    with pytest.raises(DataQualityError, match="duplicate OANDA authorized-account ID"):
+        parse_authorized_account_ids(payload)
 
 
 def test_account_summary_parsing_omits_account_identity() -> None:
