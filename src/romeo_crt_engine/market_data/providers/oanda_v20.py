@@ -19,6 +19,46 @@ SUPPORTED_PRICE_COMPONENTS = frozenset({"M", "B", "A"})
 
 
 @dataclass(frozen=True, slots=True)
+class OandaCommissionRecord:
+    commission: Decimal
+    units_traded: Decimal
+    minimum_commission: Decimal
+
+    def __post_init__(self) -> None:
+        values = (self.commission, self.units_traded, self.minimum_commission)
+        if not all(value.is_finite() and value >= 0 for value in values):
+            raise ValueError("commission values must be non-negative and finite")
+        if self.units_traded <= 0:
+            raise ValueError("commission units_traded must be positive")
+
+
+@dataclass(frozen=True, slots=True)
+class OandaFinancingDayRecord:
+    day_of_week: str
+    days_charged: int
+
+    def __post_init__(self) -> None:
+        if not self.day_of_week:
+            raise ValueError("financing day_of_week must not be empty")
+        if self.days_charged < 0:
+            raise ValueError("financing days_charged must be >= 0")
+
+
+@dataclass(frozen=True, slots=True)
+class OandaFinancingRecord:
+    long_rate: Decimal
+    short_rate: Decimal
+    financing_days: tuple[OandaFinancingDayRecord, ...]
+
+    def __post_init__(self) -> None:
+        if not self.long_rate.is_finite() or not self.short_rate.is_finite():
+            raise ValueError("financing rates must be finite")
+        days = [item.day_of_week for item in self.financing_days]
+        if len(days) != len(set(days)):
+            raise ValueError("financing day_of_week entries must be unique")
+
+
+@dataclass(frozen=True, slots=True)
 class OandaInstrumentRecord:
     """Provider metadata captured without pretending display precision is a tick size."""
 
@@ -31,6 +71,12 @@ class OandaInstrumentRecord:
     minimum_trade_size: Decimal
     observed_at: datetime
     raw_sha256: str
+    maximum_order_units: Decimal | None = None
+    maximum_position_size: Decimal | None = None
+    margin_rate: Decimal | None = None
+    commission: OandaCommissionRecord | None = None
+    financing: OandaFinancingRecord | None = None
+    guaranteed_stop_loss_order_mode: str | None = None
 
     def __post_init__(self) -> None:
         if not self.name or not self.instrument_type or not self.raw_sha256:
@@ -41,8 +87,21 @@ class OandaInstrumentRecord:
             raise ValueError("precision fields must be >= 0")
         if not self.minimum_trade_size.is_finite() or self.minimum_trade_size <= 0:
             raise ValueError("minimum_trade_size must be positive and finite")
+        for label, value in (
+            ("maximum_order_units", self.maximum_order_units),
+            ("maximum_position_size", self.maximum_position_size),
+            ("margin_rate", self.margin_rate),
+        ):
+            if value is not None and (not value.is_finite() or value < 0):
+                raise ValueError(f"{label} must be non-negative and finite when provided")
         if len(self.raw_sha256) != 64:
             raise ValueError("raw_sha256 must be a SHA-256 digest")
+
+    @property
+    def provider_unit_precision_step(self) -> Decimal:
+        """Smallest unit increment implied by OANDA's tradeUnitsPrecision field."""
+
+        return Decimal(1).scaleb(-self.trade_units_precision)
 
 
 @dataclass(frozen=True, slots=True)
@@ -100,6 +159,12 @@ def _decimal(value: object, field_name: str) -> Decimal:
     return parsed
 
 
+def _optional_decimal(value: object, field_name: str) -> Decimal | None:
+    if value is None:
+        return None
+    return _decimal(value, field_name)
+
+
 def _integer(value: object, field_name: str) -> int:
     if isinstance(value, bool):
         raise DataQualityError(DataQualityCode.PROVIDER_SCHEMA, f"invalid integer in {field_name}")
@@ -130,6 +195,48 @@ def _utc_timestamp(value: object, field_name: str) -> datetime:
 
 def _raw_digest(payload: bytes) -> str:
     return sha256(payload).hexdigest()
+
+
+def _parse_commission(value: object) -> OandaCommissionRecord | None:
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise DataQualityError(DataQualityCode.PROVIDER_SCHEMA, "invalid commission record")
+    return OandaCommissionRecord(
+        commission=_decimal(value.get("commission"), "commission.commission"),
+        units_traded=_decimal(value.get("unitsTraded"), "commission.unitsTraded"),
+        minimum_commission=_decimal(
+            value.get("minimumCommission"), "commission.minimumCommission"
+        ),
+    )
+
+
+def _parse_financing(value: object) -> OandaFinancingRecord | None:
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise DataQualityError(DataQualityCode.PROVIDER_SCHEMA, "invalid financing record")
+    raw_days = value.get("financingDaysOfWeek", [])
+    if not isinstance(raw_days, list):
+        raise DataQualityError(DataQualityCode.PROVIDER_SCHEMA, "invalid financing days")
+    days: list[OandaFinancingDayRecord] = []
+    for raw_day in raw_days:
+        if not isinstance(raw_day, dict):
+            raise DataQualityError(DataQualityCode.PROVIDER_SCHEMA, "invalid financing day record")
+        day_of_week = raw_day.get("dayOfWeek")
+        if not isinstance(day_of_week, str):
+            raise DataQualityError(DataQualityCode.PROVIDER_SCHEMA, "financing day is missing")
+        days.append(
+            OandaFinancingDayRecord(
+                day_of_week=day_of_week,
+                days_charged=_integer(raw_day.get("daysCharged"), "financing.daysCharged"),
+            )
+        )
+    return OandaFinancingRecord(
+        long_rate=_decimal(value.get("longRate"), "financing.longRate"),
+        short_rate=_decimal(value.get("shortRate"), "financing.shortRate"),
+        financing_days=tuple(days),
+    )
 
 
 def parse_account_instruments(
@@ -165,6 +272,9 @@ def parse_account_instruments(
         seen.add(name)
 
         display_name = raw.get("displayName")
+        gslo_mode = raw.get("guaranteedStopLossOrderMode")
+        if gslo_mode is not None and not isinstance(gslo_mode, str):
+            raise DataQualityError(DataQualityCode.PROVIDER_SCHEMA, "invalid GSLO mode")
         records.append(
             OandaInstrumentRecord(
                 name=name,
@@ -178,6 +288,16 @@ def parse_account_instruments(
                 minimum_trade_size=_decimal(raw.get("minimumTradeSize"), "minimumTradeSize"),
                 observed_at=observed_at,
                 raw_sha256=digest,
+                maximum_order_units=_optional_decimal(
+                    raw.get("maximumOrderUnits"), "maximumOrderUnits"
+                ),
+                maximum_position_size=_optional_decimal(
+                    raw.get("maximumPositionSize"), "maximumPositionSize"
+                ),
+                margin_rate=_optional_decimal(raw.get("marginRate"), "marginRate"),
+                commission=_parse_commission(raw.get("commission")),
+                financing=_parse_financing(raw.get("financing")),
+                guaranteed_stop_loss_order_mode=gslo_mode,
             )
         )
 
