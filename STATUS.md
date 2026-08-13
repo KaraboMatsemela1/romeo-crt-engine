@@ -10,152 +10,162 @@ Updated: 2026-08-13
 | 3 — Market data | **COMPLETE** | Provider-backed trusted/reproducible D1/H1 dataset |
 | 4 — CRT detector | **COMPLETE** | Frozen fixtures + trusted-data detector integration reproduced causally |
 | 5 — Backtester | **COMPLETE** | Deterministic cost-aware event-driven simulator |
-| 6 — Validation | **READY TO START** | Written robustness decision from preregistered OOS/walk-forward/stress evidence |
-| 7 — Paper trading | Not started | Stable realtime semantics |
-| 8 — Learning engine | Not started | OOS incremental value |
-| 9 — Shadow trading | Not started | Production-like readiness |
+| 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Preregistered DEV gate reached a terminal written decision |
+| 7 — Paper trading | **BLOCKED FOR v0.1** | No paper promotion from insufficient validation evidence |
+| 8 — Learning engine | Not started | Requires a sufficiently evidenced deterministic baseline |
+| 9 — Shadow trading | Not started | Requires paper/production-like readiness |
 | 10 — Controlled live | **NOT AUTHORIZED** | Explicit approval + canary gates |
 
-## Current frozen validation handoff
+## Current validation disposition
 
 ```text
-Strategy   CRT-C3-D1-H1-M1-BEAR-v0.1
-Detector   CRT-DETECTOR-v0.1
-Simulator  CRT-BACKTEST-v0.1
+Strategy    CRT-C3-D1-H1-M1-BEAR-v0.1
+Detector    CRT-DETECTOR-v0.1
+Simulator   CRT-BACKTEST-v0.1.1
+Phase 6     COMPLETE
+Disposition INSUFFICIENT_EVIDENCE
+Paper       NOT AUTHORIZED
+Shadow      NOT AUTHORIZED
+Live        NOT AUTHORIZED
 ```
 
-Machine-readable freezes:
+`CRT-BACKTEST-v0.1.1` is a Phase-6 data-gap compatibility patch to the v0.1 simulator. It permits ordered/non-overlapping H1 input across explicitly governed market-data gaps and does not change entry, stop, target, sizing, friction, or same-bar execution semantics.
+
+The next legitimate project track is **new evidence-backed candidate research/revision**, not Phase 7.
+
+## Phase 6 — final result
+
+The protocol was frozen before new historical outcomes were opened:
+
+```text
+P6-VALIDATION-PROTOCOL-v1
+DEV       2019-01-01 .. 2022-12-31
+OOS       2023-01-01 .. 2025-08-31
+QUARANTINE 2025-09-01 .. 2025-09-30
+CONFIRM   2025-10-01 .. 2026-07-31
+```
+
+Sequential access was enforced. DEV was opened only after its trusted dataset identity had first been sealed and then reproduced byte-for-byte on an independent provider retrieval. OOS and CONFIRM were never opened.
+
+### Frozen DEV dataset
+
+```text
+dataset_version          3e8a39fec1062ef902e8a1ad
+manifest_sha256          761b561885f94cdb440be02d3a84169549d7bafd8e820bb9654c77ed8aed9e97
+normalized_sha256        46682c2d793dbdd0a0939862f444d19b4817559c8989a7fde031598d52cb29f5
+M1 rows                  2,074,680
+H1 rows                     34,578
+complete NY D1               1,418
+raw UTC daily archives       1,461
+excluded UTC archives           20
+REST exact verification         48
+checksum verification         1,413
+```
+
+Data-quality governance:
+
+- `P6-DATA-QUALITY-AMENDMENT-001`: independently evidenced Binance trading suspension on 2019-03-12 02:00–08:00 UTC.
+- `P6-DATA-QUALITY-AMENDMENT-002`: 20 checksum-authenticated incomplete/malformed UTC archives conservatively excluded whole from normalization.
+- no missing market observations were synthesized or filled.
+
+### DEV activity gate
+
+Workflow run `31682441984`, job `94390737742`, produced:
+
+```text
+rolling detector candidates   1,416
+valid TradePlans                  4
+BASE closed trades                4
+required DEV minimum             30
+activity gate     INSUFFICIENT_DEV_SAMPLE
+```
+
+Therefore the preregistered protocol requires:
+
+```text
+Phase-6 disposition               INSUFFICIENT_EVIDENCE
+parameter optimization            PROHIBITED
+OOS outcome access                NOT AUTHORIZED
+CONFIRM outcome access            NOT AUTHORIZED
+paper promotion                   NOT AUTHORIZED
+```
+
+### Descriptive four-trade cost results
+
+These values are preserved for audit but are statistically insufficient for edge claims.
+
+| Scenario | Trades | Win rate | Expectancy R | Net P&L | Profit factor | Final equity |
+|---|---:|---:|---:|---:|---:|---:|
+| IDEAL | 4 | 50% | -0.0130 | -31.03 | 0.969 | 99,968.97 |
+| BASE | 4 | 50% | -0.1264 | -256.36 | 0.743 | 99,743.64 |
+| STRESSED | 4 | 50% | -0.1963 | -395.18 | 0.604 | 99,604.82 |
+| SEVERE | 4 | 50% | -0.2659 | -533.42 | 0.465 | 99,466.58 |
+
+No sensitivity optimization, walk-forward inference, Monte Carlo inference, OOS run, or CONFIRM run was performed because the activity gate failed.
+
+Canonical Phase-6 artifacts:
+
+- `experiments/phase6/P6_VALIDATION_PROTOCOL_V1.md`
+- `experiments/phase6/P6_DATA_QUALITY_AMENDMENT_001.md`
+- `experiments/phase6/P6_DATA_QUALITY_AMENDMENT_002.md`
+- `experiments/phase6/P6_DEV_DATA_FREEZE_001.json`
+- `experiments/phase6/P6_DEV_DATA_FREEZE_001.md`
+- `experiments/phase6/P6_DEV_OUTCOME_ACCESS_GATE_001.md`
+- `experiments/phase6/P6_DEV_RESULT_001.json`
+- `experiments/phase6/P6_DEV_RESULT_001.md`
+- `docs/reviews/PHASE_6_GATE_REVIEW.md`
+- `docs/PHASE_6_COMPLETION_REPORT.md`
+- `docs/checklists/phase-6.md`
+
+## Interpretation boundary
+
+The Phase-6 result does **not** prove that all CRT trading is unprofitable and does not evaluate Romeo's entire discretionary methodology.
+
+It establishes the narrower result that the exact deterministic reproduction candidate:
+
+```text
+CRT-C3-D1-H1-M1-BEAR-v0.1
+```
+
+is too selective on BTCUSDT over the preregistered four-year DEV window to support statistical validation or promotion.
+
+v0.1 must not be relaxed in place after seeing this result. Any attempt to increase activity requires a new version backed by additional source evidence or a separately proven implementation defect.
+
+## Frozen historical handoff retained
+
+Strategy freeze artifacts remain:
 
 - `strategy/CRT_V0.1_FREEZE_MANIFEST.json`
 - `strategy/CRT_V0.1_DETECTOR_FREEZE_MANIFEST.json`
 - `strategy/CRT_V0.1_BACKTEST_FREEZE_MANIFEST.json`
 
-None of these identifiers or phase completions is a profitability claim.
+Earlier engineering evidence remains valid:
 
-## Phase 5 completion
+- Phase 3 established provider-backed immutable/verified market data.
+- Phase 4 established deterministic frozen-strategy detection and fixture parity.
+- Phase 5 established causal event-driven simulation and preserved the zero-activity September 2025 quarantine result.
+- Phase 6 established a larger trusted DEV sample and correctly stopped because the frozen candidate produced only four trades.
 
-Phase 5 is complete as a deterministic event-driven simulator.
-
-The frozen execution contract includes:
-
-- H1 event order: manage positions already open through the bar, then activate plans confirmed at that bar close;
-- immutable detector `TradePlan` geometry;
-- entry reference must equal the canonical confirmation close;
-- Decimal position sizing rounded down to instrument quantity step;
-- explicit fee, half-spread and slippage assumptions;
-- conservative same-bar stop/target resolution: `STOP_FIRST_CONSERVATIVE`;
-- adverse stop gaps use the worse bar open;
-- favorable target-gap price improvement disabled;
-- open positions at finite dataset end remain censored rather than receiving an invented time exit;
-- simultaneous same-timestamp plans fail closed when the group exceeds available capacity;
-- simulator implementation SHA, detector-run SHA, quantity step, config SHA and result state are bound into deterministic run identity.
-
-Execution assumption:
+## Current authorization
 
 ```text
-SYNTHETIC_LINEAR_SHORT_RESEARCH_V1
+P6_OOS_OUTCOME_ACCESS_AUTHORIZED     = false
+P6_CONFIRM_OUTCOME_ACCESS_AUTHORIZED = false
+PARAMETER_OPTIMIZATION_AUTHORIZED    = false
+PAPER_TRADING_AUTHORIZED             = false
+SHADOW_TRADING_AUTHORIZED            = false
+LIVE_TRADING_AUTHORIZED              = false
 ```
 
-The first trusted observation feed is Binance BTCUSDT Spot while the strategy is bearish-only. The simulator's short position is therefore a research abstraction, **not** a claim that the modeled naked short is directly executable on Binance Spot.
+## Immediate next actions — candidate revision track
 
-Canonical Phase-5 artifacts:
-
-- `src/romeo_crt_engine/backtest/models.py`
-- `src/romeo_crt_engine/backtest/engine.py`
-- `src/romeo_crt_engine/backtest/__init__.py`
-- `tests/unit/test_backtest_phase5.py`
-- `scripts/run_backtest.py`
-- `docs/BACKTESTER.md`
-- `docs/PHASE_5_COMPLETION_REPORT.md`
-- `docs/reviews/PHASE_5_GATE_REVIEW.md`
-- `strategy/CRT_V0.1_BACKTEST_FREEZE_MANIFEST.json`
-- `experiments/phase5/P5_SIMULATION_WINDOW_001.md`
-- `experiments/phase5/P5_SIMULATION_WINDOW_001_RESULTS.json`
-
-### Simulator integrity evidence
-
-Final deterministic engineering gate for the frozen simulator source:
-
-```text
-simulator source head  dbd29ae17ed067511d4c256398bc088903577691
-CI run                 31670117944
-CI job                 94352804983
-locked install          PASS
-Ruff                    PASS
-strict MyPy             PASS
-pytest                  PASS
-```
-
-Provider-backed preregistered replay:
-
-```text
-Backtest Smoke run  31670117938
-Job                 94352804834
-Result              SUCCESS
-```
-
-### P5-SIM-001 — preserved zero-activity result
-
-Before observing results, the complete September 2025 BTCUSDT UTC calendar month was preregistered mechanically around the Phase-3 September source dates.
-
-Observed trusted shape:
-
-```text
-M1 observations       43,200
-H1 observations          720
-complete NY D1             29
-rolling C1/C2/C3           27
-valid TradePlans            0
-```
-
-All four preregistered cost scenarios therefore produced:
-
-```text
-completed trades       0
-realized equity   100000
-net P&L                 0
-expectancy R     undefined
-```
-
-This is **not** evidence of profit or loss. It is an integration result showing that this one-month sample generated no valid frozen-strategy TradePlans. The month was not replaced and the strategy/detector were not loosened after the result.
-
-## What completion does NOT mean
-
-The project is still:
-
-- **NOT proven profitable**;
-- **NOT statistically validated**;
-- **NOT paper-ready**;
-- **NOT shadow-ready**;
-- **NOT live-ready**.
-
-`LIVE_TRADING_AUTHORIZED = false` remains unchanged.
-
-## Phase 6 entry gate
-
-Phase 6 may start only under these constraints:
-
-1. preserve `CRT-C3-D1-H1-M1-BEAR-v0.1`, `CRT-DETECTOR-v0.1` and `CRT-BACKTEST-v0.1` as the frozen baseline;
-2. preregister development, OOS and confirmatory windows before observing their results;
-3. create separately versioned trusted datasets for each declared validation window;
-4. keep the final confirmatory test untouched during development and sensitivity work;
-5. first establish whether the frozen strategy produces a statistically meaningful trade sample at all;
-6. report insufficient trade frequency as a result rather than weakening strategy rules;
-7. run predeclared IDEAL/BASE/STRESSED/SEVERE cost scenarios and parameter sensitivity without rewriting the frozen candidate in place;
-8. use walk-forward, Monte Carlo and regime/session breakdowns only when sample size makes them meaningful;
-9. preserve every experiment and negative result;
-10. treat Spot-observation/synthetic-short simulation as research-only until an executable short-capable venue/instrument contract is separately approved;
-11. no paper promotion without a written Phase-6 robustness decision;
-12. live trading remains prohibited.
-
-## Immediate next actions — Phase 6
-
-1. Write and freeze the validation protocol before retrieving/observing the next historical results.
-2. Define mechanically selected development, OOS and untouched confirmatory calendar windows.
-3. Define minimum sample-size / insufficient-evidence handling before results.
-4. Build trusted versioned datasets for the preregistered windows.
-5. Measure frozen-strategy candidate and TradePlan frequency without changing rules.
-6. Run cost and parameter-sensitivity matrices only under the preregistered protocol.
-7. Add rolling/walk-forward and Monte-Carlo analysis if trade count supports inference.
-8. Produce a written `REJECT`, `REVISE_AS_NEW_VERSION`, `INSUFFICIENT_EVIDENCE`, or `PROMOTE_TO_PAPER_CANDIDATE` decision.
-9. Keep paper/shadow/live disabled unless their own gates are explicitly passed.
+1. Preserve v0.1 and all Phase-6 evidence unchanged.
+2. Return to the evidence-debt ledger and Romeo public-source corpus.
+3. Identify source-backed variants that could legitimately broaden opportunity frequency without selecting rules because they improve historical P&L.
+4. Prefer one narrowly defined new hypothesis at a time, such as a verified additional direction/setup/timeframe path rather than a bundle of discretionary additions.
+5. Create a new strategy version (for example v0.2) rather than mutating v0.1.
+6. Build new positive/negative fixtures and deterministic rule contracts before looking at fresh validation outcomes.
+7. Repeat detector/backtester compatibility and preregistered validation gates for the new candidate.
+8. Keep OOS/CONFIRM from v0.1 untouched; they remain useful reserved evidence only if governance later defines a legitimate new protocol.
+9. Do not start Phase 7 paper trading unless a future candidate independently passes validation gates.
+10. Keep live trading disabled.
