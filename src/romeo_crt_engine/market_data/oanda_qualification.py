@@ -2,10 +2,23 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from decimal import Decimal
 from hashlib import sha256
 from typing import Final
 
-from romeo_crt_engine.market_data.providers.oanda_v20 import OandaInstrumentRecord
+from romeo_crt_engine.market_data.models import BarTimeframe
+from romeo_crt_engine.market_data.price_data_v2 import (
+    ActivityMeasure,
+    ActivitySemantic,
+    CanonicalPriceBarV2,
+    PriceComponent,
+)
+from romeo_crt_engine.market_data.providers.oanda_v20 import (
+    PROVIDER,
+    VENUE,
+    OandaInstrumentRecord,
+    OandaPriceCandle,
+)
 
 QUALIFICATION_SCHEMA: Final = "P6B_OANDA_INSTRUMENT_DISCOVERY_V1"
 ACCOUNT_SCOPE: Final = "REDACTED_RUNTIME_ACCOUNT"
@@ -107,8 +120,8 @@ def build_instrument_discovery_manifest(
 
     return {
         "schema_version": QUALIFICATION_SCHEMA,
-        "provider": "OANDA_V20",
-        "venue": "OANDA_FXTRADE",
+        "provider": PROVIDER,
+        "venue": VENUE,
         "environment": environment,
         "account_scope": ACCOUNT_SCOPE,
         "observed_at_utc": observed_at.astimezone(UTC).isoformat(),
@@ -121,3 +134,62 @@ def build_instrument_discovery_manifest(
         "paper_trading_authorized": False,
         "live_trading_authorized": False,
     }
+
+
+def _price_component(value: str) -> PriceComponent:
+    mapping = {
+        "M": PriceComponent.MID,
+        "B": PriceComponent.BID,
+        "A": PriceComponent.ASK,
+    }
+    try:
+        return mapping[value]
+    except KeyError as error:
+        raise ValueError(f"unsupported OANDA price component: {value}") from error
+
+
+def canonicalize_oanda_m1(
+    candles: tuple[OandaPriceCandle, ...],
+    *,
+    session_policy_version: str,
+) -> tuple[CanonicalPriceBarV2, ...]:
+    """Map provider M1 candles into v2 price data without fabricating activity semantics."""
+
+    if not candles:
+        raise ValueError("OANDA M1 canonicalization requires at least one candle")
+    if not session_policy_version:
+        raise ValueError("session_policy_version must not be empty")
+
+    identity = (candles[0].instrument, candles[0].price_component)
+    output: list[CanonicalPriceBarV2] = []
+    for candle in candles:
+        if (candle.instrument, candle.price_component) != identity:
+            raise ValueError("OANDA M1 canonicalization requires one instrument/price component")
+        source_digest = sha256(
+            f"{candle.source_sha256}|{candle.open_time.isoformat()}".encode()
+        ).hexdigest()
+        output.append(
+            CanonicalPriceBarV2(
+                provider=PROVIDER,
+                venue=VENUE,
+                instrument=candle.instrument,
+                price_component=_price_component(candle.price_component),
+                timeframe=BarTimeframe.M1,
+                open_time=candle.open_time,
+                close_time=candle.close_time,
+                open=candle.open,
+                high=candle.high,
+                low=candle.low,
+                close=candle.close,
+                source_count=1,
+                source_digest=source_digest,
+                session_policy_version=session_policy_version,
+                activity=(
+                    ActivityMeasure(
+                        semantic=ActivitySemantic.PRICE_COUNT,
+                        value=Decimal(candle.price_count),
+                    ),
+                ),
+            )
+        )
+    return tuple(output)
