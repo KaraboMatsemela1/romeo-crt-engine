@@ -77,18 +77,53 @@ Canonical selection: `research/romeo/phase6b/MULTI_MARKET_CANDIDATE_SELECTION.md
 - [x] Add ADR-006 documenting provider/calendar/metadata boundaries.
 - [x] Add unit tests for the provider parser and safety behavior.
 
-### CI / static verification
+### Provider-neutral canonical price data
 
-- [x] Backtest smoke remained green after the initial provider change.
-- [x] Diagnose initial CI failure as Ruff-only style findings.
-- [x] Apply focused Ruff fixes without strategy/data-semantic changes.
-- [ ] Confirm Ruff passes on the latest head.
-- [ ] Confirm MyPy passes on the latest head.
-- [ ] Confirm full pytest suite passes on the latest head.
-- [ ] Confirm Backtest Smoke passes on the latest head.
+- [x] Add ADR-007 and preserve the frozen Binance `PHASE3_DATASET_MANIFEST_V1` unchanged.
+- [x] Add additive `P6B_CANONICAL_PRICE_DATASET_V2` models.
+- [x] Make price component first-class dataset identity.
+- [x] Represent OANDA activity explicitly as `PRICE_COUNT` rather than fake base/quote volume or trade count.
+- [x] Represent unavailable activity as unavailable rather than numeric zero.
+- [x] Require explicit positive `price_quantum` plus source classification before a v2 dataset may become detector-facing `TRUSTED` data.
+- [x] Add deterministic provider-neutral price-bar serialization/digests.
+- [x] Add OANDA M1 -> canonical-price-v2 conversion without fabricated activity semantics.
 
-### Runtime provider qualification — blocked until credentials are supplied at execution time
+### Session/gap and aggregation contracts
 
+- [x] Add versioned gap taxonomy: `MARKET_CLOSED`, `SESSION_BREAK`, `HOLIDAY_OR_EARLY_CLOSE`, `PROVIDER_MISSING`, `UNKNOWN_GAP`.
+- [x] Permit only evidence-backed market/session/holiday categories to remove expected observations.
+- [x] Prohibit `PROVIDER_MISSING` and `UNKNOWN_GAP` from being approved as expected trading downtime.
+- [x] Build session-aware H1 aggregation from actual M1 observations with no synthetic prices.
+- [x] Build New-York-midnight D1 aggregation for explicitly eligible local dates.
+- [x] Preserve partial-hour expected closures only when every missing minute is covered by the frozen gap policy.
+- [x] Add test: missing expected minute fails closed.
+- [x] Add test: evidenced session break can explain a missing observation without filling it.
+- [x] Add test: provider-missing interval cannot be reclassified as an expected session break.
+- [x] Add test: New-York D1 spring-forward envelope is 23 absolute hours while remaining midnight-to-midnight wall-clock D1.
+- [ ] Freeze account/division + instrument-specific OANDA session policy from authoritative provider evidence.
+- [ ] Add exact provider/session calendar fixtures for every accepted instrument.
+- [ ] Add holiday/early-close fixture registry for validation windows.
+- [ ] Cross-check project D1 aggregation against an explicitly aligned provider query where appropriate.
+
+### Price/execution metadata decisions
+
+- [x] Freeze signal-detection price component to **MID / OANDA `M`** before outcomes (`P6B-OANDA-PRICE-COMPONENT-001`).
+- [x] Freeze unsmoothed M1 as the canonical OANDA signal-source retrieval mode.
+- [x] Keep bid/ask separate from signal geometry and require them for the later execution/friction contract.
+- [ ] Freeze bid/ask historical execution-friction methodology.
+- [ ] Resolve executable price quantum without assuming `displayPrecision == historical tick size`.
+- [ ] Resolve quantity/position-size translation for each accepted instrument type.
+- [ ] Record short-capability/account-instrument execution boundary separately from alpha validity.
+
+### Credential-safe runtime qualification
+
+- [x] Add a credential-free instrument-discovery manifest builder.
+- [x] Ensure discovery manifest contains no account ID or token.
+- [x] Add ex-ante source-family intersection before any strategy outcome access.
+- [x] Add `scripts/qualify_oanda_v20.py` with practice default and explicit live-read opt-in.
+- [x] Add manual practice-only `OANDA Provider Qualification` GitHub Actions workflow.
+- [x] Require runtime/repository secrets rather than committed credentials.
+- [x] Assert qualification manifest keeps strategy/paper/live authorization false.
 - [ ] Query the actual OANDA practice account instrument universe.
 - [ ] Map source market families to exact available API symbols.
 - [ ] Record account/division-specific metadata without committing account ID/token.
@@ -98,27 +133,20 @@ Canonical selection: `research/romeo/phase6b/MULTI_MARKET_CANDIDATE_SELECTION.md
 - [ ] Re-fetch sealed historical slices and compare provider values.
 - [ ] Freeze raw-response/request/normalization provenance contract.
 
-### Calendar and gap semantics
+### CI / regression verification
 
-- [x] Explicitly reject OANDA's default 17:00 New-York daily alignment as the strategy D1 definition.
-- [x] Require project-owned New-York-midnight D1 construction.
-- [ ] Define OANDA market-closed/session-break/holiday/provider-missing/unknown-gap taxonomy in code.
-- [ ] Add provider/session calendar fixtures for accepted instruments.
-- [ ] Add DST fixtures around New-York wall-clock D1 boundaries.
-- [ ] Demonstrate H1 and D1 aggregation from OANDA observations without synthetic prices.
-- [ ] Cross-check project D1 aggregation against an explicitly aligned provider query where appropriate.
-
-### Price/execution metadata decisions
-
-- [ ] Freeze signal-detection price component (`M`, `B`, or `A`) before outcomes.
-- [ ] Freeze bid/ask use for execution-friction validation.
-- [ ] Resolve executable tick/price quantum without assuming `displayPrecision == historical tick size`.
-- [ ] Resolve quantity/position-size translation for each instrument type.
-- [ ] Record short-capability/account-instrument execution boundary separately from alpha validity.
+- [x] Diagnose and resolve initial Ruff findings without strategy/data-semantic changes.
+- [x] Diagnose and resolve MyPy HTTP-response typing issue without behavior change.
+- [x] Diagnose and resolve v2 aggregation activity typing issue without behavior change.
+- [x] Confirm Ruff passes on the current code checkpoint.
+- [x] Confirm MyPy passes on the current code checkpoint.
+- [x] Confirm full pytest suite passes on the current code checkpoint.
+- [x] Confirm preserved Backtest Smoke passes on the current code checkpoint.
+- [x] Confirm the preserved September-2025 BTCUSDT detector enumeration remains outcome-independent.
 
 ## E. Gate 6B-MM-2 — pre-outcome universe freeze
 
-**Blocked until Gate 6B-MM-1 provider/data qualification is complete.**
+**Blocked until Gate 6B-MM-1 runtime provider/data qualification is complete.**
 
 Initial source-relevant family whitelist, subject to actual account availability:
 
@@ -159,10 +187,11 @@ Before detector execution:
 
 ## G. Detector/backtester compatibility
 
-- [ ] Demonstrate frozen v0.1 strategy logic can consume the provider-neutral canonical D1/H1 bars without alpha changes.
-- [ ] Preserve all v0.1 regression tests unchanged.
+- [ ] Demonstrate frozen v0.1 strategy logic can consume provider-neutral canonical D1/H1 bars without alpha changes.
+- [x] Preserve all legacy v0.1 regression tests unchanged and green while adding Phase-6B data code.
+- [ ] Create separately versioned multi-market detector compatibility identity.
 - [ ] Confirm immutable `TradePlan` output remains the detector/backtester boundary.
-- [ ] Confirm no provider-specific logic enters the strategy validity predicates.
+- [ ] Confirm no provider-specific logic enters strategy validity predicates.
 - [ ] Confirm execution/cost changes are versioned separately from alpha validity.
 - [ ] Freeze the multi-market detector/simulator compatibility chain before outcomes.
 
@@ -182,9 +211,15 @@ Bullish successor                 EVIDENCE_INSUFFICIENT / PRESERVED
 Active successor                  BEARISH D1 -> H1 MODEL #1 / MULTI-MARKET
 Alpha changes                     NONE AUTHORIZED
 OANDA provider adapter            IMPLEMENTED
-OANDA provider ADR                PROPOSED
-Latest CI                         RECHECKING AFTER RUFF FIX
-Actual OANDA instrument discovery NOT RUN — runtime credentials absent
+Provider-neutral price data v2    IMPLEMENTED + TESTED
+Session-aware H1/D1 aggregation   IMPLEMENTED + TESTED
+Signal price component            MID / FROZEN PRE-OUTCOME
+Runtime qualification command     READY
+Manual OANDA practice workflow    READY
+CI / MyPy / pytest                GREEN
+Preserved Backtest Smoke          GREEN
+Actual OANDA instrument discovery NOT RUN — runtime credentials required
+Exact instrument universe         NOT FROZEN
 Multi-market strategy outcomes    NOT AUTHORIZED
 v0.1 OOS / CONFIRM                UNOPENED
 Phase 7                           BLOCKED
