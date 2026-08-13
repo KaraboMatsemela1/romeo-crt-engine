@@ -50,15 +50,15 @@ def _fetch(
         raise ValueError("unexpected OANDA candle response identity")
     candles = document.get("candles")
     if not isinstance(candles, list):
-        raise ValueError("unexpected OANDA candle response schema")
+        raise TypeError("unexpected OANDA candle response schema")
     return candles
 
 
 def _timestamp(candle: dict[str, object]) -> datetime:
     value = candle.get("time")
     if not isinstance(value, str):
-        raise ValueError("OANDA candle is missing a timestamp")
-    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+        raise TypeError("OANDA candle is missing a timestamp")
+    return datetime.fromisoformat(value)
 
 
 def main() -> int:
@@ -95,7 +95,7 @@ def main() -> int:
         for item in s5_missing:
             volume = item.get("volume")
             if not isinstance(volume, int):
-                raise ValueError("OANDA S5 candle volume is not an integer")
+                raise TypeError("OANDA S5 candle volume is not an integer")
             s5_prices += volume
 
         results.append(
