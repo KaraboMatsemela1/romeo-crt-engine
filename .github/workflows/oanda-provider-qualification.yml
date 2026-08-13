@@ -2,6 +2,11 @@ name: OANDA Provider Qualification
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - agent/phase-6b-candidate-revision
+    paths:
+      - .github/workflows/oanda-provider-qualification.yml
 
 jobs:
   qualify-practice-account:
@@ -29,7 +34,7 @@ jobs:
       - name: Qualify practice account
         run: python scripts/qualify_oanda_v20.py --environment practice --output /tmp/oanda-instrument-discovery.json
 
-  spx500-2022-history-validation:
+  eur-usd-2019-reconciliation-evidence:
     needs: qualify-practice-account
     runs-on: ubuntu-latest
     timeout-minutes: 120
@@ -48,31 +53,37 @@ jobs:
         run: |
           pip install -r requirements.lock
           pip install --no-deps --no-build-isolation -e .
-      - name: Fetch read-only SPX500_USD 2022 M1 history
-        run: python scripts/collect_oanda_history_shard.py --instrument SPX500_USD --year 2022 --output-dir /tmp/history
-      - name: Validate history manifest
+      - name: Fetch read-only EUR_USD 2019 M1 history and build V2 evidence
+        run: python scripts/collect_oanda_history_shard.py --instrument EUR_USD --year 2019 --output-dir /tmp/history
+      - name: Validate V2 reconciliation evidence
         run: |
-          python - /tmp/history/SPX500_USD_2022_MID_M1.manifest.json <<'PY'
+          python - /tmp/history/EUR_USD_2019_MID_M1.reconciliation-v2.json <<'PY'
           import json,sys
           from pathlib import Path
-          m=json.loads(Path(sys.argv[1]).read_text())
-          assert m['environment']=='practice'
-          assert m['account_scope']=='REDACTED_RUNTIME_ACCOUNT'
-          assert m['instrument']=='SPX500_USD'
-          assert m['year']==2022
-          assert m['price_component']=='MID'
-          assert m['granularity']=='M1'
-          assert m['refetch']['status']=='EXACT_PROVIDER_VALUE_MATCH'
-          assert m['detector_execution_authorized'] is False
-          assert m['pnl_outcome_access_authorized'] is False
-          assert m['paper_trading_authorized'] is False
-          assert m['live_trading_authorized'] is False
-          print('history_validation=PASS')
-          print('complete_candles='+str(m['complete_candle_count']))
-          print('pages='+str(m['page_count']))
-          print('missing_intervals='+str(m['missing_interval_count']))
-          print('missing_minutes='+str(m['missing_minutes']))
+          e=json.loads(Path(sys.argv[1]).read_text())
+          assert e['schema_version']=='P6B_OANDA_RECONCILIATION_EVIDENCE_V2'
+          assert e['observation_policy_version']=='P6B_OANDA_OBSERVATION_POLICY_V2'
+          assert e['instrument']=='EUR_USD' and e['year']==2019
+          assert e['refetch']['status']=='EXACT_PROVIDER_VALUE_MATCH'
+          assert e['reconciliation_status']=='PENDING_CLASSIFICATION'
+          assert e['classification_contract']['fail_closed_state']=='UNRESOLVED_PROVIDER_GAP'
+          assert e['detector_execution_authorized'] is False
+          assert e['pnl_outcome_access_authorized'] is False
+          serialized=json.dumps(e,sort_keys=True).lower()
+          for marker in ('authorization','bearer ','oanda_api_token','oanda_account_id','"balance"','"nav"','.jsonl.gz'):
+              assert marker not in serialized
+          print('reconciliation_evidence_validation=PASS')
+          print('missing_intervals='+str(e['missing_interval_count']))
+          print('missing_minutes='+str(e['missing_minutes']))
           PY
-      - name: Delete fetched history
+      - name: Upload reconciliation evidence only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p6b-reconciliation-EUR_USD-2019
+          path: /tmp/history/EUR_USD_2019_MID_M1.reconciliation-v2.json
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 9
+      - name: Delete fetched history and local evidence copy
         if: always()
         run: rm -rf /tmp/history
