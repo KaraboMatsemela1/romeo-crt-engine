@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from romeo_crt_engine.market_data.aggregate import build_complete_new_york_d1, build_h1
-from romeo_crt_engine.market_data.closures import archive_exclusion, closures_for
+from romeo_crt_engine.market_data.closures import ApprovedGap, archive_exclusion, closures_for
 from romeo_crt_engine.market_data.dataset import (
     DatasetManifest,
     IngestionReceipt,
@@ -74,7 +74,7 @@ def build_trusted_binance_dataset(
         for archive in ordered_archives
         if archive.sha256 in excluded_source_hashes
     )
-    allowed_gaps = (*closures, *exclusions)
+    allowed_gaps: tuple[ApprovedGap, ...] = (*closures, *exclusions)
 
     minute_parts = [parse_1m_archive(archive, symbol=metadata.symbol) for archive in usable_archives]
     minute_bars = tuple(bar for part in minute_parts for bar in part)
