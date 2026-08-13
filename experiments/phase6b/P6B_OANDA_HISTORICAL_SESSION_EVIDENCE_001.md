@@ -69,12 +69,12 @@ Historical timestamp reconciliation must use the named source timezone and histo
 
 OANDA's FX educational material describes ordinary weekday availability, weekend closure, New Year's Day non-trading treatment, and daylight-saving effects.
 
-First-party source:
+First-party sources:
 
-- OANDA Lab, `外匯交易最佳時段與交易時段解析`
-- https://www.oanda.com/bvi-ft/lab-education/forex/aboutfx-time/
+- https://www.oanda.com/bvi-ft/lab-education/faq_data/24999/
+- https://www.oanda.com/bvi-ft/lab-education/faq_data/24607/
 
-This is useful as a broad availability constraint for `EUR_USD`, but it is not sufficiently precise to classify every minute of the 2019-2022 provider stream.
+These are useful broad availability constraints for `EUR_USD`, but they are not sufficiently precise to classify every minute of the 2019-2022 provider stream.
 
 ## Evidence E5 — dated exceptional closures exist
 
@@ -118,6 +118,26 @@ First-party sources:
 
 Any complete historical collection job must therefore be rate-aware. Pagination may not be accelerated by violating the provider's documented connection limits.
 
+## Evidence E8 — holiday treatment is instrument-class specific
+
+OANDA's current holiday-hours material shows that a single holiday can produce different schedules for FX, US indices, and metals. For example, current published holiday tables separately list FX, US indices, and metals with different open/close behavior.
+
+First-party source:
+
+- https://www.oanda.com/bvi-en/cfds/holiday-trading-hours/
+
+This current table is **not** evidence for 2019-2022 timestamps. It strengthens the reconciliation rule that an historical holiday name alone cannot determine a missing interval; the date, instrument class and provider-specific schedule must all be evidenced.
+
+## Evidence E9 — historical archive contains additional dated schedule notices
+
+OANDA's own news archive indexes additional historical schedule-change notices, including a `2022-01-17` item titled `交易時間變更通知` (trading-hours change notice).
+
+First-party archive index:
+
+- https://www.oanda.com/bvi-ft/lab-education/info/page/45/
+
+The search-accessible archive currently exposes the dated title but not enough semantic detail to apply it to the frozen symbols. Therefore it is recorded as a **candidate dated source**, not an approved rule. It must be opened/verified against an actual raw-gap need before it can classify any interval.
+
 ## Historical-calendar rule
 
 The Phase-6B trusted-data gate therefore uses this order:
@@ -126,8 +146,13 @@ The Phase-6B trusted-data gate therefore uses this order:
 2. enumerate all missing intervals mechanically;
 3. classify recurring session closures only when supported by a dated/current rule that is valid for that historical segment;
 4. classify holidays/early closes only with dated evidence or an authoritative market-calendar contract proven to govern that OANDA instrument at the time;
-5. leave any unresolved interval as `UNKNOWN_GAP` / fail closed;
-6. do not build a detector-facing `TRUSTED` dataset until every removed expected observation is evidenced.
+5. require approved evidence to cover raw missing intervals exactly and not extend into provider-observed minutes;
+6. leave any unresolved interval as `UNKNOWN_GAP` / fail closed;
+7. do not build a detector-facing `TRUSTED` dataset until every removed expected observation is evidenced.
+
+Exact reconciliation implementation:
+
+- `src/romeo_crt_engine/market_data/gap_reconciliation_v2.py`
 
 ## Explicit non-decisions
 
