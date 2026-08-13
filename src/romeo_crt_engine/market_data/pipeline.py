@@ -60,14 +60,16 @@ def build_trusted_binance_dataset(
     raw_hashes = {archive.sha256 for archive in ordered_archives}
     evidence_hashes = {evidence.source_sha256 for evidence in provider_crosschecks}
     if evidence_hashes != raw_hashes or len(provider_crosschecks) != len(ordered_archives):
-        raise ValueError("trusted promotion requires exactly one provider verification per archive")
+        raise ValueError(
+            "trusted promotion requires exactly one provider cross-check/verification per archive"
+        )
     for evidence in provider_crosschecks:
         if (
             evidence.provider != metadata.provider
             or evidence.venue != metadata.venue
             or evidence.symbol != metadata.symbol
         ):
-            raise ValueError("provider verification identity does not match instrument metadata")
+            raise ValueError("provider cross-check identity does not match instrument metadata")
 
     h1_bars = build_h1(minute_bars, allowed_closures=closures)
     d1_bars = build_complete_new_york_d1(h1_bars, allowed_closures=closures)
