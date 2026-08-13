@@ -46,6 +46,67 @@ def _decimal(value: object, field_name: str) -> Decimal:
     return parsed
 
 
+def parse_authorized_account_ids(payload: bytes) -> tuple[str, ...]:
+    """Parse token-authorized account IDs for in-memory authorization preflight only."""
+
+    try:
+        document = cast(dict[str, Any], json.loads(payload))
+    except json.JSONDecodeError as error:
+        raise DataQualityError(
+            DataQualityCode.PROVIDER_SCHEMA,
+            "invalid OANDA authorized-account JSON",
+        ) from error
+
+    accounts = document.get("accounts")
+    if not isinstance(accounts, list):
+        raise DataQualityError(
+            DataQualityCode.PROVIDER_SCHEMA,
+            "OANDA authorized-account list missing",
+        )
+
+    account_ids: list[str] = []
+    for account in accounts:
+        if not isinstance(account, dict):
+            raise DataQualityError(
+                DataQualityCode.PROVIDER_SCHEMA,
+                "invalid OANDA authorized-account entry",
+            )
+        account_id = account.get("id")
+        if not isinstance(account_id, str) or not account_id:
+            raise DataQualityError(
+                DataQualityCode.PROVIDER_SCHEMA,
+                "OANDA authorized-account ID missing",
+            )
+        account_ids.append(account_id)
+
+    if len(set(account_ids)) != len(account_ids):
+        raise DataQualityError(
+            DataQualityCode.PROVIDER_DUPLICATE,
+            "duplicate OANDA authorized-account ID",
+        )
+    return tuple(account_ids)
+
+
+def fetch_authorized_account_ids(
+    *,
+    base_url: str,
+    token: str,
+    timeout_seconds: float = 30.0,
+) -> tuple[str, ...]:
+    """Fetch token-authorized accounts without persisting or printing their identifiers."""
+
+    if not token:
+        raise ValueError("OANDA token must not be empty")
+    request = Request(
+        f"{base_url.rstrip('/')}/v3/accounts",
+        headers={"Authorization": f"Bearer {token}"},
+        method="GET",
+    )
+    with urlopen(request, timeout=timeout_seconds) as response:
+        payload = cast(bytes, response.read())
+    return parse_authorized_account_ids(payload)
+
+
 def parse_account_summary(
     payload: bytes,
     *,
