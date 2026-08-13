@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from collections import defaultdict
 from collections.abc import Sequence
-from dataclasses import asdict
+from datetime import datetime
 from decimal import Decimal, ROUND_FLOOR
 from hashlib import sha256
 
@@ -133,7 +133,7 @@ def _entry_fill(candidate: DetectorCandidate, quantity: Decimal, config: Backtes
 def _exit_decision(
     position: OpenPosition,
     bar: CanonicalBar,
-) -> tuple[ExitReason, Decimal, object] | None:
+) -> tuple[ExitReason, Decimal, datetime] | None:
     _, stop, target = trade_plan_decimal_prices(position.plan)
 
     if bar.open >= stop:
@@ -157,16 +157,13 @@ def _close_position(
     *,
     exit_reason: ExitReason,
     exit_reference: Decimal,
-    exit_time: object,
+    exit_time: datetime,
     equity_before: Decimal,
     config: BacktestConfig,
 ) -> CompletedTrade:
-    if not hasattr(exit_time, "utcoffset"):
-        raise TypeError("exit timestamp must be datetime-like")
-    timestamp = exit_time
     exit_price = _short_exit_fill_price(exit_reference, config)
     exit_fill = SimulatedFill(
-        timestamp=timestamp,  # type: ignore[arg-type]
+        timestamp=exit_time,
         reference_price=exit_reference,
         fill_price=exit_price,
         quantity=position.entry_fill.quantity,
@@ -460,9 +457,7 @@ def run_backtest(
     if dataset.h1:
         final_bar = dataset.h1[-1]
         for position in open_positions:
-            unrealized = (
-                position.entry_fill.fill_price - final_bar.close
-            ) * position.entry_fill.quantity
+            unrealized = (position.entry_fill.fill_price - final_bar.close) * position.entry_fill.quantity
             item = OpenAtEnd(
                 candidate_id=position.candidate_id,
                 plan=position.plan,
