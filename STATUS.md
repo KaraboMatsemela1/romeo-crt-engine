@@ -44,16 +44,24 @@ alpha changes          NONE AUTHORIZED
 
 The exact frozen OANDA universe is `EUR_USD`, `XAU_USD`, `NAS100_USD`, and `SPX500_USD`.
 
-Historical qualification is governed by `P6B-OANDA-HISTORY-QUALIFICATION-V1`. The fixed 2019 MID/M1 smoke passed for all four symbols with 60/60 complete candles each. Complete raw DEV collection, historical gap reconciliation, trusted H1/New-York-D1 dataset identities, and detector activity counts remain pending.
+Historical qualification is governed by `P6B-OANDA-HISTORY-QUALIFICATION-V1`. The fixed 2019 MID/M1 smoke passed for all four symbols with 60/60 complete candles each.
+
+The complete collection execution is now precommitted as four UTC calendar-year shards per frozen instrument (`16` total execution units). This is an operational memory/retry boundary only and does not change the parent historical-data protocol.
+
+Exact raw-gap reconciliation is implemented and regression-tested: approved closure evidence must cover raw missing intervals exactly, may not leave unexplained minutes, and may not extend into provider-observed minutes.
+
+Complete raw DEV collection, historical gap reconciliation, trusted H1/New-York-D1 dataset identities, and detector activity counts remain pending.
 
 Canonical detail:
 
 - `docs/checklists/phase-6b.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_QUALIFICATION_PROTOCOL_V1.md`
+- `experiments/phase6b/P6B_OANDA_HISTORY_SHARD_EXECUTION_V1.md`
 - `experiments/phase6b/P6B_OANDA_HISTORICAL_SESSION_EVIDENCE_001.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_SMOKE_001.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_COLLECTION_GATE_001.md`
 - `research/romeo/phase6b/PRIMARY_SOURCE_PASS_003.md`
+- `src/romeo_crt_engine/market_data/gap_reconciliation_v2.py`
 
 ## Authorization
 
@@ -62,6 +70,7 @@ V0_1_MUTATION_AUTHORIZED               = false
 V0_1_OOS_OUTCOME_ACCESS_AUTHORIZED     = false
 V0_1_CONFIRM_OUTCOME_ACCESS_AUTHORIZED = false
 PARAMETER_OPTIMIZATION_AUTHORIZED      = false
+FULL_RAW_HISTORY_COLLECTION_AUTHORIZED = true
 MULTI_MARKET_ACTIVITY_COUNTS_OPENED    = false
 MULTI_MARKET_PNL_OUTCOME_ACCESS        = false
 PAPER_TRADING_AUTHORIZED               = false
