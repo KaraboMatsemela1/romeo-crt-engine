@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
-from typing import TypeAlias
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,7 +59,7 @@ class ArchiveExclusion:
         return self.start_utc + timedelta(days=1)
 
 
-ApprovedGap: TypeAlias = VenueClosure | ArchiveExclusion
+type ApprovedGap = VenueClosure | ArchiveExclusion
 
 
 def _validate_gap_fields(
