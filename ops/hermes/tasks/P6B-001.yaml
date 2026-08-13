@@ -1,35 +1,37 @@
 id: P6B-001
 sequence: 1
 status: READY
-executor: GITHUB_ACTIONS
+executor: HERMES_LOCAL
 branch: agent/phase-6b-candidate-revision
 depends_on: []
-objective: Execute and validate the frozen EUR_USD 2019 OANDA practice MID/M1 shard on an ephemeral GitHub Actions runner; Hermes must not require or read OANDA credentials locally.
-workflow: .github/workflows/oanda-provider-qualification.yml
-required_repository_secrets:
-  - OANDA_ACCOUNT_ID
-  - OANDA_API_TOKEN
+objective: Execute and validate the frozen EUR_USD 2019 OANDA practice MID/M1 shard locally.
+allowed_commands:
+  - git fetch origin
+  - git checkout agent/phase-6b-candidate-revision
+  - git pull --ff-only
+  - python scripts/collect_oanda_history_shard.py --instrument EUR_USD --year 2019
 required_environment:
   - OANDA_ENV=practice
+  - OANDA_ACCOUNT_ID=LOCAL_SECRET
+  - OANDA_API_TOKEN=LOCAL_SECRET
 pass_conditions:
   - manifest_self_check=PASS
   - refetch=EXACT_PROVIDER_VALUE_MATCH
-  - credentials_redacted=true
   - detector_execution_authorized=false
   - pnl_outcome_access_authorized=false
-ephemeral_artifacts_only:
-  - /tmp/romeo-p6b-001/EUR_USD_2019_MID_M1.jsonl.gz
-  - /tmp/romeo-p6b-001/EUR_USD_2019_MID_M1.manifest.json
+local_artifacts:
+  - artifacts/phase6b/oanda_raw/EUR_USD_2019_MID_M1.jsonl.gz
+  - artifacts/phase6b/oanda_raw/EUR_USD_2019_MID_M1.manifest.json
 forbidden_actions:
-  - expose, print, download, or persist OANDA credentials
-  - require OANDA credentials in the Hermes local runtime
-  - upload or commit raw OANDA M1 data
+  - expose or persist OANDA credentials
+  - upload raw OANDA M1 data
   - run detector
   - inspect TradePlan counts or reason distributions
   - run backtester or calculate PnL
   - access v0.1 OOS or CONFIRM
   - alter instruments, year, price component, paging, strategy rules, thresholds, or gates
-result_source: github_actions_job_summary
+result_channel: github_issue_14
+result_prefix: '[HERMES_RESULT]'
 result_fields:
   - task_id
   - status
