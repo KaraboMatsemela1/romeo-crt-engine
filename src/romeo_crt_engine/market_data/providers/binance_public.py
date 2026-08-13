@@ -12,6 +12,7 @@ from urllib.parse import urlencode
 from urllib.request import urlopen
 from zipfile import BadZipFile, ZipFile
 
+from romeo_crt_engine.market_data.closures import closures_for, expected_minute_opens
 from romeo_crt_engine.market_data.models import (
     AssetClass,
     InstrumentMetadata,
@@ -119,10 +120,17 @@ def parse_1m_archive(archive: RawArchive, *, symbol: str) -> tuple[MinuteBar, ..
     except BadZipFile as error:
         raise DataQualityError(DataQualityCode.PROVIDER_SCHEMA, "invalid zip archive") from error
 
-    if len(rows) != 1440:
+    expected_start = datetime.combine(archive.archive_date, time.min, tzinfo=UTC)
+    expected_end = expected_start + timedelta(days=1)
+    closures = closures_for(provider=PROVIDER, venue=VENUE, symbol=symbol)
+    expected_opens = expected_minute_opens(expected_start, expected_end, closures)
+    if len(rows) != len(expected_opens):
         raise DataQualityError(
             DataQualityCode.INCOMPLETE_BUCKET,
-            f"daily crypto archive contains {len(rows)} minutes, expected 1440",
+            (
+                f"archive {archive.filename} contains {len(rows)} minutes, "
+                f"expected {len(expected_opens)} after evidenced venue closures"
+            ),
         )
 
     bars: list[MinuteBar] = []
@@ -156,6 +164,14 @@ def parse_1m_archive(archive: RawArchive, *, symbol: str) -> tuple[MinuteBar, ..
             )
 
         open_time = _epoch_to_utc(raw_open, scale)
+        if open_time != expected_opens[row_number - 1]:
+            raise DataQualityError(
+                DataQualityCode.INCOMPLETE_BUCKET,
+                (
+                    f"archive {archive.filename} minute chronology differs from the exact "
+                    f"approved venue-closure calendar at row {row_number}"
+                ),
+            )
         bars.append(
             MinuteBar(
                 provider=PROVIDER,
@@ -174,12 +190,12 @@ def parse_1m_archive(archive: RawArchive, *, symbol: str) -> tuple[MinuteBar, ..
             )
         )
 
-    expected_start = datetime.combine(archive.archive_date, time.min, tzinfo=UTC)
-    expected_end = expected_start + timedelta(days=1)
-    if bars[0].open_time != expected_start or bars[-1].close_time != expected_end:
+    if not bars:
+        raise DataQualityError(DataQualityCode.EMPTY, f"archive {archive.filename} contains no bars")
+    if bars[0].open_time != expected_opens[0] or bars[-1].open_time != expected_opens[-1]:
         raise DataQualityError(
             DataQualityCode.INCOMPLETE_BUCKET,
-            f"archive {archive.filename} does not cover its exact UTC day",
+            f"archive {archive.filename} does not match its expected UTC-day chronology",
         )
     return tuple(bars)
 

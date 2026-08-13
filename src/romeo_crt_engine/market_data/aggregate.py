@@ -7,6 +7,7 @@ from decimal import Decimal
 from hashlib import sha256
 from zoneinfo import ZoneInfo
 
+from romeo_crt_engine.market_data.closures import ApprovedGap, gap_is_approved, window_overlaps_gap
 from romeo_crt_engine.market_data.models import BarTimeframe, CanonicalBar, MinuteBar
 from romeo_crt_engine.market_data.quality import (
     DataQualityCode,
@@ -37,9 +38,13 @@ def _sum_decimal(values: Sequence[Decimal]) -> Decimal:
     return sum(values, start=Decimal(0))
 
 
-def build_h1(minute_bars: Sequence[MinuteBar]) -> tuple[CanonicalBar, ...]:
-    """Aggregate gapless UTC M1 observations into exact elapsed-hour H1 bars."""
-    validate_minute_series(minute_bars)
+def build_h1(
+    minute_bars: Sequence[MinuteBar],
+    *,
+    allowed_closures: tuple[ApprovedGap, ...] = (),
+) -> tuple[CanonicalBar, ...]:
+    """Aggregate trusted UTC M1 observations into actual complete elapsed-hour H1 bars."""
+    validate_minute_series(minute_bars, allowed_closures=allowed_closures)
 
     buckets: dict[int, list[MinuteBar]] = defaultdict(list)
     for bar in minute_bars:
@@ -92,30 +97,38 @@ def _ny_midnight(day: date) -> datetime:
     return datetime.combine(day, time.min, tzinfo=NY)
 
 
-def _validate_h1_series(bars: Sequence[CanonicalBar]) -> None:
+def _validate_h1_series(
+    bars: Sequence[CanonicalBar],
+    *,
+    allowed_closures: tuple[ApprovedGap, ...] = (),
+) -> None:
     if not bars:
         raise DataQualityError(DataQualityCode.EMPTY, "H1 series must not be empty")
     identity = (bars[0].provider, bars[0].venue, bars[0].symbol)
-    prior_close: float | None = None
+    prior_close: datetime | None = None
     for bar in bars:
         if bar.timeframe is not BarTimeframe.H1:
             raise DataQualityError(DataQualityCode.PROVIDER_SCHEMA, "expected only H1 bars")
         if (bar.provider, bar.venue, bar.symbol) != identity:
             raise DataQualityError(DataQualityCode.IDENTITY_MISMATCH, "H1 identity mismatch")
-        open_ts = bar.open_time.timestamp()
-        close_ts = bar.close_time.timestamp()
-        if close_ts - open_ts != 3600.0:
+        if bar.close_time - bar.open_time != timedelta(hours=1):
             raise DataQualityError(DataQualityCode.PROVIDER_SCHEMA, "H1 must span 3600 seconds")
-        if prior_close is not None and open_ts != prior_close:
-            raise DataQualityError(DataQualityCode.GAP, "H1 series is not contiguous")
-        prior_close = close_ts
+        if (
+            prior_close is not None
+            and bar.open_time != prior_close
+            and not gap_is_approved(prior_close, bar.open_time, allowed_closures)
+        ):
+            raise DataQualityError(DataQualityCode.GAP, "H1 series has an unapproved gap")
+        prior_close = bar.close_time
 
 
 def build_complete_new_york_d1(
     h1_bars: Sequence[CanonicalBar],
+    *,
+    allowed_closures: tuple[ApprovedGap, ...] = (),
 ) -> tuple[CanonicalBar, ...]:
-    """Build only complete New-York wall-clock days; partial edge days are discarded."""
-    _validate_h1_series(h1_bars)
+    """Build complete NY wall-clock parents; trusted-gap-affected parent days are excluded."""
+    _validate_h1_series(h1_bars, allowed_closures=allowed_closures)
 
     by_day: dict[date, list[CanonicalBar]] = defaultdict(list)
     for bar in h1_bars:
@@ -139,6 +152,10 @@ def build_complete_new_york_d1(
         )
 
         if not is_complete:
+            utc_open = local_open.astimezone(UTC)
+            utc_close = local_close.astimezone(UTC)
+            if window_overlaps_gap(utc_open, utc_close, allowed_closures):
+                continue
             if index in (0, len(ordered_days) - 1):
                 continue
             raise DataQualityError(

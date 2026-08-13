@@ -1,0 +1,93 @@
+name: Phase 6 DEV Validation
+
+# Phase 6 for v0.1 is complete with INSUFFICIENT_EVIDENCE.
+# Historical outcome evidence is sealed in P6_DEV_RESULT_001.*.
+# This workflow is retained only for deliberate manual reproduction of the sealed DEV data.
+on:
+  workflow_dispatch:
+
+env:
+  P6_DEV_OUTCOME_ACCESS_AUTHORIZED: "false"
+
+jobs:
+  reproduce-p6-dev-001-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Install locked environment
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps --no-build-isolation -e .
+
+      - name: Reconstruct sealed P6-DEV-001 trusted dataset
+        run: |
+          python scripts/ingest_binance_spot.py \
+            --symbol BTCUSDT \
+            --start-utc-day 2019-01-01 \
+            --end-utc-day 2022-12-31 \
+            --metadata-observed-at 2026-08-13T08:16:25.815237+00:00 \
+            --verification-policy checksum-all-rest-monthly \
+            --download-workers 8 \
+            --data-root /tmp/romeo-phase6-dev \
+            > /tmp/p6-dev-ingest.txt
+
+      - name: Verify sealed DEV data identity
+        run: |
+          dataset_dir=$(find /tmp/romeo-phase6-dev/normalized -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -n "$dataset_dir"
+          python - "$dataset_dir/manifest.json" /tmp/p6-dev-ingest.txt experiments/phase6/P6_DEV_DATA_FREEZE_001.json <<'PY'
+          import hashlib
+          import json
+          import sys
+          from collections import Counter
+          from pathlib import Path
+
+          manifest_bytes = Path(sys.argv[1]).read_bytes()
+          manifest = json.loads(manifest_bytes)
+          freeze = json.loads(Path(sys.argv[3]).read_text())
+          values = {}
+          for line in Path(sys.argv[2]).read_text().splitlines():
+              if '=' in line:
+                  key, value = line.split('=', 1)
+                  values[key] = value
+
+          exclusions = json.loads(values['archive_exclusions_json'])
+          excluded_records = [
+              {
+                  'archive_date': record['archive_date'],
+                  'source_sha256': record['source_sha256'],
+                  'error_code': record['error_code'],
+              }
+              for record in exclusions['records']
+          ]
+          methods = Counter(item['verification_method'] for item in manifest['provider_crosschecks'])
+
+          assert manifest['dataset_version'] == freeze['dataset_version']
+          assert hashlib.sha256(manifest_bytes).hexdigest() == freeze['manifest_sha256']
+          assert manifest['normalized_sha256'] == freeze['normalized_sha256']
+          assert manifest['market_data_code_sha256'] == freeze['market_data_code_sha256']
+          assert manifest['dependency_lock_sha256'] == freeze['dependency_lock_sha256']
+          assert manifest['instrument_metadata_version'] == freeze['instrument_metadata_version']
+          assert manifest['instrument_metadata_observed_at'] == freeze['instrument_metadata_observed_at']
+          assert excluded_records == freeze['excluded_archives']
+          assert values['exclusion_ledger_sha256'] == freeze['exclusion_ledger_sha256']
+          assert dict(sorted(methods.items())) == freeze['verification_methods']
+          assert manifest['m1_rows'] == freeze['m1_rows']
+          assert manifest['h1_rows'] == freeze['h1_rows']
+          assert manifest['d1_rows'] == freeze['d1_rows']
+
+          print('P6_DEV_DATA_REPRODUCTION_OK=true')
+          print('dataset_version=' + manifest['dataset_version'])
+          print('manifest_sha256=' + freeze['manifest_sha256'])
+          print('outcome_access_authorized=false')
+          PY
+
+      - name: Confirm outcome access remains disabled
+        run: test "$P6_DEV_OUTCOME_ACCESS_AUTHORIZED" = "false"
