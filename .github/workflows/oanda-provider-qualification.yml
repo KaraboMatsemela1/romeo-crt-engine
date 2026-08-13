@@ -2,11 +2,6 @@ name: OANDA Provider Qualification
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - agent/phase-6b-candidate-revision
-    paths:
-      - .github/workflows/oanda-provider-qualification.yml
 
 jobs:
   qualify-practice-account:
