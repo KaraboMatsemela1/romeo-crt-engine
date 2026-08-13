@@ -13,6 +13,9 @@ from romeo_crt_engine.market_data.price_data_v2 import (
     CanonicalPriceBarV2,
     PriceComponent,
 )
+from romeo_crt_engine.market_data.providers.oanda_account import (
+    OandaAccountQualificationRecord,
+)
 from romeo_crt_engine.market_data.providers.oanda_v20 import (
     PROVIDER,
     VENUE,
@@ -121,11 +124,23 @@ def _instrument_record(instrument: OandaInstrumentRecord) -> dict[str, object]:
     }
 
 
+def _account_record(account: OandaAccountQualificationRecord) -> dict[str, object]:
+    return {
+        "home_currency": account.home_currency,
+        "margin_rate": format(account.margin_rate, "f"),
+        "hedging_enabled": account.hedging_enabled,
+        "guaranteed_stop_loss_order_mode": account.guaranteed_stop_loss_order_mode,
+        "metadata_observed_at_utc": account.observed_at.astimezone(UTC).isoformat(),
+        "raw_account_summary_sha256": account.raw_sha256,
+    }
+
+
 def build_instrument_discovery_manifest(
     instruments: tuple[OandaInstrumentRecord, ...],
     *,
     environment: str,
     observed_at: datetime,
+    account: OandaAccountQualificationRecord | None = None,
 ) -> dict[str, object]:
     """Build a deterministic, credential-free Phase-6B discovery record.
 
@@ -167,6 +182,7 @@ def build_instrument_discovery_manifest(
         "venue": VENUE,
         "environment": environment,
         "account_scope": ACCOUNT_SCOPE,
+        "account_profile": _account_record(account) if account is not None else None,
         "observed_at_utc": observed_at.astimezone(UTC).isoformat(),
         "raw_instrument_response_sha256": next(iter(raw_hashes)),
         "available_instrument_count": len(instruments),
