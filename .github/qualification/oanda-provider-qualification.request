@@ -1,4 +1,5 @@
 Phase 6B OANDA practice qualification request
 Requested: 2026-08-13
-Purpose: one-shot account/instrument metadata discovery using runtime-only repository secrets.
+Attempt: 2
+Purpose: rerun one-shot account/instrument metadata discovery after adding redacted token/account authorization preflight.
 Outcome/P&L access: prohibited.
