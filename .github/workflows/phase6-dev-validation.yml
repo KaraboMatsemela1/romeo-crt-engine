@@ -1,5 +1,7 @@
 name: Phase 6 DEV Validation
 
+# This workflow is intentionally pinned to the preregistered DEV window.
+# Infrastructure-only reruns must preserve the same dates and frozen strategy chain.
 on:
   workflow_dispatch:
   pull_request:
