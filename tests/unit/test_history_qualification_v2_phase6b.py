@@ -6,8 +6,12 @@ from decimal import Decimal
 
 import pytest
 
+from romeo_crt_engine.market_data.gap_reconciliation_v2 import (
+    reconcile_missing_intervals_exactly,
+)
 from romeo_crt_engine.market_data.history_qualification_v2 import (
     REFETCH_WINDOWS_UTC,
+    MissingInterval,
     assert_refetch_equal,
     enumerate_missing_intervals,
     gap_digest,
@@ -15,6 +19,7 @@ from romeo_crt_engine.market_data.history_qualification_v2 import (
 )
 from romeo_crt_engine.market_data.providers.oanda_history import _parse_history_page_candles
 from romeo_crt_engine.market_data.providers.oanda_v20 import OandaPriceCandle
+from romeo_crt_engine.market_data.session_policy_v2 import GapCategory, MarketGapV2
 
 
 def _candle(minute: int, close: str = "1.1001") -> OandaPriceCandle:
@@ -125,3 +130,65 @@ def test_refetch_windows_are_frozen_inside_dev_and_one_hour_each() -> None:
     for start, end in REFETCH_WINDOWS_UTC:
         assert datetime(2019, 1, 1, tzinfo=UTC) <= start < datetime(2023, 1, 1, tzinfo=UTC)
         assert end - start == timedelta(hours=1)
+
+
+def test_gap_reconciliation_requires_exact_coverage() -> None:
+    start = datetime(2021, 6, 28, 16, 0, tzinfo=UTC)
+    end = datetime(2021, 6, 28, 17, 0, tzinfo=UTC)
+    missing = (MissingInterval(start=start, end=end),)
+    approved = (
+        MarketGapV2(
+            provider="OANDA_V20",
+            venue="OANDA_FXTRADE",
+            instrument="NAS100_USD",
+            start_time=start,
+            end_time=end,
+            category=GapCategory.SESSION_BREAK,
+            policy_version="P6B-HISTORICAL-SESSION-POLICY-V1",
+            evidence_id="TEST-E1",
+            evidence_source="first-party-test-fixture",
+        ),
+    )
+
+    summary = reconcile_missing_intervals_exactly(
+        missing,
+        approved,
+        provider="OANDA_V20",
+        venue="OANDA_FXTRADE",
+        instrument="NAS100_USD",
+        policy_version="P6B-HISTORICAL-SESSION-POLICY-V1",
+    )
+
+    assert summary.status == "FULLY_RECONCILED"
+    assert summary.missing_minutes == 60
+    assert summary.approved_minutes == 60
+    assert len(summary.reconciliation_sha256) == 64
+
+
+def test_gap_reconciliation_rejects_evidence_that_hides_observed_minutes() -> None:
+    start = datetime(2021, 6, 28, 16, 0, tzinfo=UTC)
+    end = datetime(2021, 6, 28, 17, 0, tzinfo=UTC)
+    missing = (MissingInterval(start=start, end=end),)
+    approved = (
+        MarketGapV2(
+            provider="OANDA_V20",
+            venue="OANDA_FXTRADE",
+            instrument="NAS100_USD",
+            start_time=start,
+            end_time=end + timedelta(minutes=1),
+            category=GapCategory.SESSION_BREAK,
+            policy_version="P6B-HISTORICAL-SESSION-POLICY-V1",
+            evidence_id="TEST-E2",
+            evidence_source="first-party-test-fixture",
+        ),
+    )
+
+    with pytest.raises(ValueError, match="outside raw gap"):
+        reconcile_missing_intervals_exactly(
+            missing,
+            approved,
+            provider="OANDA_V20",
+            venue="OANDA_FXTRADE",
+            instrument="NAS100_USD",
+            policy_version="P6B-HISTORICAL-SESSION-POLICY-V1",
+        )
