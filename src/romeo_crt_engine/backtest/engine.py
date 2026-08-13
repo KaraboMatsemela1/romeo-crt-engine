@@ -4,7 +4,7 @@ import json
 from collections import defaultdict
 from collections.abc import Sequence
 from datetime import datetime
-from decimal import Decimal, ROUND_FLOOR
+from decimal import ROUND_FLOOR, Decimal
 from hashlib import sha256
 
 from romeo_crt_engine.backtest.models import (
@@ -284,13 +284,16 @@ def run_backtest(
     dataset: DetectorDataset,
     *,
     quantity_step: Decimal,
-    config: BacktestConfig = BacktestConfig(),
+    config: BacktestConfig | None = None,
 ) -> BacktestResult:
     """Simulate frozen TradePlans on a causal H1 event clock.
 
     BTCUSDT Spot is the observation source in the first route. Short fills here are a synthetic
     linear research assumption, not a claim that Binance Spot itself executes naked shorts.
     """
+    if config is None:
+        config = BacktestConfig()
+
     _require_quantity_step(quantity_step)
     _validate_binding(detector_run, dataset)
     _validate_h1(dataset.h1, detector_run)
