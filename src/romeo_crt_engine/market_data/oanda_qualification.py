@@ -20,7 +20,7 @@ from romeo_crt_engine.market_data.providers.oanda_v20 import (
     OandaPriceCandle,
 )
 
-QUALIFICATION_SCHEMA: Final = "P6B_OANDA_INSTRUMENT_DISCOVERY_V1"
+QUALIFICATION_SCHEMA: Final = "P6B_OANDA_INSTRUMENT_DISCOVERY_V2"
 ACCOUNT_SCOPE: Final = "REDACTED_RUNTIME_ACCOUNT"
 
 # These are candidate API aliases, not assertions that every OANDA division/account
@@ -65,6 +65,30 @@ def select_source_relevant_instruments(
 
 
 def _instrument_record(instrument: OandaInstrumentRecord) -> dict[str, object]:
+    commission: dict[str, object] | None = None
+    if instrument.commission is not None:
+        commission = {
+            "commission_account_home": format(instrument.commission.commission, "f"),
+            "units_traded": format(instrument.commission.units_traded, "f"),
+            "minimum_commission_account_home": format(
+                instrument.commission.minimum_commission, "f"
+            ),
+        }
+
+    financing: dict[str, object] | None = None
+    if instrument.financing is not None:
+        financing = {
+            "long_rate": format(instrument.financing.long_rate, "f"),
+            "short_rate": format(instrument.financing.short_rate, "f"),
+            "financing_days": [
+                {
+                    "day_of_week": day.day_of_week,
+                    "days_charged": day.days_charged,
+                }
+                for day in instrument.financing.financing_days
+            ],
+        }
+
     return {
         "name": instrument.name,
         "display_name": instrument.display_name,
@@ -72,7 +96,26 @@ def _instrument_record(instrument: OandaInstrumentRecord) -> dict[str, object]:
         "display_precision": instrument.display_precision,
         "pip_location": instrument.pip_location,
         "trade_units_precision": instrument.trade_units_precision,
+        "provider_unit_precision_step": format(
+            instrument.provider_unit_precision_step, "f"
+        ),
         "minimum_trade_size": format(instrument.minimum_trade_size, "f"),
+        "maximum_order_units": (
+            format(instrument.maximum_order_units, "f")
+            if instrument.maximum_order_units is not None
+            else None
+        ),
+        "maximum_position_size": (
+            format(instrument.maximum_position_size, "f")
+            if instrument.maximum_position_size is not None
+            else None
+        ),
+        "margin_rate": (
+            format(instrument.margin_rate, "f") if instrument.margin_rate is not None else None
+        ),
+        "commission": commission,
+        "financing": financing,
+        "guaranteed_stop_loss_order_mode": instrument.guaranteed_stop_loss_order_mode,
         "metadata_observed_at_utc": instrument.observed_at.astimezone(UTC).isoformat(),
         "raw_instrument_response_sha256": instrument.raw_sha256,
     }
