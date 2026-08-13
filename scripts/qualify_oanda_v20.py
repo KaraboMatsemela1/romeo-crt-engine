@@ -93,12 +93,6 @@ def main() -> int:
         )
 
     try:
-        account = fetch_account_summary(
-            base_url=base_url,
-            account_id=account_id,
-            token=token,
-            observed_at=observed_at,
-        )
         instruments = fetch_account_instruments(
             base_url=base_url,
             account_id=account_id,
@@ -107,9 +101,25 @@ def main() -> int:
         )
     except HTTPError as error:
         raise SystemExit(
-            f"OANDA account qualification failed with HTTP {error.code} after authorization "
-            "preflight; verify account API eligibility and provider account type"
+            f"OANDA instrument discovery failed with HTTP {error.code} after authorization "
+            "preflight; the configured account is not usable for the v20 instrument endpoint"
         ) from None
+
+    account = None
+    account_summary_available = True
+    try:
+        account = fetch_account_summary(
+            base_url=base_url,
+            account_id=account_id,
+            token=token,
+            observed_at=observed_at,
+        )
+    except HTTPError as error:
+        if error.code != 403:
+            raise SystemExit(
+                f"OANDA account-summary qualification failed with HTTP {error.code}"
+            ) from None
+        account_summary_available = False
 
     manifest = build_instrument_discovery_manifest(
         instruments,
@@ -135,12 +145,16 @@ def main() -> int:
     )
 
     account_profile = manifest["account_profile"]
-    if not isinstance(account_profile, dict):
+    if account_profile is not None and not isinstance(account_profile, dict):
         raise TypeError("qualification manifest account_profile is invalid")
 
     print(f"provider={manifest['provider']}")
     print(f"environment={environment}")
-    print(f"account_home_currency={account_profile['home_currency']}")
+    print(f"account_summary_available={str(account_summary_available).lower()}")
+    if isinstance(account_profile, dict):
+        print(f"account_home_currency={account_profile['home_currency']}")
+    else:
+        print("account_home_currency=UNAVAILABLE")
     print(f"available_instrument_count={manifest['available_instrument_count']}")
     print(f"source_family_matches={matched_count}/{len(matches)}")
     print(f"manifest={output}")
