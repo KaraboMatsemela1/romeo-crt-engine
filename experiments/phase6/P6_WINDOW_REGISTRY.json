@@ -1,0 +1,92 @@
+{
+  "protocol_id": "P6-VALIDATION-PROTOCOL-v1",
+  "strategy_version": "CRT-C3-D1-H1-M1-BEAR-v0.1",
+  "detector_version": "CRT-DETECTOR-v0.1",
+  "simulator_version": "CRT-BACKTEST-v0.1",
+  "observation_route": {
+    "provider": "BINANCE_PUBLIC_DATA",
+    "venue": "BINANCE_SPOT",
+    "symbol": "BTCUSDT",
+    "raw_timeframe": "M1",
+    "execution_timeframe": "H1",
+    "parent_timeframe": "D1",
+    "source_timezone": "America/New_York",
+    "execution_assumption": "SYNTHETIC_LINEAR_SHORT_RESEARCH_V1"
+  },
+  "windows": [
+    {
+      "id": "P6-DEV-001",
+      "role": "DEVELOPMENT_FREQUENCY",
+      "start_utc_day": "2019-01-01",
+      "end_utc_day": "2022-12-31",
+      "access_order": 1,
+      "outcome_status": "UNOBSERVED_AT_REGISTRATION"
+    },
+    {
+      "id": "P6-OOS-001",
+      "role": "OUT_OF_SAMPLE",
+      "start_utc_day": "2023-01-01",
+      "end_utc_day": "2025-08-31",
+      "access_order": 2,
+      "outcome_status": "UNOBSERVED_AT_REGISTRATION"
+    },
+    {
+      "id": "P6-QUARANTINE-2025-09",
+      "role": "QUARANTINED_ENGINEERING_ONLY",
+      "start_utc_day": "2025-09-01",
+      "end_utc_day": "2025-09-30",
+      "access_order": 0,
+      "outcome_status": "PREVIOUSLY_OBSERVED_PHASE5_ZERO_TRADEPLANS",
+      "eligible_for_inference": false
+    },
+    {
+      "id": "P6-CONFIRM-001",
+      "role": "FINAL_CONFIRMATORY",
+      "start_utc_day": "2025-10-01",
+      "end_utc_day": "2026-07-31",
+      "access_order": 3,
+      "outcome_status": "UNOBSERVED_AT_REGISTRATION"
+    }
+  ],
+  "sample_gates": {
+    "dev_min_closed_trades_for_diagnostics": 30,
+    "oos_min_closed_trades_to_consider_confirm": 30,
+    "promotion_min_independent_closed_trades": 60,
+    "promotion_min_confirm_closed_trades": 20
+  },
+  "promotion_gates": {
+    "oos_base_expectancy_r": ">0",
+    "confirm_base_expectancy_r": ">0",
+    "combined_independent_base_expectancy_r": ">0",
+    "combined_independent_stressed_expectancy_r": ">=0",
+    "combined_independent_base_profit_factor": ">1.0",
+    "combined_independent_max_realized_drawdown": "<=0.15",
+    "max_single_trade_share_of_positive_net_pnl": "<=0.25",
+    "max_top5_trade_share_of_positive_net_pnl": "<=0.60"
+  },
+  "monte_carlo": {
+    "min_closed_trades": 30,
+    "iterations": 10000,
+    "seed": 20260813,
+    "missed_trade_rates": [0.05, 0.10]
+  },
+  "sensitivity": {
+    "model1_thick_body_thresholds": [0.40, 0.45, 0.50, 0.55, 0.60],
+    "baseline_model1_thick_body_threshold": 0.50,
+    "stop_buffer_ticks": [0, 1, 2],
+    "baseline_stop_buffer_ticks": 1,
+    "diagnostic_only": true
+  },
+  "fixed_simulation": {
+    "initial_equity": "100000",
+    "risk_fraction": "0.005",
+    "max_concurrent_positions": 1,
+    "same_bar_policy": "STOP_FIRST_CONSERVATIVE",
+    "finite_data_end": "CENSOR_OPEN_POSITION",
+    "favorable_target_gap_price_improvement": false
+  },
+  "authorization": {
+    "paper_trading_authorized": false,
+    "live_trading_authorized": false
+  }
+}
