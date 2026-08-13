@@ -11,7 +11,7 @@ Updated: 2026-08-13
 | 4 — CRT detector | **COMPLETE FOR v0.1** | Frozen deterministic detector |
 | 5 — Backtester | **COMPLETE FOR v0.1** | Deterministic cost-aware simulator |
 | 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Terminal preregistered DEV decision |
-| 6B — Candidate revision | **IN PROGRESS — LOCAL RAW OANDA COLLECTION READY** | Trusted multi-market DEV datasets + detector-only activity decision |
+| 6B — Candidate revision | **IN PROGRESS — HERMES LOCAL RAW COLLECTION QUEUED** | Trusted multi-market DEV datasets + detector-only activity decision |
 | 7 — Paper trading | **BLOCKED** | Requires future validated paper promotion |
 | 8 — Learning engine | Not started | Requires sufficient deterministic labels |
 | 9 — Shadow trading | Not started | Requires paper readiness |
@@ -55,7 +55,7 @@ The repository contains a practice-only local collector and runbook:
 - `scripts/collect_oanda_history_shard.py`
 - `experiments/phase6b/P6B_OANDA_LOCAL_COLLECTION_RUNBOOK_V1.md`
 
-The collector is restricted to the frozen four symbols and years 2019-2022, reads credentials only from the local runtime environment, preserves page-level request/raw-response provenance, enumerates raw gaps as `UNRECONCILED`, runs the mapped preregistered independent re-fetch, and keeps detector/TradePlan/P&L/paper/shadow/live authorization false.
+The collector is restricted to the frozen four symbols and years 2019-2022, reads credentials only from the local runtime environment, preserves page-level request/raw-response provenance, enumerates raw gaps as `UNRECONCILED`, runs the mapped preregistered independent re-fetch, self-checks manifest redaction/authorization state, and keeps detector/TradePlan/P&L/paper/shadow/live authorization false.
 
 Local raw outputs are Git-ignored at:
 
@@ -63,15 +63,29 @@ Local raw outputs are Git-ignored at:
 artifacts/phase6b/oanda_raw/
 ```
 
-The next required execution is the first full shard:
+## Persistent Hermes control plane
+
+GitHub is now the persistent control channel for the local Hermes executor:
 
 ```text
-EUR_USD / 2019
+control file      ops/hermes/CONTROL.json
+control branch    agent/phase-6b-candidate-revision
+poll interval     300 seconds
+auto execute      READY tasks
+result channel    GitHub Issue #14 / [HERMES_RESULT]
+local state       ~/.hermes/state/romeo-crt-engine-control.json
 ```
 
-It is pending on the local/Hermes runtime where OANDA runtime credentials are available. After its manifest/redaction structure is validated, the same frozen collector is used for the remaining 15 shards.
+Queued tasks:
 
-Complete raw DEV collection, historical gap reconciliation, trusted H1/New-York-D1 dataset identities, and detector activity counts remain pending.
+```text
+P6B-001  READY  EUR_USD / 2019 first full shard
+P6B-002  READY  remaining 15 frozen shards; depends on P6B-001 PASS
+```
+
+Once Hermes is bootstrapped with the persistent watcher, the user does not need to manually tell Hermes to check GitHub for each task. Hermes must stop the chain on failure and may never relax strategy/data gates or expose local secrets/raw OANDA M1 files.
+
+After all 16 shards are collected, historical gap reconciliation, trusted H1/New-York-D1 dataset identities, and detector activity counts remain separate gated work.
 
 Canonical detail:
 
@@ -85,6 +99,9 @@ Canonical detail:
 - `research/romeo/phase6b/PRIMARY_SOURCE_PASS_003.md`
 - `src/romeo_crt_engine/market_data/gap_reconciliation_v2.py`
 - `scripts/collect_oanda_history_shard.py`
+- `ops/hermes/CONTROL.json`
+- `ops/hermes/tasks/P6B-001.yaml`
+- `ops/hermes/tasks/P6B-002.yaml`
 
 ## Authorization
 
