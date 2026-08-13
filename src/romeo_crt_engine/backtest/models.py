@@ -12,7 +12,7 @@ from typing import Final
 from romeo_crt_engine.crt.detector import DetectorCandidate
 from romeo_crt_engine.crt.v0_1 import Direction, TradePlan
 
-SIMULATOR_VERSION: Final = "CRT-BACKTEST-v0.1"
+SIMULATOR_VERSION: Final = "CRT-BACKTEST-v0.1.1"
 EXECUTION_ASSUMPTION_VERSION: Final = "SYNTHETIC_LINEAR_SHORT_RESEARCH_V1"
 
 
