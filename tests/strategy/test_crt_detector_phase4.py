@@ -17,7 +17,7 @@ from romeo_crt_engine.crt.detector import (
     detect_dataset,
     identity_from_manifest_bytes,
 )
-from romeo_crt_engine.crt.v0_1 import DecisionState, ReasonCode, STRATEGY_VERSION
+from romeo_crt_engine.crt.v0_1 import STRATEGY_VERSION, DecisionState, ReasonCode
 from romeo_crt_engine.market_data.dataset import normalized_digest
 from romeo_crt_engine.market_data.models import BarTimeframe, CanonicalBar
 
@@ -58,8 +58,8 @@ def _bar_from_fixture(
         high=Decimal(str(payload["high"])),
         low=Decimal(str(payload["low"])),
         close=Decimal(str(payload["close"])),
-        volume=Decimal("0"),
-        quote_volume=Decimal("0"),
+        volume=Decimal(0),
+        quote_volume=Decimal(0),
         trade_count=0,
         source_count=24 if timeframe is BarTimeframe.D1 else 60,
         source_digest=_digest(label),
@@ -89,8 +89,8 @@ def _c3_bar(case: dict[str, Any]) -> CanonicalBar:
         high=high,
         low=low,
         close=close,
-        volume=Decimal("0"),
-        quote_volume=Decimal("0"),
+        volume=Decimal(0),
+        quote_volume=Decimal(0),
         trade_count=0,
         source_count=24,
         source_digest=_digest(f"{case['id']}:c3"),
@@ -175,9 +175,9 @@ def test_detector_ignores_future_c3_daily_ohlc_in_strategy_decision() -> None:
         open_time=original_c3.open_time,
         close_time=original_c3.close_time,
         open=original_c3.open,
-        high=Decimal("999999"),
-        low=Decimal("1"),
-        close=Decimal("500000"),
+        high=Decimal(999999),
+        low=Decimal(1),
+        close=Decimal(500000),
         volume=original_c3.volume,
         quote_volume=original_c3.quote_volume,
         trade_count=original_c3.trade_count,
