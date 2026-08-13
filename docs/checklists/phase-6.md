@@ -19,43 +19,61 @@ Protocol: `experiments/phase6/P6_VALIDATION_PROTOCOL_V1.md`
 
 ## DEV — P6-DEV-001
 
-- [ ] Trusted DEV dataset built and versioned
-- [ ] Data-quality gate passed
-- [ ] Frozen detector run completed
-- [ ] Frozen simulator scenarios completed
-- [ ] DEV activity gate evaluated
-- [ ] DEV report sealed before OOS access
+- [x] Trusted DEV dataset built and versioned
+- [x] Data-quality gate passed
+- [x] Frozen detector run completed
+- [x] Frozen simulator scenarios completed
+- [x] DEV activity gate evaluated
+- [x] DEV report sealed before any OOS access
+
+DEV result:
+
+```text
+rolling detector candidates  1,416
+valid TradePlans                 4
+BASE closed trades               4
+required minimum                30
+result          INSUFFICIENT_DEV_SAMPLE
+```
 
 ## OOS — P6-OOS-001
 
-- [ ] OOS remains unobserved until DEV report sealed
-- [ ] Trusted OOS dataset built and versioned
-- [ ] Data-quality gate passed
-- [ ] Frozen detector/simulator runs completed
-- [ ] OOS activity and robustness gates evaluated
-- [ ] OOS report sealed before CONFIRM decision
+- [x] OOS remained unobserved through DEV decision
+- [x] OOS access decision recorded: **DO NOT OPEN — DEV SAMPLE GATE FAILED**
+- [ ] Trusted OOS dataset built and versioned — **NOT PERMITTED / NOT REQUIRED**
+- [ ] Frozen detector/simulator OOS runs — **NOT PERMITTED / NOT REQUIRED**
+- [ ] OOS robustness gates — **NOT REACHED**
 
 ## CONFIRM — P6-CONFIRM-001
 
-- [ ] CONFIRM remains untouched until protocol permits access
-- [ ] Decision recorded whether to consume or preserve CONFIRM
-- [ ] If consumed, trusted dataset built/versioned once
-- [ ] Frozen confirmatory run completed once
-- [ ] Confirmatory report sealed
+- [x] CONFIRM remained untouched
+- [x] Decision recorded: **PRESERVE CONFIRM UNUSED**
+- [ ] Trusted CONFIRM dataset — **NOT PERMITTED / NOT REQUIRED**
+- [ ] Confirmatory run — **NOT PERMITTED / NOT REQUIRED**
 
 ## Robustness analysis
 
-- [ ] Cost scenario matrix reported
-- [ ] Sensitivity diagnostics run only if DEV sample gate permits
-- [ ] Rolling stability reported if sample size permits
-- [ ] Monte Carlo run only if sample size permits
-- [ ] Regime/session diagnostics run only if predefined and sample permits
-- [ ] Independent leakage/overfit review completed
-- [ ] Negative/zero-activity results preserved
+- [x] Cost scenario matrix reported descriptively
+- [x] Sensitivity diagnostics correctly skipped because DEV sample gate failed
+- [x] Rolling stability correctly skipped because sample size is insufficient
+- [x] Monte Carlo correctly skipped because sample size is insufficient
+- [x] Regime/session inference correctly skipped because sample size is insufficient
+- [x] Independent leakage/overfit/gate review completed
+- [x] Negative/low-activity results preserved
 
 ## Final decision
 
-- [ ] Final disposition written: `REJECT`, `REVISE_AS_NEW_VERSION`, `INSUFFICIENT_EVIDENCE`, or `PROMOTE_TO_PAPER_CANDIDATE`
-- [ ] Project Bible / STATUS updated
-- [ ] Paper trading remains disabled unless explicitly promoted
-- [ ] Live trading remains disabled
+- [x] Final disposition written: `INSUFFICIENT_EVIDENCE`
+- [x] OOS remains unopened
+- [x] CONFIRM remains untouched
+- [x] Paper trading remains disabled
+- [x] Shadow trading remains disabled
+- [x] Live trading remains disabled
+- [x] Phase-6 completion report written
+- [x] Project status/governance synchronization required before merge
+
+## Exit
+
+Phase 6 is complete for v0.1 when the governance synchronization and final CI/PR review pass.
+
+The next legitimate project track is a **new evidence-backed strategy candidate/version**, not Phase 7 paper trading.
