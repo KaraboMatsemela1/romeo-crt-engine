@@ -1,30 +1,32 @@
 id: P6B-001
 sequence: 1
-status: READY
-executor: HERMES_LOCAL
+status: BLOCKED_CI_HARNESS
+executor: GITHUB_ACTIONS_PENDING
 branch: agent/phase-6b-candidate-revision
 depends_on: []
-objective: Execute and validate the frozen EUR_USD 2019 OANDA practice MID/M1 shard locally.
-allowed_commands:
-  - git fetch origin
-  - git checkout agent/phase-6b-candidate-revision
-  - git pull --ff-only
-  - python scripts/collect_oanda_history_shard.py --instrument EUR_USD --year 2019
+objective: Execute and validate the frozen EUR_USD 2019 OANDA practice MID/M1 shard using repository secrets in an ephemeral GitHub Actions runner.
+qualification_preconditions:
+  - configured_account_authorized=true
+  - account_summary_available=true
+  - source_family_matches=4/4
+  - history_smoke=HISTORICAL_M1_ACCESS_CONFIRMED
+  - credentials_redacted=true
+blocked_reason: GitHub connector safety layer currently prevents creating or modifying the full-year historical collection workflow from this control plane.
 required_environment:
   - OANDA_ENV=practice
-  - OANDA_ACCOUNT_ID=LOCAL_SECRET
-  - OANDA_API_TOKEN=LOCAL_SECRET
+  - OANDA_ACCOUNT_ID=GITHUB_ACTIONS_SECRET
+  - OANDA_API_TOKEN=GITHUB_ACTIONS_SECRET
 pass_conditions:
   - manifest_self_check=PASS
   - refetch=EXACT_PROVIDER_VALUE_MATCH
   - detector_execution_authorized=false
   - pnl_outcome_access_authorized=false
-local_artifacts:
-  - artifacts/phase6b/oanda_raw/EUR_USD_2019_MID_M1.jsonl.gz
-  - artifacts/phase6b/oanda_raw/EUR_USD_2019_MID_M1.manifest.json
+ephemeral_artifacts:
+  - EUR_USD_2019_MID_M1.jsonl.gz
+  - EUR_USD_2019_MID_M1.manifest.json
 forbidden_actions:
   - expose or persist OANDA credentials
-  - upload raw OANDA M1 data
+  - commit or upload raw OANDA M1 data
   - run detector
   - inspect TradePlan counts or reason distributions
   - run backtester or calculate PnL
