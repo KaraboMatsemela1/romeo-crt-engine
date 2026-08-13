@@ -1,7 +1,7 @@
 name: Phase 6 DEV Validation
 
-# P6-DEV-001 is preregistered. Detector/P&L access remains disabled until the
-# data-only exclusion ledger and canonical row counts are frozen in git.
+# P6-DEV-001 is preregistered. Detector/P&L access remains disabled until a fresh
+# provider retrieval reproduces the sealed DEV data identity exactly.
 on:
   workflow_dispatch:
   pull_request:
@@ -11,6 +11,7 @@ on:
       - "src/romeo_crt_engine/market_data/**"
       - "src/romeo_crt_engine/backtest/**"
       - "experiments/phase6/P6_DATA_QUALITY_AMENDMENT_*.md"
+      - "experiments/phase6/P6_DEV_DATA_FREEZE_001.*"
       - "requirements.lock"
 
 env:
@@ -33,24 +34,25 @@ jobs:
           pip install -r requirements.lock
           pip install --no-deps --no-build-isolation -e .
 
-      - name: Build preregistered P6-DEV-001 trusted dataset
+      - name: Reconstruct sealed P6-DEV-001 trusted dataset
         run: |
           python scripts/ingest_binance_spot.py \
             --symbol BTCUSDT \
             --start-utc-day 2019-01-01 \
             --end-utc-day 2022-12-31 \
+            --metadata-observed-at 2026-08-13T08:16:25.815237+00:00 \
             --verification-policy checksum-all-rest-monthly \
             --download-workers 8 \
             --data-root /tmp/romeo-phase6-dev \
             > /tmp/p6-dev-ingest.txt
           cat /tmp/p6-dev-ingest.txt
 
-      - name: Verify and freeze DEV data-only evidence
+      - name: Verify sealed DEV data identity
         run: |
           dataset_dir=$(find /tmp/romeo-phase6-dev/normalized -mindepth 1 -maxdepth 1 -type d -print -quit)
           test -n "$dataset_dir"
           echo "$dataset_dir" > /tmp/p6-dev-dataset-dir.txt
-          python - "$dataset_dir/manifest.json" /tmp/p6-dev-ingest.txt <<'PY'
+          python - "$dataset_dir/manifest.json" /tmp/p6-dev-ingest.txt experiments/phase6/P6_DEV_DATA_FREEZE_001.json <<'PY'
           import hashlib
           import json
           import sys
@@ -59,6 +61,7 @@ jobs:
 
           manifest_path = Path(sys.argv[1])
           ingest_lines = Path(sys.argv[2]).read_text().splitlines()
+          freeze = json.loads(Path(sys.argv[3]).read_text())
           manifest_bytes = manifest_path.read_bytes()
           manifest = json.loads(manifest_bytes)
           values = {}
@@ -68,32 +71,45 @@ jobs:
                   values[key] = value
 
           exclusions = json.loads(values['archive_exclusions_json'])
-          excluded_dates = [record['archive_date'] for record in exclusions['records']]
+          excluded_records = [
+              {
+                  'archive_date': record['archive_date'],
+                  'source_sha256': record['source_sha256'],
+                  'error_code': record['error_code'],
+              }
+              for record in exclusions['records']
+          ]
           methods = Counter(item['verification_method'] for item in manifest['provider_crosschecks'])
+          manifest_sha = hashlib.sha256(manifest_bytes).hexdigest()
 
           assert manifest['quality_status'] == 'TRUSTED'
           assert manifest['provider'] == 'BINANCE_PUBLIC_DATA'
           assert manifest['venue'] == 'BINANCE_SPOT'
           assert manifest['symbol'] == 'BTCUSDT'
-          assert len(manifest['raw_artifacts']) == 1461
-          assert len(manifest['provider_crosschecks']) == 1461
-          assert int(values['excluded_archive_count']) == 20
-          assert len(excluded_dates) == 20
-          assert methods['REST_KLINE_EXACT_MATCH_V1'] == 48
-          assert methods['PROVIDER_SHA256_CHECKSUM_V1'] == 1413
+          assert manifest['dataset_version'] == freeze['dataset_version']
+          assert manifest_sha == freeze['manifest_sha256']
+          assert manifest['normalized_sha256'] == freeze['normalized_sha256']
+          assert manifest['market_data_code_sha256'] == freeze['market_data_code_sha256']
+          assert manifest['dependency_lock_sha256'] == freeze['dependency_lock_sha256']
+          assert manifest['instrument_metadata_version'] == freeze['instrument_metadata_version']
+          assert manifest['instrument_metadata_observed_at'] == freeze['instrument_metadata_observed_at']
+          assert values['metadata_observed_at'] == freeze['instrument_metadata_observed_at']
+          assert len(manifest['raw_artifacts']) == freeze['raw_archive_count']
+          assert len(manifest['provider_crosschecks']) == freeze['raw_archive_count']
+          assert int(values['excluded_archive_count']) == len(freeze['excluded_archives'])
+          assert excluded_records == freeze['excluded_archives']
+          assert values['exclusion_ledger_sha256'] == freeze['exclusion_ledger_sha256']
+          assert dict(sorted(methods.items())) == freeze['verification_methods']
+          assert manifest['m1_rows'] == freeze['m1_rows']
+          assert manifest['h1_rows'] == freeze['h1_rows']
+          assert manifest['d1_rows'] == freeze['d1_rows']
 
           summary = {
-              'protocol_id': 'P6-VALIDATION-PROTOCOL-v1',
-              'data_quality_amendments': [
-                  'P6-DATA-QUALITY-AMENDMENT-001',
-                  'P6-DATA-QUALITY-AMENDMENT-002',
-              ],
-              'window_id': 'P6-DEV-001',
-              'window_start_utc_day': '2019-01-01',
-              'window_end_utc_day': '2022-12-31',
+              'protocol_id': freeze['protocol_id'],
+              'window_id': freeze['window_id'],
               'outcome_access_authorized': False,
               'dataset_version': manifest['dataset_version'],
-              'manifest_sha256': hashlib.sha256(manifest_bytes).hexdigest(),
+              'manifest_sha256': manifest_sha,
               'normalized_sha256': manifest['normalized_sha256'],
               'market_data_code_sha256': manifest['market_data_code_sha256'],
               'dependency_lock_sha256': manifest['dependency_lock_sha256'],
@@ -101,16 +117,16 @@ jobs:
               'instrument_metadata_observed_at': manifest['instrument_metadata_observed_at'],
               'raw_archive_count': len(manifest['raw_artifacts']),
               'verification_methods': dict(sorted(methods.items())),
-              'excluded_archive_count': len(excluded_dates),
-              'excluded_archive_dates': excluded_dates,
+              'excluded_archive_count': len(excluded_records),
               'exclusion_ledger_sha256': values['exclusion_ledger_sha256'],
               'm1_rows': manifest['m1_rows'],
               'h1_rows': manifest['h1_rows'],
               'd1_rows': manifest['d1_rows'],
+              'sealed_identity_reproduced': True,
               'paper_trading_authorized': False,
               'live_trading_authorized': False,
           }
-          print('PHASE6_DEV_DATA_SUMMARY=' + json.dumps(summary, sort_keys=True, separators=(',', ':')))
+          print('PHASE6_DEV_DATA_REPRODUCTION=' + json.dumps(summary, sort_keys=True, separators=(',', ':')))
           PY
 
       - name: Run frozen detector and all preregistered cost scenarios
