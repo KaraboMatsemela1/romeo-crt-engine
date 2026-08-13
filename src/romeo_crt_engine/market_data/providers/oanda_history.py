@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from hashlib import sha256
+from time import sleep
 from typing import cast
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -13,6 +15,7 @@ from romeo_crt_engine.market_data.providers.oanda_v20 import (
     parse_m1_candles,
     request_fingerprint,
 )
+from romeo_crt_engine.market_data.quality import DataQualityCode, DataQualityError
 
 DEFAULT_PAGE_MINUTES = 4500
 MAX_OANDA_CANDLES_PER_RESPONSE = 5000
@@ -166,6 +169,35 @@ def _request_parameters(
     }
 
 
+def _parse_history_page_candles(
+    payload: bytes,
+    *,
+    instrument: str,
+    price_component: str,
+) -> tuple[OandaPriceCandle, ...]:
+    """Allow only a provider-confirmed empty candle array as a valid empty page."""
+
+    try:
+        return parse_m1_candles(
+            payload,
+            instrument=instrument,
+            price_component=price_component,
+            require_complete=True,
+        )
+    except DataQualityError as error:
+        if error.code is not DataQualityCode.EMPTY:
+            raise
+        document = json.loads(payload)
+        if (
+            isinstance(document, dict)
+            and document.get("instrument") == instrument
+            and document.get("granularity") == "M1"
+            and document.get("candles") == []
+        ):
+            return ()
+        raise
+
+
 def fetch_m1_history_page(
     *,
     base_url: str,
@@ -203,11 +235,10 @@ def fetch_m1_history_page(
         retrieved_at=retrieved_at,
         request_sha256=request_fingerprint(redacted_path, parameters),
         raw_response_sha256=sha256(payload).hexdigest(),
-        candles=parse_m1_candles(
+        candles=_parse_history_page_candles(
             payload,
             instrument=instrument,
             price_component=price_component,
-            require_complete=True,
         ),
     )
 
@@ -223,20 +254,27 @@ def retrieve_m1_history(
     price_component: str = "M",
     page_minutes: int = DEFAULT_PAGE_MINUTES,
     timeout_seconds: float = 30.0,
+    request_delay_seconds: float = 0.0,
 ) -> OandaHistoryRetrieval:
+    if request_delay_seconds < 0:
+        raise ValueError("request_delay_seconds must be >= 0")
     windows = build_m1_request_windows(start, end, page_minutes=page_minutes)
-    pages = tuple(
-        fetch_m1_history_page(
-            base_url=base_url,
-            account_id=account_id,
-            token=token,
-            instrument=instrument,
-            window=window,
-            price_component=price_component,
-            timeout_seconds=timeout_seconds,
+    pages_list: list[OandaHistoryPage] = []
+    for index, window in enumerate(windows):
+        pages_list.append(
+            fetch_m1_history_page(
+                base_url=base_url,
+                account_id=account_id,
+                token=token,
+                instrument=instrument,
+                window=window,
+                price_component=price_component,
+                timeout_seconds=timeout_seconds,
+            )
         )
-        for window in windows
-    )
+        if request_delay_seconds and index < len(windows) - 1:
+            sleep(request_delay_seconds)
+    pages = tuple(pages_list)
     candles = merge_m1_pages(pages, requested_start=start, requested_end=end)
     digest = sha256()
     digest.update(instrument.encode())
