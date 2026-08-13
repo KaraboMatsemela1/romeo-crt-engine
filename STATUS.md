@@ -50,24 +50,12 @@ Complete collection is precommitted as four UTC calendar-year shards per frozen 
 
 ## Local collection path
 
-The repository now contains a practice-only local collector:
+The repository contains a practice-only local collector and runbook:
 
 - `scripts/collect_oanda_history_shard.py`
 - `experiments/phase6b/P6B_OANDA_LOCAL_COLLECTION_RUNBOOK_V1.md`
 
-The collector:
-
-- accepts only the four frozen symbols and the years 2019-2022;
-- reads `OANDA_ACCOUNT_ID` and `OANDA_API_TOKEN` only from the local runtime environment;
-- uses OANDA practice only;
-- retrieves MID/M1 with the frozen 4500-minute page width;
-- uses a conservative request delay for new-connection limits;
-- preserves page request/raw-response provenance;
-- enumerates every raw missing interval as `UNRECONCILED`;
-- performs the preregistered yearly independent re-fetch and requires exact provider-value equality;
-- persists no account ID, token, balance, or NAV;
-- never imports or invokes detector/backtest/order code;
-- keeps detector/TradePlan/P&L/paper/shadow/live authorization false.
+The collector is restricted to the frozen four symbols and years 2019-2022, reads credentials only from the local runtime environment, preserves page-level request/raw-response provenance, enumerates raw gaps as `UNRECONCILED`, runs the mapped preregistered independent re-fetch, and keeps detector/TradePlan/P&L/paper/shadow/live authorization false.
 
 Local raw outputs are Git-ignored at:
 
@@ -75,13 +63,13 @@ Local raw outputs are Git-ignored at:
 artifacts/phase6b/oanda_raw/
 ```
 
-The first full shard to execute is:
+The next required execution is the first full shard:
 
 ```text
 EUR_USD / 2019
 ```
 
-It remains **PENDING LOCAL EXECUTION** because the OANDA runtime credentials are available on the user's local/Hermes environment rather than this connected execution environment.
+It is pending on the local/Hermes runtime where OANDA runtime credentials are available. After its manifest/redaction structure is validated, the same frozen collector is used for the remaining 15 shards.
 
 Complete raw DEV collection, historical gap reconciliation, trusted H1/New-York-D1 dataset identities, and detector activity counts remain pending.
 
