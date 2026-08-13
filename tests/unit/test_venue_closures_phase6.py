@@ -84,10 +84,10 @@ def _h1(open_time: datetime, *, label: str) -> CanonicalBar:
         timeframe=BarTimeframe.H1,
         open_time=open_time,
         close_time=open_time + timedelta(hours=1),
-        open=Decimal("100"),
-        high=Decimal("101"),
-        low=Decimal("99"),
-        close=Decimal("100"),
+        open=Decimal(100),
+        high=Decimal(101),
+        low=Decimal(99),
+        close=Decimal(100),
         volume=Decimal(1),
         quote_volume=Decimal(100),
         trade_count=1,
@@ -171,13 +171,11 @@ def test_closure_affected_new_york_parent_days_are_excluded_not_filled() -> None
         allowed_closures=(BINANCE_BTCUSDT_2019_03_12,),
     )
 
-    local_dates = {bar.open_time.astimezone().date() for bar in d1}
     assert len(d1) == 2
     assert d1[0].source_count == 23  # DST-start day, still a complete NY wall-clock day.
     assert d1[1].source_count == 24
     assert d1[0].open_time == datetime(2019, 3, 10, 5, 0, tzinfo=UTC)
     assert d1[1].open_time == datetime(2019, 3, 13, 4, 0, tzinfo=UTC)
-    assert local_dates  # keep test explicit that real complete parents remain.
 
 
 def test_backtester_accepts_forward_gap_after_trusted_data_gate() -> None:
