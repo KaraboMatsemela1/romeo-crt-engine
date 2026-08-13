@@ -34,7 +34,7 @@ jobs:
       - name: Qualify practice account
         run: python scripts/qualify_oanda_v20.py --environment practice --output /tmp/oanda-instrument-discovery.json
 
-  xau-usd-reconciliation-evidence:
+  nas100-usd-reconciliation-evidence:
     needs: qualify-practice-account
     strategy:
       fail-fast: false
@@ -58,18 +58,18 @@ jobs:
         run: |
           pip install -r requirements.lock
           pip install --no-deps --no-build-isolation -e .
-      - name: Fetch read-only XAU_USD M1 history and build V2 evidence
-        run: python scripts/collect_oanda_history_shard.py --instrument XAU_USD --year ${{ matrix.year }} --output-dir /tmp/history
+      - name: Fetch read-only NAS100_USD M1 history and build V2 evidence
+        run: python scripts/collect_oanda_history_shard.py --instrument NAS100_USD --year ${{ matrix.year }} --output-dir /tmp/history
       - name: Validate V2 reconciliation evidence
         run: |
-          python - "/tmp/history/XAU_USD_${{ matrix.year }}_MID_M1.reconciliation-v2.json" "${{ matrix.year }}" <<'PY'
+          python - "/tmp/history/NAS100_USD_${{ matrix.year }}_MID_M1.reconciliation-v2.json" "${{ matrix.year }}" <<'PY'
           import json,sys
           from pathlib import Path
           e=json.loads(Path(sys.argv[1]).read_text())
           year=int(sys.argv[2])
           assert e['schema_version']=='P6B_OANDA_RECONCILIATION_EVIDENCE_V2'
           assert e['observation_policy_version']=='P6B_OANDA_OBSERVATION_POLICY_V2'
-          assert e['instrument']=='XAU_USD' and e['year']==year
+          assert e['instrument']=='NAS100_USD' and e['year']==year
           assert e['refetch']['status']=='EXACT_PROVIDER_VALUE_MATCH'
           assert e['reconciliation_status']=='PENDING_CLASSIFICATION'
           assert e['classification_contract']['fail_closed_state']=='UNRESOLVED_PROVIDER_GAP'
@@ -86,8 +86,8 @@ jobs:
       - name: Upload reconciliation evidence only
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: p6b-reconciliation-XAU_USD-${{ matrix.year }}
-          path: /tmp/history/XAU_USD_${{ matrix.year }}_MID_M1.reconciliation-v2.json
+          name: p6b-reconciliation-NAS100_USD-${{ matrix.year }}
+          path: /tmp/history/NAS100_USD_${{ matrix.year }}_MID_M1.reconciliation-v2.json
           if-no-files-found: error
           retention-days: 30
           compression-level: 9
