@@ -6,6 +6,7 @@ from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
 from hashlib import sha256
+from pathlib import Path
 from typing import Final
 
 from romeo_crt_engine.crt.detector import DetectorCandidate
@@ -233,11 +234,14 @@ class BacktestMetrics:
 @dataclass(frozen=True, slots=True)
 class BacktestResult:
     simulator_version: str
+    simulator_code_sha256: str
     strategy_version: str
     detector_version: str
+    detector_run_sha256: str
     dataset_version: str
     dataset_manifest_sha256: str
     symbol: str
+    quantity_step: Decimal
     config: BacktestConfig
     completed_trades: tuple[CompletedTrade, ...]
     rejections: tuple[PlanRejection, ...]
@@ -247,14 +251,29 @@ class BacktestResult:
     final_realized_equity: Decimal
     run_sha256: str
 
+    def __post_init__(self) -> None:
+        for name, digest in (
+            ("simulator_code_sha256", self.simulator_code_sha256),
+            ("detector_run_sha256", self.detector_run_sha256),
+            ("dataset_manifest_sha256", self.dataset_manifest_sha256),
+            ("run_sha256", self.run_sha256),
+        ):
+            if len(digest) != 64:
+                raise ValueError(f"{name} must be a SHA-256 digest")
+        if not self.quantity_step.is_finite() or self.quantity_step <= 0:
+            raise ValueError("quantity_step must be positive and finite")
+
     def to_summary_dict(self) -> dict[str, object]:
         return {
             "simulator_version": self.simulator_version,
+            "simulator_code_sha256": self.simulator_code_sha256,
             "strategy_version": self.strategy_version,
             "detector_version": self.detector_version,
+            "detector_run_sha256": self.detector_run_sha256,
             "dataset_version": self.dataset_version,
             "dataset_manifest_sha256": self.dataset_manifest_sha256,
             "symbol": self.symbol,
+            "quantity_step": str(self.quantity_step),
             "config_sha256": self.config.config_sha256,
             "completed_trades": len(self.completed_trades),
             "rejections": len(self.rejections),
@@ -263,6 +282,20 @@ class BacktestResult:
             "metrics": asdict(self.metrics),
             "run_sha256": self.run_sha256,
         }
+
+
+def simulator_code_sha256() -> str:
+    root = Path(__file__).resolve().parent
+    files = sorted(root.glob("*.py"))
+    if not files:
+        raise RuntimeError("backtest source files not found")
+    digest = sha256()
+    for path in files:
+        digest.update(path.name.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
 
 
 def trade_plan_decimal_prices(plan: TradePlan) -> tuple[Decimal, Decimal, Decimal]:
