@@ -48,10 +48,10 @@ jobs:
           print('OANDA_QUALIFICATION_ARTIFACT_SAFE=true')
           PY
 
-  p6b002-eurusd-2021-2022:
+  p6b002-xauusd-2019-2022:
     needs: qualify-practice-account
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 240
     permissions:
       contents: read
     env:
@@ -67,26 +67,26 @@ jobs:
         run: |
           pip install -r requirements.lock
           pip install --no-deps --no-build-isolation -e .
-      - name: Collect EUR_USD 2021 and 2022 shards
+      - name: Collect XAU_USD 2019 through 2022 shards
         run: |
           set -euo pipefail
           mkdir -p /tmp/p6b002
-          python scripts/collect_oanda_history_shard.py --instrument EUR_USD --year 2021 --output-dir /tmp/p6b002
-          python scripts/collect_oanda_history_shard.py --instrument EUR_USD --year 2022 --output-dir /tmp/p6b002
+          for year in 2019 2020 2021 2022; do
+            python scripts/collect_oanda_history_shard.py --instrument XAU_USD --year "$year" --output-dir /tmp/p6b002
+          done
       - name: Verify redacted shard results
         run: |
           python - /tmp/p6b002 <<'PY'
           import json,sys
           from pathlib import Path
           root=Path(sys.argv[1])
-          for year in (2021,2022):
-              p=root/f'EUR_USD_{year}_MID_M1.manifest.json'
-              m=json.loads(p.read_text())
+          for year in (2019,2020,2021,2022):
+              m=json.loads((root/f'XAU_USD_{year}_MID_M1.manifest.json').read_text())
               s=json.dumps(m,sort_keys=True).lower()
               assert m['schema_version']=='P6B_OANDA_HISTORY_SHARD_V1'
               assert m['environment']=='practice'
               assert m['account_scope']=='REDACTED_RUNTIME_ACCOUNT'
-              assert m['instrument']=='EUR_USD' and m['year']==year
+              assert m['instrument']=='XAU_USD' and m['year']==year
               assert m['price_component']=='MID' and m['granularity']=='M1'
               assert m['refetch']['status']=='EXACT_PROVIDER_VALUE_MATCH'
               assert m['detector_execution_authorized'] is False
@@ -98,7 +98,7 @@ jobs:
               print('[HERMES_RESULT]')
               print('task_id=P6B-002')
               print('status=PARTIAL_PASS')
-              print('instrument=EUR_USD')
+              print('instrument=XAU_USD')
               print('year='+str(year))
               print('manifest_self_check=PASS')
               print('refetch=EXACT_PROVIDER_VALUE_MATCH')
