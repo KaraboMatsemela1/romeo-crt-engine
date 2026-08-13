@@ -1,7 +1,7 @@
 # Romeo CRT Engine — Project Bible
 
 **Repository:** `KaraboMatsemela1/romeo-crt-engine`  
-**Status:** Phases 0–4 complete / `CRT-DETECTOR-v0.1` frozen for Phase-5 backtest integration  
+**Status:** Phases 0–5 complete / `CRT-BACKTEST-v0.1` frozen for Phase-6 validation  
 **Live trading:** **NOT AUTHORIZED**
 
 This document is the canonical source of truth for the project. If implementation, research notes, an AI agent, or a proposed strategy conflicts with this document, the conflict must be surfaced and resolved explicitly rather than silently encoded.
@@ -185,7 +185,7 @@ WAIT_FOR_CONTEXT
  -> EXIT
 ```
 
-The first frozen transition subset is now defined in `strategy/CRT_V0.1_SPEC.md`; broader CRT doctrine transitions remain versioned research/strategy work.
+The first frozen transition subset is defined in `strategy/CRT_V0.1_SPEC.md`; broader CRT doctrine transitions remain versioned research/strategy work.
 
 ---
 
@@ -231,7 +231,7 @@ Internal timestamps use UTC. Session definitions must retain the market timezone
 
 ## 10. Backtesting requirements
 
-Final validation should use an event-driven simulator. Vectorized research is permitted for exploration but cannot be the sole basis for production claims.
+Final validation uses an event-driven simulator. Vectorized research is permitted for exploration but cannot be the sole basis for production claims.
 
 The simulator must prevent:
 
@@ -243,7 +243,11 @@ The simulator must prevent:
 
 Execution assumptions must include at least spread, commission, slippage, tick/lot constraints and financing/latency when material.
 
-Run at minimum ideal, normal, stressed and severe-friction scenarios.
+Run at minimum ideal, normal/base, stressed and severe-friction scenarios.
+
+The first frozen simulator is `CRT-BACKTEST-v0.1`. It consumes immutable detector `TradePlan`s and does not reimplement strategy validity. Its H1 event clock manages positions that were already open through a bar before activating plans confirmed at that bar close. Same-bar stop/target ambiguity resolves stop-first conservatively; adverse stop gaps use the worse bar open; favorable target-gap price improvement is disabled; finite-data open positions remain censored unless a strategy-defined exit exists.
+
+The current short simulation assumption is `SYNTHETIC_LINEAR_SHORT_RESEARCH_V1`. Because the first observation route is Binance BTCUSDT Spot while the frozen strategy is bearish-only, this is a research abstraction and not an assertion that Binance Spot can execute the modeled naked short.
 
 ---
 
@@ -286,6 +290,8 @@ Track at least:
 15. controlled live canary only with explicit authorization
 
 Red flags include a narrow magic optimum, OOS collapse, edge disappearing under small cost changes, profits dominated by very few trades, unrealistic fills, or repeated reinterpretation after observing test results.
+
+Phase 6 must also treat insufficient trade frequency as a valid result. A frozen candidate is not weakened merely to create a larger trade count.
 
 ---
 
@@ -495,19 +501,23 @@ Implement provider abstraction, historical ingestion, immutable raw data, normal
 **Exit:** a historical window can be reproduced deterministically from a trusted dataset.
 
 ### Phase 4 — CRT detection primitives
-Implement candles, swings, ranges, liquidity, sweeps, structure, context, confirmations, invalidations, entry/SL/TP candidates, explanations and source-derived fixtures.
+Implement candles, ranges, liquidity/manipulation state, context, confirmations, invalidations, entry/SL/TP candidates, explanations and source-derived fixtures around the frozen first route.
 
-**Exit:** known Romeo examples and counterexamples can be reproduced without LLM judgement in the execution path.
+**Exit:** frozen examples and counterexamples reproduce without LLM judgement in the execution path and trusted canonical data can be consumed causally.
 
 ### Phase 5 — Backtester
-Implement event clock, account/portfolio state, orders/fills, costs, partial fills where relevant, stop/target sequencing, sizing, metrics and journal.
+Implement event clock, account/portfolio state, orders/fills, costs, stop/target sequencing, sizing, metrics, journals and deterministic run provenance around frozen detector outputs.
 
-**Exit:** identical code/data/config produce identical cost-aware results.
+**Status:** **COMPLETE — `CRT-BACKTEST-v0.1` FROZEN FOR PHASE 6.**
+
+**Exit achieved:** identical code/data/config/quantity contracts produce identical cost-aware results; lifecycle regressions cover target, stop, same-bar ambiguity, gaps, costs, activation conflicts and finite-data censoring; preregistered provider-backed integration succeeded.
+
+The first preregistered September 2025 BTCUSDT sample produced 27 rolling detector candidates and **zero valid TradePlans**. All four cost scenarios therefore had zero closed trades and unchanged realized equity. This result is preserved as `INSUFFICIENT PERFORMANCE EVIDENCE`, not treated as profit or loss, and the period/strategy were not changed after observation.
 
 ### Phase 6 — Strategy validation
-Freeze candidate, run OOS, walk-forward, parameter sensitivity, friction stress, Monte Carlo, regime/instrument/session breakdowns and independent leakage/overfit review.
+Preserve the frozen strategy/detector/simulator baseline, preregister development/OOS/final-confirmatory windows, build separately versioned trusted datasets, measure setup/trade frequency, and run OOS, walk-forward, parameter sensitivity, friction stress, Monte Carlo, regime/instrument/session breakdowns and independent leakage/overfit review when sample size supports them.
 
-**Exit:** written decision to reject, revise or promote to paper trading.
+**Exit:** written decision to `REJECT`, `REVISE_AS_NEW_VERSION`, declare `INSUFFICIENT_EVIDENCE`, or `PROMOTE_TO_PAPER_CANDIDATE`.
 
 ### Phase 7 — Paper trading
 Add live data, scheduler, independent risk service/module, paper broker, state persistence, alerts, reconciliation and comparison against simulated expectations.
@@ -594,46 +604,52 @@ Phase 1  Romeo corpus acquisition   COMPLETE
 Phase 2  Formal strategy spec       COMPLETE — FROZEN_FOR_VALIDATION
 Phase 3  Market data                COMPLETE
 Phase 4  CRT detector               COMPLETE — CRT-DETECTOR-v0.1 FROZEN
-Phase 5  Backtester                 READY TO START
-Phase 6  Validation                 NOT STARTED
+Phase 5  Backtester                 COMPLETE — CRT-BACKTEST-v0.1 FROZEN
+Phase 6  Validation                 READY TO START
 Phase 7  Paper trading              NOT STARTED
 Phase 8  Learning engine            NOT STARTED
 Phase 9  Shadow trading             NOT STARTED
 Phase 10 Controlled live            NOT AUTHORIZED
 ```
 
-The current frozen handoff is:
+The current frozen validation handoff is:
 
 ```text
-strategy  CRT-C3-D1-H1-M1-BEAR-v0.1
-detector  CRT-DETECTOR-v0.1
-dataset   ee1300f0da50e4debcbbc3b7
+strategy   CRT-C3-D1-H1-M1-BEAR-v0.1
+detector   CRT-DETECTOR-v0.1
+simulator  CRT-BACKTEST-v0.1
 ```
 
-The active-path strategy rules, project parameters and exclusions remain canonical in `strategy/CRT_V0.1_SPEC.md` and `strategy/CRT_V0.1_FREEZE_MANIFEST.json`.
+Machine-readable freezes:
+
+```text
+strategy/CRT_V0.1_FREEZE_MANIFEST.json
+strategy/CRT_V0.1_DETECTOR_FREEZE_MANIFEST.json
+strategy/CRT_V0.1_BACKTEST_FREEZE_MANIFEST.json
+```
 
 Phase 3 established provider-backed immutable/verified market data and froze dataset `ee1300f0da50e4debcbbc3b7` as a compact detector-integration fixture.
 
-Phase 4 now enforces trusted-manifest/content equality, exhaustive rolling C1/C2/C3 enumeration, future-C3 D1 leakage protection, frozen-fixture parity and deterministic candidate/rejection explanations. Its machine-readable handoff is `strategy/CRT_V0.1_DETECTOR_FREEZE_MANIFEST.json`.
+Phase 4 enforces trusted-manifest/content equality, exhaustive rolling C1/C2/C3 enumeration, future-C3 D1 leakage protection, frozen-fixture parity and deterministic candidate/rejection explanations.
 
-The compact frozen dataset contains only one complete New-York D1, so its correct real-data detector integration result is `INSUFFICIENT_D1_HISTORY` with zero candidates. This is not `NO_SIGNAL` and is not a profitability result.
+Phase 5 validates simulator semantics and reproducibility. The preregistered September 2025 provider-backed replay produced 27 rolling C1/C2/C3 candidates but zero valid TradePlans. Therefore no strategy performance conclusion is possible from that month. Negative/zero-activity evidence is preserved without loosening the frozen strategy.
 
-The largest current missing asset is now a deterministic cost-aware event-driven backtester plus a larger separately versioned trusted historical sample suitable for simulation. Profitability has not been established.
+The largest current need is now a preregistered Phase-6 validation protocol plus larger separately versioned trusted historical windows. Profitability has not been established.
 
 ---
 
 ## 26. Immediate next actions
 
-1. Build Phase-5 event-clock, account, order, fill, position and journal contracts around immutable `TradePlan` outputs from `CRT-DETECTOR-v0.1`.
-2. Preserve the frozen strategy/detector while implementing simulation; do not reimplement strategy validity inside the backtester.
-3. Define deterministic same-bar stop/target ordering, gap handling, partial-fill policy and finite-dataset-end treatment.
-4. Define conservative spread, commission and slippage assumptions for BTCUSDT Spot, explicitly acknowledging the first archive route has no historical bid/ask spread.
-5. Build a larger separately versioned trusted BTCUSDT historical dataset before interpreting performance statistics.
-6. Add no-lookahead regression tests for entry availability, stop/target observation timing, HTF closure and dataset boundaries.
-7. Record strategy, detector, dataset, simulator and cost-model versions in every simulated trade/result.
-8. Run simulator-integrity fixtures before calculating strategy edge metrics.
-9. Only after simulator/data integrity gates pass begin Phase-6 OOS/walk-forward/sensitivity/friction/Monte-Carlo validation.
-10. Do not promote to paper/shadow/live without their explicit gates.
+1. Write and freeze the Phase-6 validation protocol before observing the next historical results.
+2. Mechanically select development, OOS and untouched final-confirmatory windows before retrieval/analysis.
+3. Define minimum trade-count / insufficient-evidence criteria before seeing outcomes.
+4. Build trusted separately versioned datasets for those windows.
+5. Measure candidate and valid-TradePlan frequency with the frozen strategy/detector unchanged.
+6. Run the predeclared IDEAL/BASE/STRESSED/SEVERE cost matrix.
+7. Run parameter sensitivity only as a robustness diagnostic; any rule change becomes a new strategy version and cannot overwrite v0.1.
+8. Add walk-forward, Monte Carlo and regime/session analysis only when sample size supports meaningful inference.
+9. Produce a written Phase-6 decision: `REJECT`, `REVISE_AS_NEW_VERSION`, `INSUFFICIENT_EVIDENCE`, or `PROMOTE_TO_PAPER_CANDIDATE`.
+10. Do not promote to paper/shadow/live without their explicit gates; `LIVE_TRADING_AUTHORIZED = false` remains unchanged.
 
 ---
 
