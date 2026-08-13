@@ -1,6 +1,6 @@
 # Phase 6B — Candidate Revision Checklist
 
-**Status:** **IN PROGRESS — RUNTIME OANDA DATA QUALIFICATION REQUIRED**  
+**Status:** **IN PROGRESS — REST-v20 PRACTICE ACCOUNT REQUIRED**  
 **Active research target:** `CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH`  
 **Underlying frozen alpha:** `CRT-C3-D1-H1-M1-BEAR-v0.1`  
 **Preserved failed research path:** `CRT-C3-D1-H1-M1-BULL-v0.2-RESEARCH` -> `EVIDENCE_INSUFFICIENT`  
@@ -55,6 +55,7 @@ Canonical selection: `research/romeo/phase6b/MULTI_MARKET_CANDIDATE_SELECTION.md
 - [x] Require explicit opt-in for any live read.
 - [x] Add runtime env variable names only; no values committed.
 - [x] Add manual practice-only GitHub Actions qualification workflow.
+- [x] Add token-authorized-account preflight that prints only count and configured-account authorization boolean.
 
 Canonical provider decision: `docs/adr/ADR-006-oanda-v20-multi-market-qualification.md`.
 
@@ -188,20 +189,24 @@ Canonical artifacts:
 
 Canonical decision: `docs/adr/ADR-009-oanda-execution-evidence-boundary.md`.
 
-## K. Runtime Gate 6B-MM-1 — current hard blocker
+## K. Runtime Gate 6B-MM-1 — first credentialed attempt completed; account eligibility blocker
 
-Requires runtime-only OANDA **practice** credentials:
+Runtime-only OANDA **practice** secrets are configured and were exercised through GitHub Actions.
 
-```text
-OANDA_ACCOUNT_ID
-OANDA_API_TOKEN
-```
-
-The repo/tooling is ready to execute the qualification without persisting either credential.
-
-Outstanding runtime work:
-
-- [ ] Run actual OANDA practice account summary + instrument discovery.
+- [x] Confirm `OANDA_ACCOUNT_ID` and `OANDA_API_TOKEN` are present in Actions without printing values.
+- [x] Query the token-authorized practice account list without persisting/printing account IDs.
+- [x] Confirm the token authorizes 5 practice accounts.
+- [x] Confirm the configured account ID is one of those authorized accounts.
+- [x] Attempt account-summary qualification: HTTP 403.
+- [x] Attempt account-instrument discovery first with account summary made optional: HTTP 403.
+- [x] Confirm no instrument universe was opened or frozen.
+- [x] Confirm no detector activity counts were opened.
+- [x] Confirm no P&L/backtest outcomes were opened.
+- [x] Seal `P6B_OANDA_RUNTIME_QUALIFICATION_001 = ACCOUNT_NOT_V20_ELIGIBLE_FOR_REQUIRED_ENDPOINTS`.
+- [x] Restore the qualification workflow to manual-only after the one-shot diagnostic trigger.
+- [x] Remove the temporary qualification sentinel file.
+- [ ] Update runtime `OANDA_ACCOUNT_ID` to an API-eligible OANDA practice REST-v20 account authorized by the token.
+- [ ] Rerun actual OANDA practice instrument discovery successfully.
 - [ ] Confirm exact availability of the precommitted source-family instruments.
 - [ ] Freeze exact API symbols before detector activity access.
 - [ ] Freeze account/instrument metadata digests.
@@ -211,7 +216,9 @@ Outstanding runtime work:
 - [ ] Independently re-fetch selected sealed samples and compare provider values.
 - [ ] Freeze the exact DEV dataset identities.
 
-## L. After runtime data qualification
+Canonical runtime record: `experiments/phase6b/P6B_OANDA_RUNTIME_QUALIFICATION_001.md`.
+
+## L. After successful runtime data qualification
 
 If fewer than two source-family instruments are eligible, terminate the activity protocol as `INSUFFICIENT_ELIGIBLE_UNIVERSE` without opening detector counts.
 
@@ -234,21 +241,19 @@ Bullish successor                 EVIDENCE_INSUFFICIENT / PRESERVED
 Active successor                  BEARISH v0.1 ALPHA / MULTI-MARKET v0.2 RESEARCH
 Alpha changes                     NONE AUTHORIZED
 OANDA provider/parser             IMPLEMENTED + TESTED
-Redacted account metadata         IMPLEMENTED + TESTED
-Execution-aware instrument schema IMPLEMENTED + TESTED
-Paged history provenance          IMPLEMENTED + TESTED
+OANDA token practice preflight    VALID / 5 AUTHORIZED ACCOUNTS
+Configured account authorized     YES
+Configured account v20 endpoints  HTTP 403 / NOT ELIGIBLE FOR REQUIRED ROUTE
+Exact instrument universe         NOT OPENED / NOT FROZEN
 Provider-neutral price data v2    IMPLEMENTED + TESTED
 Session-aware aggregation engine  IMPLEMENTED + TESTED
-Actual session schedules          NOT FROZEN
 Signal price component            MID / FROZEN PRE-OUTCOME
 Multi-market detector             PARITY VERIFIED + FROZEN
 Activity protocol                 2 / 2 / 30 + P&L FIREWALL / FROZEN
-Runtime qualification workflow    READY
-Actual OANDA account discovery    NOT RUN — EXTERNAL RUNTIME DEPENDENCY
-Exact instrument universe         NOT FROZEN
 Detector activity counts          NOT OPENED
 Multi-market P&L outcomes         NOT AUTHORIZED
 v0.1 OOS / CONFIRM                UNOPENED
+Next external action              CHANGE OANDA_ACCOUNT_ID TO PRACTICE REST-v20/API-ELIGIBLE ACCOUNT
 Phase 7                           BLOCKED
 Live trading                      NOT AUTHORIZED
 ```
