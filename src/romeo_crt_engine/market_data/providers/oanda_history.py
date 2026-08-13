@@ -8,8 +8,8 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from romeo_crt_engine.market_data.providers.oanda_v20 import (
-    OandaPriceCandle,
     SUPPORTED_PRICE_COMPONENTS,
+    OandaPriceCandle,
     parse_m1_candles,
     request_fingerprint,
 )
