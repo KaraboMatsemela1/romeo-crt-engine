@@ -206,7 +206,7 @@ def _build_reconciliation_evidence(manifest: dict[str, object]) -> dict[str, obj
 def _parse_utc(value: object) -> datetime:
     if not isinstance(value, str):
         raise TypeError("timestamp must be a string")
-    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    parsed = datetime.fromisoformat(value)
     if parsed.utcoffset() is None:
         raise ValueError("timestamp must be timezone-aware")
     return parsed.astimezone(UTC)
