@@ -70,6 +70,46 @@ def _page_record(page: object) -> dict[str, object]:
     }
 
 
+def _assert_manifest_safe(manifest: dict[str, object]) -> None:
+    if manifest.get("schema_version") != "P6B_OANDA_HISTORY_SHARD_V1":
+        raise ValueError("unexpected shard manifest schema")
+    if manifest.get("account_scope") != "REDACTED_RUNTIME_ACCOUNT":
+        raise ValueError("runtime account scope must remain redacted")
+    if manifest.get("gap_reconciliation_status") != "UNRECONCILED":
+        raise ValueError("raw shard must remain UNRECONCILED")
+
+    refetch = manifest.get("refetch")
+    if not isinstance(refetch, dict) or refetch.get("status") != "EXACT_PROVIDER_VALUE_MATCH":
+        raise ValueError("independent re-fetch must exactly match provider values")
+
+    false_flags = (
+        "trusted_dataset_authorized",
+        "detector_execution_authorized",
+        "tradeplan_count_access_authorized",
+        "backtester_authorized",
+        "pnl_outcome_access_authorized",
+        "paper_trading_authorized",
+        "shadow_trading_authorized",
+        "live_trading_authorized",
+    )
+    for flag in false_flags:
+        if manifest.get(flag) is not False:
+            raise ValueError(f"{flag} must remain false")
+
+    serialized = json.dumps(manifest, sort_keys=True)
+    forbidden = (
+        "Authorization",
+        "Bearer ",
+        "OANDA_API_TOKEN",
+        "OANDA_ACCOUNT_ID",
+        '"balance"',
+        '"NAV"',
+    )
+    for marker in forbidden:
+        if marker in serialized:
+            raise ValueError(f"forbidden persisted marker found: {marker}")
+
+
 def main() -> int:
     args = _parser().parse_args()
     instrument = str(args.instrument)
@@ -131,7 +171,7 @@ def main() -> int:
         end=refetch_end,
     )
 
-    manifest = {
+    manifest: dict[str, object] = {
         "schema_version": "P6B_OANDA_HISTORY_SHARD_V1",
         "execution_id": "P6B-OANDA-HISTORY-SHARD-EXECUTION-V1",
         "parent_protocol": "P6B-OANDA-HISTORY-QUALIFICATION-V1",
@@ -177,6 +217,7 @@ def main() -> int:
         "shadow_trading_authorized": False,
         "live_trading_authorized": False,
     }
+    _assert_manifest_safe(manifest)
     manifest_path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n", encoding="utf-8")
 
     print(f"history_shard={instrument}/{year}")
@@ -184,6 +225,7 @@ def main() -> int:
     print(f"pages={len(retrieval.pages)}")
     print(f"missing_intervals={len(missing)}")
     print(f"missing_minutes={manifest['missing_minutes']}")
+    print("manifest_self_check=PASS")
     print("refetch=EXACT_PROVIDER_VALUE_MATCH")
     print(f"values={values_path}")
     print(f"manifest={manifest_path}")
