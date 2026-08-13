@@ -30,7 +30,7 @@ jobs:
           test -n "$OANDA_ACCOUNT_ID"
           test -n "$OANDA_API_TOKEN"
 
-      - name: Discover account-specific OANDA instrument universe
+      - name: Discover redacted OANDA account and instrument execution metadata
         run: |
           python scripts/qualify_oanda_v20.py \
             --environment practice \
@@ -45,9 +45,14 @@ jobs:
 
           manifest = json.loads(Path(sys.argv[1]).read_text())
           serialized = json.dumps(manifest, sort_keys=True)
+          account = manifest['account_profile']
 
+          assert manifest['schema_version'] == 'P6B_OANDA_INSTRUMENT_DISCOVERY_V2'
           assert manifest['environment'] == 'practice'
           assert manifest['account_scope'] == 'REDACTED_RUNTIME_ACCOUNT'
+          assert isinstance(account, dict)
+          assert account['home_currency']
+          assert account['raw_account_summary_sha256']
           assert manifest['status'] == 'DISCOVERED_NOT_FROZEN'
           assert manifest['strategy_outcome_access_authorized'] is False
           assert manifest['paper_trading_authorized'] is False
@@ -55,8 +60,10 @@ jobs:
           assert 'account_id' not in serialized.lower()
           assert 'api_token' not in serialized.lower()
           assert 'authorization' not in serialized.lower()
+          assert 'balance' not in serialized.lower()
+          assert 'nav' not in serialized.lower()
           print('OANDA_QUALIFICATION_ARTIFACT_SAFE=true')
           PY
 
-      - name: Print redacted source-family discovery record
+      - name: Print redacted qualification record
         run: cat /tmp/oanda-instrument-discovery.json
