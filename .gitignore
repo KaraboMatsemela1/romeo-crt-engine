@@ -23,6 +23,7 @@ venv/
 !/data/normalized/.gitkeep
 !/data/features/.gitkeep
 experiments/**/artifacts/
+artifacts/phase6b/oanda_raw/
 mlruns/
 
 # Editors / OS
