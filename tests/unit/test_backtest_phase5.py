@@ -320,9 +320,8 @@ def test_simultaneous_plans_are_all_rejected_when_capacity_cannot_fit_group() ->
     assert result.completed_trades == ()
     assert result.open_at_end == ()
     assert len(result.rejections) == 2
-    assert {
-        rejection.reason for rejection in result.rejections
-    } == {RejectionReason.SIMULTANEOUS_PLAN_CONFLICT}
+    reasons = {rejection.reason for rejection in result.rejections}
+    assert reasons == {RejectionReason.SIMULTANEOUS_PLAN_CONFLICT}
 
 
 def test_backtest_run_hash_is_deterministic_for_identical_inputs() -> None:
