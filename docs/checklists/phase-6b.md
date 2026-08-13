@@ -187,13 +187,22 @@ Before detector execution:
 
 ## G. Detector/backtester compatibility
 
-- [ ] Demonstrate frozen v0.1 strategy logic can consume provider-neutral canonical D1/H1 bars without alpha changes.
+- [x] Demonstrate frozen v0.1 strategy logic can consume provider-neutral canonical D1/H1 bars without alpha changes.
 - [x] Preserve all legacy v0.1 regression tests unchanged and green while adding Phase-6B data code.
-- [ ] Create separately versioned multi-market detector compatibility identity.
-- [ ] Confirm immutable `TradePlan` output remains the detector/backtester boundary.
-- [ ] Confirm no provider-specific logic enters strategy validity predicates.
-- [ ] Confirm execution/cost changes are versioned separately from alpha validity.
-- [ ] Freeze the multi-market detector/simulator compatibility chain before outcomes.
+- [x] Create separately versioned `CRT-DETECTOR-v0.2-MULTI-MARKET` compatibility identity.
+- [x] Record both candidate version `v0.2-MULTI-MARKET` and underlying alpha version `v0.1` on detector runs/candidates.
+- [x] Require every emitted `TradePlan` to retain `strategy_version = CRT-C3-D1-H1-M1-BEAR-v0.1`.
+- [x] Confirm exact parity across all frozen v0.1 fixtures for state, reason, rule trace, evidence IDs, causal-input digest and TradePlan.
+- [x] Fail closed when v2 normalized content does not match the trusted dataset identity.
+- [x] Fail closed on non-MID signal data for the active candidate.
+- [x] Confirm no provider activity metadata enters strategy validity predicates.
+- [x] Freeze detector compatibility baseline in `strategy/CRT_V0.2_MULTI_MARKET_DETECTOR_COMPATIBILITY_MANIFEST.json` before provider-backed outcomes.
+- [x] Confirm CI and the preserved BTCUSDT Backtest Smoke remain green after detector compatibility work.
+- [ ] Freeze provider-backed execution/cost semantics before adapting the simulator to OANDA data.
+- [ ] Resolve quantity-step / instrument sizing semantics before provider-backed simulation.
+- [ ] Create separately versioned multi-market simulator compatibility identity only after execution/friction contracts are frozen.
+
+Canonical detector compatibility decision: `docs/adr/ADR-008-multi-market-detector-compatibility.md`.
 
 ## H. Promotion boundary
 
@@ -214,12 +223,16 @@ OANDA provider adapter            IMPLEMENTED
 Provider-neutral price data v2    IMPLEMENTED + TESTED
 Session-aware H1/D1 aggregation   IMPLEMENTED + TESTED
 Signal price component            MID / FROZEN PRE-OUTCOME
+Multi-market detector             IMPLEMENTED + PARITY VERIFIED
+Detector compatibility baseline   FROZEN PRE-OUTCOME
 Runtime qualification command     READY
 Manual OANDA practice workflow    READY
 CI / MyPy / pytest                GREEN
 Preserved Backtest Smoke          GREEN
 Actual OANDA instrument discovery NOT RUN — runtime credentials required
 Exact instrument universe         NOT FROZEN
+Execution/friction contract       NOT FROZEN
+Multi-market simulator            BLOCKED ON EXECUTION CONTRACT
 Multi-market strategy outcomes    NOT AUTHORIZED
 v0.1 OOS / CONFIRM                UNOPENED
 Phase 7                           BLOCKED
