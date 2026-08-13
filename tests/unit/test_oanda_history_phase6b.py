@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from itertools import pairwise
 
 import pytest
 
@@ -61,7 +62,7 @@ def test_request_windows_respect_5000_candle_limit_and_cover_range_exactly() -> 
     ]
     assert windows[0].start == start
     assert windows[-1].end == end
-    for first, second in zip(windows, windows[1:], strict=True):
+    for first, second in pairwise(windows):
         assert first.end == second.start
 
 
