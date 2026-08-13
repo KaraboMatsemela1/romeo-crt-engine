@@ -7,11 +7,7 @@ from decimal import Decimal
 from hashlib import sha256
 from zoneinfo import ZoneInfo
 
-from romeo_crt_engine.market_data.closures import (
-    VenueClosure,
-    exact_gap_is_approved,
-    window_overlaps_closure,
-)
+from romeo_crt_engine.market_data.closures import ApprovedGap, gap_is_approved, window_overlaps_gap
 from romeo_crt_engine.market_data.models import BarTimeframe, CanonicalBar, MinuteBar
 from romeo_crt_engine.market_data.quality import (
     DataQualityCode,
@@ -45,7 +41,7 @@ def _sum_decimal(values: Sequence[Decimal]) -> Decimal:
 def build_h1(
     minute_bars: Sequence[MinuteBar],
     *,
-    allowed_closures: tuple[VenueClosure, ...] = (),
+    allowed_closures: tuple[ApprovedGap, ...] = (),
 ) -> tuple[CanonicalBar, ...]:
     """Aggregate trusted UTC M1 observations into actual complete elapsed-hour H1 bars."""
     validate_minute_series(minute_bars, allowed_closures=allowed_closures)
@@ -104,7 +100,7 @@ def _ny_midnight(day: date) -> datetime:
 def _validate_h1_series(
     bars: Sequence[CanonicalBar],
     *,
-    allowed_closures: tuple[VenueClosure, ...] = (),
+    allowed_closures: tuple[ApprovedGap, ...] = (),
 ) -> None:
     if not bars:
         raise DataQualityError(DataQualityCode.EMPTY, "H1 series must not be empty")
@@ -120,7 +116,7 @@ def _validate_h1_series(
         if (
             prior_close is not None
             and bar.open_time != prior_close
-            and not exact_gap_is_approved(prior_close, bar.open_time, allowed_closures)
+            and not gap_is_approved(prior_close, bar.open_time, allowed_closures)
         ):
             raise DataQualityError(DataQualityCode.GAP, "H1 series has an unapproved gap")
         prior_close = bar.close_time
@@ -129,9 +125,9 @@ def _validate_h1_series(
 def build_complete_new_york_d1(
     h1_bars: Sequence[CanonicalBar],
     *,
-    allowed_closures: tuple[VenueClosure, ...] = (),
+    allowed_closures: tuple[ApprovedGap, ...] = (),
 ) -> tuple[CanonicalBar, ...]:
-    """Build complete NY wall-clock parents; closure-affected parent days are excluded."""
+    """Build complete NY wall-clock parents; trusted-gap-affected parent days are excluded."""
     _validate_h1_series(h1_bars, allowed_closures=allowed_closures)
 
     by_day: dict[date, list[CanonicalBar]] = defaultdict(list)
@@ -158,7 +154,7 @@ def build_complete_new_york_d1(
         if not is_complete:
             utc_open = local_open.astimezone(UTC)
             utc_close = local_close.astimezone(UTC)
-            if window_overlaps_closure(utc_open, utc_close, allowed_closures):
+            if window_overlaps_gap(utc_open, utc_close, allowed_closures):
                 continue
             if index in (0, len(ordered_days) - 1):
                 continue
