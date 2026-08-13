@@ -16,7 +16,7 @@ This document does **not** create the final executable 2019-2022 calendar. The f
 
 OANDA published **2021-06-28** that trading hours changed that day for, among other instruments, **US Nas 100** and **US SPX 500**.
 
-OANDA's table states:
+OANDA's dated table states:
 
 ```text
 before: Sunday-Friday 17:00-16:00
@@ -34,13 +34,15 @@ A single present-day regular-session rule cannot be applied to the complete 2019
 
 At minimum, index session reconciliation must treat **2021-06-28** as a dated policy boundary and confirm exact timestamp semantics against observed provider gaps.
 
-## Evidence E2 — current OANDA schedules are current-reference only
+## Evidence E2 — current OANDA schedules are reference constraints only
 
-OANDA's current hours-of-operation page presently lists:
+OANDA's current hours-of-operation material lists:
 
 ```text
-US Nas 100  — Chicago — Sunday-Friday 17:01-15:59
-US SPX 500  — Chicago — Sunday-Friday 17:01-15:59
+All FX      New York  Sunday-Friday 17:05-16:59
+XAU/USD     New York  Sunday-Friday 18:05-16:59
+US Nas 100  Chicago   Sunday-Friday 17:01-15:59
+US SPX 500  Chicago   Sunday-Friday 17:01-15:59
 ```
 
 First-party source:
@@ -48,11 +50,24 @@ First-party source:
 - OANDA Global Markets, `Trading Times | Forex Market Hours`
 - https://www.oanda.com/bvi-en/cfds/hours-of-operation/
 
-This differs by one minute from the 2021 change notice's stated post-change `17:00-15:59`. Therefore even post-2021 current rules must not be silently assumed for all historical data without raw-gap confirmation or another dated OANDA change notice.
+The current index reference differs by one minute from the 2021 dated post-change notice's `17:00-15:59`. Therefore another regime change may exist after 2021-06-28. The exact boundary must be identified from dated OANDA evidence plus observed provider gaps; it may not be guessed.
 
-## Evidence E3 — FX weekly closure / special-day caveat
+## Evidence E3 — hours vary for DST and public holidays
 
-OANDA's own FX educational material states that FX is ordinarily available on weekdays but not on weekends and identifies New Year's Day as a non-trading day; it also notes daylight-saving effects.
+OANDA help material states that hours of operation are subject to change during daylight saving time and certain public holidays.
+
+First-party source:
+
+- OANDA Help, `Hours of operation in OANDA Global Markets`
+- https://help.oanda.com/bvi/en/faqs/hours-of-operation.htm
+
+### Consequence
+
+Historical timestamp reconciliation must use the named source timezone and historical timezone rules. A familiar exchange holiday is not, by itself, enough to classify a missing OANDA interval.
+
+## Evidence E4 — FX broad availability constraint
+
+OANDA's FX educational material describes ordinary weekday availability, weekend closure, New Year's Day non-trading treatment, and daylight-saving effects.
 
 First-party source:
 
@@ -61,16 +76,47 @@ First-party source:
 
 This is useful as a broad availability constraint for `EUR_USD`, but it is not sufficiently precise to classify every minute of the 2019-2022 provider stream.
 
-## Evidence E4 — dated exceptional closures exist
+## Evidence E5 — dated exceptional closures exist
 
-OANDA published dated trading notices for exceptional closures. For example, on **2022-06-10**, OANDA announced a temporary trading suspension for AU200 related to an Australian holiday, and on **2022-05-31** OANDA announced market closures affecting some financial instruments for UK public holidays.
+OANDA publishes dated notices for exceptional closures. Examples in the archive include:
+
+- `2022-05-31`: notice that UK public holidays on June 2 and June 3 would close some financial-instrument markets;
+- `2022-06-10`: notice of an Australian-holiday-related temporary closure for AU200.
 
 First-party sources:
 
-- https://www.oanda.com/bvi-ft/lab-education/info/20220610-4/
 - https://www.oanda.com/bvi-ft/lab-education/info/20220531-1/
+- https://www.oanda.com/bvi-ft/lab-education/info/20220610-4/
 
-These notices establish that historical exceptional closures must be treated as dated evidence, not inferred from today's recurring schedule.
+These examples are not automatically applicable to the four frozen instruments. They establish the evidence model: exceptional historical closures are dated provider events and must be reconciled instrument-by-instrument rather than generated from today's recurring schedule.
+
+## Evidence E6 — historical API contract supports the raw observation route
+
+OANDA v20's official instrument-candles endpoint is account scoped:
+
+```text
+GET /v3/accounts/{accountID}/instruments/{instrument}/candles
+```
+
+The official contract supports `M1`, `price=M`, `from`/`to`, unsmoothed candles and a maximum of 5,000 candles per response. OANDA's API comparison describes v20 instrument history as complete and supports M1.
+
+First-party sources:
+
+- https://developer.oanda.com/rest-live-v20/instrument-ep/
+- https://developer.oanda.com/rest-live-v20/api-comparison/
+
+This supports the project's frozen 4,500-minute paging contract without relying on provider-native Daily alignment.
+
+## Evidence E7 — connection-rate constraint
+
+OANDA's v20 best-practices material recommends no more than two new connections per second and up to 100 requests per second on an established persistent connection. The development guide describes the two-new-connections-per-second limit explicitly.
+
+First-party sources:
+
+- https://developer.oanda.com/rest-live-v20/best-practices/
+- https://developer.oanda.com/rest-live-v20/development-guide/
+
+Any complete historical collection job must therefore be rate-aware. Pagination may not be accelerated by violating the provider's documented connection limits.
 
 ## Historical-calendar rule
 
@@ -98,4 +144,4 @@ LIVE_TRADING_AUTHORIZED                 = false
 
 ## Next evidence work
 
-After the sealed raw M1 pull, use the actual missing-interval inventory to search OANDA's dated archive efficiently. This prevents us from manufacturing a broad holiday calendar that may not match the provider's historical instrument availability.
+After the sealed raw M1 pull, use the actual missing-interval inventory to search OANDA's dated archive efficiently. This prevents manufacturing a broad holiday calendar that may not match the provider's historical instrument availability.
