@@ -11,7 +11,7 @@ Updated: 2026-08-13
 | 4 — CRT detector | **COMPLETE FOR v0.1** | Frozen deterministic detector |
 | 5 — Backtester | **COMPLETE FOR v0.1** | Deterministic cost-aware simulator |
 | 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Terminal preregistered DEV decision |
-| 6B — Candidate revision | **IN PROGRESS — OANDA UNIVERSE FROZEN / HISTORICAL DATA QUALIFICATION NEXT** | Trusted multi-market DEV datasets + detector-only activity decision |
+| 6B — Candidate revision | **IN PROGRESS — HISTORICAL DATA QUALIFICATION** | Trusted multi-market DEV datasets + detector-only activity decision |
 | 7 — Paper trading | **BLOCKED** | Requires future validated paper promotion |
 | 8 — Learning engine | Not started | Requires sufficient deterministic labels |
 | 9 — Shadow trading | Not started | Requires paper readiness |
@@ -30,21 +30,9 @@ required   30
 decision   INSUFFICIENT_EVIDENCE
 ```
 
-v0.1 OOS (`2023-01-01 .. 2025-08-31`) and CONFIRM (`2025-10-01 .. 2026-07-31`) remain unopened. Parameter optimization and paper/shadow/live promotion remain unauthorized.
+v0.1 OOS and CONFIRM remain unopened. Parameter optimization and paper/shadow/live promotion remain unauthorized.
 
-## Phase 6B research history
-
-### Bullish successor
-
-```text
-candidate CRT-C3-D1-H1-M1-BULL-v0.2-RESEARCH
-decision  EVIDENCE_INSUFFICIENT
-outcomes  NOT OPENED
-```
-
-The bullish path was preserved without symmetry inference or historical outcome access.
-
-### Active successor
+## Active Phase 6B route
 
 ```text
 candidate_version      CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH
@@ -54,22 +42,11 @@ signal_component       MID
 alpha changes          NONE AUTHORIZED
 ```
 
-The active question is whether the unchanged frozen bearish alpha produces a sufficient sample across an ex-ante Romeo-relevant market universe.
+The exact frozen OANDA universe is `EUR_USD`, `XAU_USD`, `NAS100_USD`, and `SPX500_USD`.
 
-## Frozen Phase-6B OANDA universe
+Historical qualification is governed by `P6B-OANDA-HISTORY-QUALIFICATION-V1`. The fixed 2019 MID/M1 smoke passed for all four symbols with 60/60 complete candles each. Complete raw DEV collection, historical gap reconciliation, trusted H1/New-York-D1 dataset identities, and detector activity counts remain pending.
 
-```text
-EUR_USD
-XAU_USD
-NAS100_USD
-SPX500_USD
-```
-
-All four were precommitted before runtime discovery and all four remain retained before detector access.
-
-## Historical-data gate
-
-The exact historical qualification detail is maintained in:
+Canonical detail:
 
 - `docs/checklists/phase-6b.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_QUALIFICATION_PROTOCOL_V1.md`
@@ -77,8 +54,6 @@ The exact historical qualification detail is maintained in:
 - `experiments/phase6b/P6B_OANDA_HISTORY_SMOKE_001.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_COLLECTION_GATE_001.md`
 - `research/romeo/phase6b/PRIMARY_SOURCE_PASS_003.md`
-
-Detector counts and all P&L outcomes remain unopened.
 
 ## Authorization
 
