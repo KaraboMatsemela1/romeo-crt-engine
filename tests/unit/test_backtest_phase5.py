@@ -190,8 +190,11 @@ def test_target_exit_occurs_only_after_confirmation_bar_closes() -> None:
     _, detector_run, result = _backtest(("106", "107", "99", "100"))
 
     assert result.simulator_version == SIMULATOR_VERSION
+    assert len(result.simulator_code_sha256) == 64
     assert result.strategy_version == STRATEGY_VERSION
     assert result.detector_version == DETECTOR_VERSION
+    assert result.detector_run_sha256 == detector_run.run_sha256
+    assert result.quantity_step == Decimal("0.01")
     assert len(result.completed_trades) == 1
     trade = result.completed_trades[0]
     plan = detector_run.candidates[0].trade_plan
@@ -344,5 +347,28 @@ def test_backtest_run_hash_is_deterministic_for_identical_inputs() -> None:
         config=config,
     )
     assert first.run_sha256 == second.run_sha256
+    assert first.simulator_code_sha256 == second.simulator_code_sha256
     assert first.completed_trades == second.completed_trades
     assert first.metrics == second.metrics
+
+
+def test_quantity_step_is_part_of_backtest_run_identity() -> None:
+    dataset = _scenario_dataset(("106", "107", "99", "100"))
+    detector_run = detect_dataset(dataset)
+    config = BacktestConfig(cost_model=BASE_COSTS)
+
+    fine = run_backtest(
+        detector_run,
+        dataset,
+        quantity_step=Decimal("0.01"),
+        config=config,
+    )
+    coarse = run_backtest(
+        detector_run,
+        dataset,
+        quantity_step=Decimal("1"),
+        config=config,
+    )
+
+    assert fine.quantity_step != coarse.quantity_step
+    assert fine.run_sha256 != coarse.run_sha256
