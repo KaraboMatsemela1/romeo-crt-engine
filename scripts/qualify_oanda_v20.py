@@ -5,11 +5,15 @@ import json
 import os
 from datetime import UTC, datetime
 from pathlib import Path
+from urllib.error import HTTPError
 
 from romeo_crt_engine.market_data.oanda_qualification import (
     build_instrument_discovery_manifest,
 )
-from romeo_crt_engine.market_data.providers.oanda_account import fetch_account_summary
+from romeo_crt_engine.market_data.providers.oanda_account import (
+    fetch_account_summary,
+    fetch_authorized_account_ids,
+)
 from romeo_crt_engine.market_data.providers.oanda_v20 import (
     LIVE_BASE_URL,
     PRACTICE_BASE_URL,
@@ -67,18 +71,46 @@ def main() -> int:
 
     observed_at = datetime.now(UTC)
     base_url = PRACTICE_BASE_URL if environment == "practice" else LIVE_BASE_URL
-    account = fetch_account_summary(
-        base_url=base_url,
-        account_id=account_id,
-        token=token,
-        observed_at=observed_at,
-    )
-    instruments = fetch_account_instruments(
-        base_url=base_url,
-        account_id=account_id,
-        token=token,
-        observed_at=observed_at,
-    )
+
+    try:
+        authorized_account_ids = fetch_authorized_account_ids(
+            base_url=base_url,
+            token=token,
+        )
+    except HTTPError as error:
+        raise SystemExit(
+            f"OANDA authorization preflight failed with HTTP {error.code} in {environment}; "
+            "verify the personal access token and selected API environment"
+        ) from None
+
+    print(f"authorized_account_count={len(authorized_account_ids)}")
+    configured_account_authorized = account_id in authorized_account_ids
+    print(f"configured_account_authorized={str(configured_account_authorized).lower()}")
+    if not configured_account_authorized:
+        raise SystemExit(
+            "configured OANDA_ACCOUNT_ID is not authorized by this token in the selected "
+            f"{environment} environment"
+        )
+
+    try:
+        account = fetch_account_summary(
+            base_url=base_url,
+            account_id=account_id,
+            token=token,
+            observed_at=observed_at,
+        )
+        instruments = fetch_account_instruments(
+            base_url=base_url,
+            account_id=account_id,
+            token=token,
+            observed_at=observed_at,
+        )
+    except HTTPError as error:
+        raise SystemExit(
+            f"OANDA account qualification failed with HTTP {error.code} after authorization "
+            "preflight; verify account API eligibility and provider account type"
+        ) from None
+
     manifest = build_instrument_discovery_manifest(
         instruments,
         environment=environment,
