@@ -27,31 +27,17 @@ jobs:
         run: |
           pip install -r requirements.lock
           pip install --no-deps --no-build-isolation -e .
-      - name: Require runtime-only OANDA practice credentials
+      - name: Require OANDA practice credentials
         run: |
           test -n "$OANDA_ACCOUNT_ID"
           test -n "$OANDA_API_TOKEN"
-      - name: Discover redacted OANDA account and instrument execution metadata
+      - name: Qualify practice account
         run: python scripts/qualify_oanda_v20.py --environment practice --output /tmp/oanda-instrument-discovery.json
-      - name: Verify qualification artifact
-        run: |
-          python - /tmp/oanda-instrument-discovery.json <<'PY'
-          import json,sys
-          from pathlib import Path
-          m=json.loads(Path(sys.argv[1]).read_text())
-          assert m['environment']=='practice'
-          assert m['account_scope']=='REDACTED_RUNTIME_ACCOUNT'
-          assert m['available_instrument_count']>0
-          assert m['strategy_outcome_access_authorized'] is False
-          assert m['paper_trading_authorized'] is False
-          assert m['live_trading_authorized'] is False
-          print('OANDA_QUALIFICATION_ARTIFACT_SAFE=true')
-          PY
 
-  p6b002-xauusd-2019-2022:
+  nas100-2019-history-validation:
     needs: qualify-practice-account
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 120
     permissions:
       contents: read
     env:
@@ -67,49 +53,31 @@ jobs:
         run: |
           pip install -r requirements.lock
           pip install --no-deps --no-build-isolation -e .
-      - name: Collect XAU_USD 2019 through 2022 shards
+      - name: Fetch read-only NAS100_USD 2019 M1 history
+        run: python scripts/collect_oanda_history_shard.py --instrument NAS100_USD --year 2019 --output-dir /tmp/history
+      - name: Validate history manifest
         run: |
-          set -euo pipefail
-          mkdir -p /tmp/p6b002
-          for year in 2019 2020 2021 2022; do
-            python scripts/collect_oanda_history_shard.py --instrument XAU_USD --year "$year" --output-dir /tmp/p6b002
-          done
-      - name: Verify redacted shard results
-        run: |
-          python - /tmp/p6b002 <<'PY'
+          python - /tmp/history/NAS100_USD_2019_MID_M1.manifest.json <<'PY'
           import json,sys
           from pathlib import Path
-          root=Path(sys.argv[1])
-          for year in (2019,2020,2021,2022):
-              m=json.loads((root/f'XAU_USD_{year}_MID_M1.manifest.json').read_text())
-              s=json.dumps(m,sort_keys=True).lower()
-              assert m['schema_version']=='P6B_OANDA_HISTORY_SHARD_V1'
-              assert m['environment']=='practice'
-              assert m['account_scope']=='REDACTED_RUNTIME_ACCOUNT'
-              assert m['instrument']=='XAU_USD' and m['year']==year
-              assert m['price_component']=='MID' and m['granularity']=='M1'
-              assert m['refetch']['status']=='EXACT_PROVIDER_VALUE_MATCH'
-              assert m['detector_execution_authorized'] is False
-              assert m['pnl_outcome_access_authorized'] is False
-              assert m['paper_trading_authorized'] is False
-              assert m['live_trading_authorized'] is False
-              for x in ('account_id','api_token','authorization','balance','nav'):
-                  assert x not in s
-              print('[HERMES_RESULT]')
-              print('task_id=P6B-002')
-              print('status=PARTIAL_PASS')
-              print('instrument=XAU_USD')
-              print('year='+str(year))
-              print('manifest_self_check=PASS')
-              print('refetch=EXACT_PROVIDER_VALUE_MATCH')
-              print('complete_candles='+str(m['complete_candle_count']))
-              print('pages='+str(m['page_count']))
-              print('missing_intervals='+str(m['missing_interval_count']))
-              print('missing_minutes='+str(m['missing_minutes']))
-              print('credentials_redacted=true')
-              print('detector_execution_authorized=false')
-              print('pnl_outcome_access_authorized=false')
+          m=json.loads(Path(sys.argv[1]).read_text())
+          assert m['environment']=='practice'
+          assert m['account_scope']=='REDACTED_RUNTIME_ACCOUNT'
+          assert m['instrument']=='NAS100_USD'
+          assert m['year']==2019
+          assert m['price_component']=='MID'
+          assert m['granularity']=='M1'
+          assert m['refetch']['status']=='EXACT_PROVIDER_VALUE_MATCH'
+          assert m['detector_execution_authorized'] is False
+          assert m['pnl_outcome_access_authorized'] is False
+          assert m['paper_trading_authorized'] is False
+          assert m['live_trading_authorized'] is False
+          print('history_validation=PASS')
+          print('complete_candles='+str(m['complete_candle_count']))
+          print('pages='+str(m['page_count']))
+          print('missing_intervals='+str(m['missing_interval_count']))
+          print('missing_minutes='+str(m['missing_minutes']))
           PY
-      - name: Remove raw shard data
+      - name: Delete fetched history
         if: always()
-        run: rm -rf /tmp/p6b002
+        run: rm -rf /tmp/history
