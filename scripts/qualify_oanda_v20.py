@@ -86,7 +86,7 @@ def main() -> int:
 
     matches = manifest["source_family_matches"]
     if not isinstance(matches, list):
-        raise RuntimeError("qualification manifest source_family_matches is invalid")
+        raise TypeError("qualification manifest source_family_matches is invalid")
     matched_count = sum(
         1
         for item in matches
