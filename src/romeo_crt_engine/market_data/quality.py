@@ -60,15 +60,18 @@ def validate_minute_series(
                     DataQualityCode.OUT_OF_ORDER,
                     f"out-of-order minute open at {bar.open_time.isoformat()}",
                 )
-            if prior_close is not None and bar.open_time != prior_close:
-                if not exact_gap_is_approved(prior_close, bar.open_time, allowed_closures):
-                    raise DataQualityError(
-                        DataQualityCode.GAP,
-                        (
-                            f"expected next minute at {prior_close.isoformat()}, "
-                            f"got {bar.open_time.isoformat()}"
-                        ),
-                    )
+            if (
+                prior_close is not None
+                and bar.open_time != prior_close
+                and not exact_gap_is_approved(prior_close, bar.open_time, allowed_closures)
+            ):
+                raise DataQualityError(
+                    DataQualityCode.GAP,
+                    (
+                        f"expected next minute at {prior_close.isoformat()}, "
+                        f"got {bar.open_time.isoformat()}"
+                    ),
+                )
 
         if as_of is not None and bar.close_time > as_of:
             raise DataQualityError(
