@@ -365,7 +365,7 @@ def test_quantity_step_is_part_of_backtest_run_identity() -> None:
     coarse = run_backtest(
         detector_run,
         dataset,
-        quantity_step=Decimal("1"),
+        quantity_step=Decimal("0.01") * 100,
         config=config,
     )
 
