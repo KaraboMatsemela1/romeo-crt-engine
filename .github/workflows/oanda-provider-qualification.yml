@@ -1,0 +1,62 @@
+name: OANDA Provider Qualification
+
+on:
+  workflow_dispatch:
+
+jobs:
+  qualify-practice-account:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      OANDA_ENV: practice
+      OANDA_ACCOUNT_ID: ${{ secrets.OANDA_ACCOUNT_ID }}
+      OANDA_API_TOKEN: ${{ secrets.OANDA_API_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Install locked environment
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps --no-build-isolation -e .
+
+      - name: Require runtime-only OANDA practice credentials
+        run: |
+          test -n "$OANDA_ACCOUNT_ID"
+          test -n "$OANDA_API_TOKEN"
+
+      - name: Discover account-specific OANDA instrument universe
+        run: |
+          python scripts/qualify_oanda_v20.py \
+            --environment practice \
+            --output /tmp/oanda-instrument-discovery.json
+
+      - name: Verify qualification artifact is credential-free and outcome-locked
+        run: |
+          python - /tmp/oanda-instrument-discovery.json <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          manifest = json.loads(Path(sys.argv[1]).read_text())
+          serialized = json.dumps(manifest, sort_keys=True)
+
+          assert manifest['environment'] == 'practice'
+          assert manifest['account_scope'] == 'REDACTED_RUNTIME_ACCOUNT'
+          assert manifest['status'] == 'DISCOVERED_NOT_FROZEN'
+          assert manifest['strategy_outcome_access_authorized'] is False
+          assert manifest['paper_trading_authorized'] is False
+          assert manifest['live_trading_authorized'] is False
+          assert 'account_id' not in serialized.lower()
+          assert 'api_token' not in serialized.lower()
+          assert 'authorization' not in serialized.lower()
+          print('OANDA_QUALIFICATION_ARTIFACT_SAFE=true')
+          PY
+
+      - name: Print redacted source-family discovery record
+        run: cat /tmp/oanda-instrument-discovery.json
