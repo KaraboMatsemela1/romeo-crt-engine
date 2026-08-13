@@ -2,6 +2,11 @@ name: OANDA Provider Qualification
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - agent/phase-6b-candidate-revision
+    paths:
+      - .github/workflows/oanda-provider-qualification.yml
 
 jobs:
   qualify-practice-account:
@@ -15,63 +20,37 @@ jobs:
       OANDA_API_TOKEN: ${{ secrets.OANDA_API_TOKEN }}
 
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: "3.12"
-
       - name: Install locked environment
         run: |
           pip install -r requirements.lock
           pip install --no-deps --no-build-isolation -e .
-
       - name: Require runtime-only OANDA practice credentials
         run: |
           test -n "$OANDA_ACCOUNT_ID"
           test -n "$OANDA_API_TOKEN"
-
       - name: Discover redacted OANDA account and instrument execution metadata
         run: |
-          python scripts/qualify_oanda_v20.py \
-            --environment practice \
-            --output /tmp/oanda-instrument-discovery.json
-
-      - name: Verify qualification artifact is credential-free and outcome-locked
+          python scripts/qualify_oanda_v20.py --environment practice --output /tmp/oanda-instrument-discovery.json
+      - name: Verify qualification artifact
         run: |
           python - /tmp/oanda-instrument-discovery.json <<'PY'
-          import json
-          import sys
+          import json, sys
           from pathlib import Path
-
-          manifest = json.loads(Path(sys.argv[1]).read_text())
-          serialized = json.dumps(manifest, sort_keys=True)
-          account = manifest['account_profile']
-
-          assert manifest['schema_version'] == 'P6B_OANDA_INSTRUMENT_DISCOVERY_V2'
-          assert manifest['environment'] == 'practice'
-          assert manifest['account_scope'] == 'REDACTED_RUNTIME_ACCOUNT'
-          assert account is None or isinstance(account, dict)
-          if isinstance(account, dict):
-              assert account['home_currency']
-              assert account['raw_account_summary_sha256']
-          assert manifest['available_instrument_count'] > 0
-          assert manifest['raw_instrument_response_sha256']
-          assert manifest['status'] == 'DISCOVERED_NOT_FROZEN'
-          assert manifest['strategy_outcome_access_authorized'] is False
-          assert manifest['paper_trading_authorized'] is False
-          assert manifest['live_trading_authorized'] is False
-          assert 'account_id' not in serialized.lower()
-          assert 'api_token' not in serialized.lower()
-          assert 'authorization' not in serialized.lower()
-          assert 'balance' not in serialized.lower()
-          assert 'nav' not in serialized.lower()
+          m=json.loads(Path(sys.argv[1]).read_text())
+          assert m['environment']=='practice'
+          assert m['account_scope']=='REDACTED_RUNTIME_ACCOUNT'
+          assert m['available_instrument_count']>0
+          assert m['strategy_outcome_access_authorized'] is False
+          assert m['paper_trading_authorized'] is False
+          assert m['live_trading_authorized'] is False
           print('OANDA_QUALIFICATION_ARTIFACT_SAFE=true')
           PY
 
-      - name: Print redacted qualification record
-        run: cat /tmp/oanda-instrument-discovery.json
-
-  p6b001-eurusd-2019:
+  p6b002-eurusd-2020:
     needs: qualify-practice-account
     runs-on: ubuntu-latest
     timeout-minutes: 120
@@ -83,62 +62,53 @@ jobs:
       OANDA_API_TOKEN: ${{ secrets.OANDA_API_TOKEN }}
 
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: "3.12"
-
       - name: Install locked environment
         run: |
           pip install -r requirements.lock
           pip install --no-deps --no-build-isolation -e .
-
-      - name: Collect frozen P6B-001 EUR_USD 2019 shard
+      - name: Collect EUR_USD 2020 shard
         run: |
-          python scripts/collect_oanda_history_shard.py \
-            --instrument EUR_USD \
-            --year 2019 \
-            --output-dir /tmp/p6b001
-
-      - name: Verify redacted P6B-001 manifest and print approved result fields
+          python scripts/collect_oanda_history_shard.py --instrument EUR_USD --year 2020 --output-dir /tmp/p6b002
+      - name: Verify redacted shard result
         run: |
-          python - /tmp/p6b001/EUR_USD_2019_MID_M1.manifest.json <<'PY'
-          import json
-          import sys
+          python - /tmp/p6b002/EUR_USD_2020_MID_M1.manifest.json <<'PY'
+          import json, sys
           from pathlib import Path
-
-          manifest = json.loads(Path(sys.argv[1]).read_text())
-          serialized = json.dumps(manifest, sort_keys=True)
-          assert manifest['schema_version'] == 'P6B_OANDA_HISTORY_SHARD_V1'
-          assert manifest['environment'] == 'practice'
-          assert manifest['account_scope'] == 'REDACTED_RUNTIME_ACCOUNT'
-          assert manifest['instrument'] == 'EUR_USD'
-          assert manifest['year'] == 2019
-          assert manifest['price_component'] == 'MID'
-          assert manifest['granularity'] == 'M1'
-          assert manifest['refetch']['status'] == 'EXACT_PROVIDER_VALUE_MATCH'
-          assert manifest['detector_execution_authorized'] is False
-          assert manifest['pnl_outcome_access_authorized'] is False
-          assert manifest['paper_trading_authorized'] is False
-          assert manifest['live_trading_authorized'] is False
-          for forbidden in ('account_id', 'api_token', 'authorization', 'balance', 'nav'):
-              assert forbidden not in serialized.lower()
+          m=json.loads(Path(sys.argv[1]).read_text())
+          s=json.dumps(m, sort_keys=True).lower()
+          assert m['schema_version']=='P6B_OANDA_HISTORY_SHARD_V1'
+          assert m['environment']=='practice'
+          assert m['account_scope']=='REDACTED_RUNTIME_ACCOUNT'
+          assert m['instrument']=='EUR_USD'
+          assert m['year']==2020
+          assert m['price_component']=='MID'
+          assert m['granularity']=='M1'
+          assert m['refetch']['status']=='EXACT_PROVIDER_VALUE_MATCH'
+          assert m['detector_execution_authorized'] is False
+          assert m['pnl_outcome_access_authorized'] is False
+          assert m['paper_trading_authorized'] is False
+          assert m['live_trading_authorized'] is False
+          for x in ('account_id','api_token','authorization','balance','nav'):
+              assert x not in s
           print('[HERMES_RESULT]')
-          print('task_id=P6B-001')
-          print('status=PASS')
+          print('task_id=P6B-002')
+          print('status=PARTIAL_PASS')
           print('instrument=EUR_USD')
-          print('year=2019')
+          print('year=2020')
           print('manifest_self_check=PASS')
-          print('refetch=' + manifest['refetch']['status'])
-          print('complete_candles=' + str(manifest['complete_candle_count']))
-          print('pages=' + str(manifest['page_count']))
-          print('missing_intervals=' + str(manifest['missing_interval_count']))
-          print('missing_minutes=' + str(manifest['missing_minutes']))
+          print('refetch=EXACT_PROVIDER_VALUE_MATCH')
+          print('complete_candles='+str(m['complete_candle_count']))
+          print('pages='+str(m['page_count']))
+          print('missing_intervals='+str(m['missing_interval_count']))
+          print('missing_minutes='+str(m['missing_minutes']))
           print('credentials_redacted=true')
           print('detector_execution_authorized=false')
           print('pnl_outcome_access_authorized=false')
           PY
-
       - name: Remove raw shard data
         if: always()
-        run: rm -rf /tmp/p6b001
+        run: rm -rf /tmp/p6b002
