@@ -1,12 +1,20 @@
 name: Phase 6 DEV Validation
 
-# This workflow is intentionally pinned to the preregistered DEV window.
-# Infrastructure-only reruns must preserve the same dates and frozen strategy chain.
+# P6-DEV-001 is preregistered. Detector/P&L access remains disabled until the
+# data-only exclusion ledger and canonical row counts are frozen in git.
 on:
   workflow_dispatch:
   pull_request:
     paths:
       - ".github/workflows/phase6-dev-validation.yml"
+      - "scripts/ingest_binance_spot.py"
+      - "src/romeo_crt_engine/market_data/**"
+      - "src/romeo_crt_engine/backtest/**"
+      - "experiments/phase6/P6_DATA_QUALITY_AMENDMENT_*.md"
+      - "requirements.lock"
+
+env:
+  P6_DEV_OUTCOME_ACCESS_AUTHORIZED: "false"
 
 jobs:
   p6-dev-001:
@@ -37,34 +45,76 @@ jobs:
             > /tmp/p6-dev-ingest.txt
           cat /tmp/p6-dev-ingest.txt
 
-      - name: Assert DEV data integrity and verification coverage
+      - name: Verify and freeze DEV data-only evidence
         run: |
           dataset_dir=$(find /tmp/romeo-phase6-dev/normalized -mindepth 1 -maxdepth 1 -type d -print -quit)
           test -n "$dataset_dir"
           echo "$dataset_dir" > /tmp/p6-dev-dataset-dir.txt
-          python - "$dataset_dir/manifest.json" <<'PY'
+          python - "$dataset_dir/manifest.json" /tmp/p6-dev-ingest.txt <<'PY'
+          import hashlib
           import json
           import sys
           from collections import Counter
           from pathlib import Path
 
-          manifest = json.loads(Path(sys.argv[1]).read_text())
+          manifest_path = Path(sys.argv[1])
+          ingest_lines = Path(sys.argv[2]).read_text().splitlines()
+          manifest_bytes = manifest_path.read_bytes()
+          manifest = json.loads(manifest_bytes)
+          values = {}
+          for line in ingest_lines:
+              if '=' in line:
+                  key, value = line.split('=', 1)
+                  values[key] = value
+
+          exclusions = json.loads(values['archive_exclusions_json'])
+          excluded_dates = [record['archive_date'] for record in exclusions['records']]
           methods = Counter(item['verification_method'] for item in manifest['provider_crosschecks'])
 
           assert manifest['quality_status'] == 'TRUSTED'
           assert manifest['provider'] == 'BINANCE_PUBLIC_DATA'
           assert manifest['venue'] == 'BINANCE_SPOT'
           assert manifest['symbol'] == 'BTCUSDT'
-          assert manifest['m1_rows'] == 2_103_480
-          assert manifest['h1_rows'] == 35_058
-          assert manifest['d1_rows'] == 1_458
-          assert len(manifest['raw_artifacts']) == 1_461
-          assert len(manifest['provider_crosschecks']) == 1_461
+          assert len(manifest['raw_artifacts']) == 1461
+          assert len(manifest['provider_crosschecks']) == 1461
+          assert int(values['excluded_archive_count']) == 20
+          assert len(excluded_dates) == 20
           assert methods['REST_KLINE_EXACT_MATCH_V1'] == 48
-          assert methods['PROVIDER_SHA256_CHECKSUM_V1'] == 1_413
+          assert methods['PROVIDER_SHA256_CHECKSUM_V1'] == 1413
+
+          summary = {
+              'protocol_id': 'P6-VALIDATION-PROTOCOL-v1',
+              'data_quality_amendments': [
+                  'P6-DATA-QUALITY-AMENDMENT-001',
+                  'P6-DATA-QUALITY-AMENDMENT-002',
+              ],
+              'window_id': 'P6-DEV-001',
+              'window_start_utc_day': '2019-01-01',
+              'window_end_utc_day': '2022-12-31',
+              'outcome_access_authorized': False,
+              'dataset_version': manifest['dataset_version'],
+              'manifest_sha256': hashlib.sha256(manifest_bytes).hexdigest(),
+              'normalized_sha256': manifest['normalized_sha256'],
+              'market_data_code_sha256': manifest['market_data_code_sha256'],
+              'dependency_lock_sha256': manifest['dependency_lock_sha256'],
+              'instrument_metadata_version': manifest['instrument_metadata_version'],
+              'instrument_metadata_observed_at': manifest['instrument_metadata_observed_at'],
+              'raw_archive_count': len(manifest['raw_artifacts']),
+              'verification_methods': dict(sorted(methods.items())),
+              'excluded_archive_count': len(excluded_dates),
+              'excluded_archive_dates': excluded_dates,
+              'exclusion_ledger_sha256': values['exclusion_ledger_sha256'],
+              'm1_rows': manifest['m1_rows'],
+              'h1_rows': manifest['h1_rows'],
+              'd1_rows': manifest['d1_rows'],
+              'paper_trading_authorized': False,
+              'live_trading_authorized': False,
+          }
+          print('PHASE6_DEV_DATA_SUMMARY=' + json.dumps(summary, sort_keys=True, separators=(',', ':')))
           PY
 
       - name: Run frozen detector and all preregistered cost scenarios
+        if: env.P6_DEV_OUTCOME_ACCESS_AUTHORIZED == 'true'
         run: |
           dataset_dir=$(cat /tmp/p6-dev-dataset-dir.txt)
           for scenario in ideal base stressed severe; do
@@ -77,7 +127,8 @@ jobs:
               > "/tmp/p6-dev-${scenario}.json"
           done
 
-      - name: Emit compact P6-DEV-001 evidence
+      - name: Emit compact P6-DEV-001 outcome evidence
+        if: env.P6_DEV_OUTCOME_ACCESS_AUTHORIZED == 'true'
         run: |
           python - <<'PY'
           import hashlib
@@ -90,7 +141,6 @@ jobs:
           manifest_bytes = manifest_path.read_bytes()
           manifest = json.loads(manifest_bytes)
           methods = Counter(item['verification_method'] for item in manifest['provider_crosschecks'])
-
           outputs = {
               name: json.loads(Path(f'/tmp/p6-dev-{name}.json').read_text())
               for name in ('ideal', 'base', 'stressed', 'severe')
@@ -101,16 +151,14 @@ jobs:
           plan_counts = {result['detector_trade_plan_count'] for result in outputs.values()}
           statuses = {result['detector_status'] for result in outputs.values()}
           simulator_versions = {result['simulator_version'] for result in outputs.values()}
-
           assert detector_hashes and len(detector_hashes) == 1
-          assert candidate_counts == {1456}
+          assert len(candidate_counts) == 1
           assert len(plan_counts) == 1
           assert statuses == {'COMPLETE'}
           assert simulator_versions == {'CRT-BACKTEST-v0.1.1'}
 
           base_closed = outputs['base']['completed_trades']
           activity_gate = 'DEV_SAMPLE_GATE_PASSED' if base_closed >= 30 else 'INSUFFICIENT_DEV_SAMPLE'
-
           scenarios = {}
           for name, result in outputs.items():
               metrics = result['metrics']
@@ -132,26 +180,9 @@ jobs:
 
           summary = {
               'protocol_id': 'P6-VALIDATION-PROTOCOL-v1',
-              'data_quality_amendment_id': 'P6-DATA-QUALITY-AMENDMENT-001',
               'window_id': 'P6-DEV-001',
-              'window_start_utc_day': '2019-01-01',
-              'window_end_utc_day': '2022-12-31',
-              'approved_venue_closure': {
-                  'start_utc': '2019-03-12T02:00:00+00:00',
-                  'end_utc': '2019-03-12T08:00:00+00:00',
-                  'synthetic_bars_added': 0,
-                  'excluded_incomplete_ny_d1': 2,
-              },
               'dataset_version': manifest['dataset_version'],
               'manifest_sha256': hashlib.sha256(manifest_bytes).hexdigest(),
-              'normalized_sha256': manifest['normalized_sha256'],
-              'market_data_code_sha256': manifest['market_data_code_sha256'],
-              'dependency_lock_sha256': manifest['dependency_lock_sha256'],
-              'instrument_metadata_version': manifest['instrument_metadata_version'],
-              'instrument_metadata_observed_at': manifest['instrument_metadata_observed_at'],
-              'price_tick_size': manifest['price_tick_size'],
-              'quantity_step': manifest['quantity_step'],
-              'raw_archive_count': len(manifest['raw_artifacts']),
               'verification_methods': dict(sorted(methods.items())),
               'm1_rows': manifest['m1_rows'],
               'h1_rows': manifest['h1_rows'],
