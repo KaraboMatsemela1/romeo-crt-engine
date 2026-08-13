@@ -273,7 +273,7 @@ def request_fingerprint(path: str, parameters: dict[str, object]) -> str:
     """Hash a canonical, secret-free provider request description."""
 
     canonical = urlencode(sorted((key, str(value)) for key, value in parameters.items()))
-    return sha256(f"{path}?{canonical}".encode("utf-8")).hexdigest()
+    return sha256(f"{path}?{canonical}".encode()).hexdigest()
 
 
 def _authorized_get(
