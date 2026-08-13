@@ -82,12 +82,16 @@ def _fetch_archives(
 
 
 def _validate_archive_shapes(archives: tuple[RawArchive, ...], *, symbol: str) -> None:
-    """Fail with provider archive identity before constructing a multi-year trusted series."""
+    """Report every provider-day shape defect before constructing a trusted multi-year series."""
+    failures: list[str] = []
     for archive in archives:
         try:
             parse_1m_archive(archive, symbol=symbol)
         except DataQualityError as error:
-            raise RuntimeError(f"provider archive {archive.filename} failed: {error}") from error
+            failures.append(f"{archive.filename}: {error}")
+    if failures:
+        joined = "\n".join(f"- {failure}" for failure in failures)
+        raise RuntimeError(f"provider archive validation failed:\n{joined}")
 
 
 def main() -> None:
