@@ -45,6 +45,12 @@ Protocol: `P6B-OANDA-HISTORY-QUALIFICATION-V1`.
 - [x] Preserve only counts/hashes in repository smoke evidence.
 - [x] Record dated OANDA evidence that index hours changed inside DEV on 2021-06-28.
 - [x] Prohibit projecting current OANDA hours backward across the complete DEV interval.
+- [x] Freeze 16 yearly execution shards: four UTC years for each frozen instrument.
+- [x] Preserve one preregistered independent re-fetch window per yearly shard.
+- [x] Implement exact raw-gap reconciliation.
+- [x] Reject approved closure evidence that leaves raw missing minutes unexplained.
+- [x] Reject approved closure evidence that extends into provider-observed minutes.
+- [x] Regression-test exact reconciliation and preserve BTCUSDT behavior.
 - [ ] Collect complete sealed raw DEV M1 history for all four instruments.
 - [ ] Execute 4/4 independent re-fetch comparisons per instrument.
 - [ ] Inventory every missing interval.
@@ -56,10 +62,13 @@ Protocol: `P6B-OANDA-HISTORY-QUALIFICATION-V1`.
 Canonical artifacts:
 
 - `experiments/phase6b/P6B_OANDA_HISTORY_QUALIFICATION_PROTOCOL_V1.md`
+- `experiments/phase6b/P6B_OANDA_HISTORY_SHARD_EXECUTION_V1.md`
 - `experiments/phase6b/P6B_OANDA_HISTORICAL_SESSION_EVIDENCE_001.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_SMOKE_001.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_COLLECTION_GATE_001.md`
 - `research/romeo/phase6b/PRIMARY_SOURCE_PASS_003.md`
+- `src/romeo_crt_engine/market_data/gap_reconciliation_v2.py`
+- `tests/unit/test_history_qualification_v2_phase6b.py`
 
 ## E. Detector-only activity protocol
 
@@ -78,16 +87,18 @@ Detector execution remains blocked until trusted historical datasets exist.
 ## Current handoff
 
 ```text
-Phase 6B                     IN PROGRESS
-Alpha changes                NONE AUTHORIZED
-Frozen OANDA universe        4 SYMBOLS
-Historical M1 smoke          PASS 4/4, 60/60 EACH
-Full raw 2019-2022 M1        PENDING
-Historical gap reconciliation PENDING
-Trusted H1 / NY-D1 datasets  PENDING
-Detector activity counts     NOT OPENED
-Multi-market P&L             NOT AUTHORIZED
-v0.1 OOS / CONFIRM           UNOPENED
-Phase 7                      BLOCKED
-Live trading                 NOT AUTHORIZED
+Phase 6B                       IN PROGRESS
+Alpha changes                  NONE AUTHORIZED
+Frozen OANDA universe          4 SYMBOLS
+Historical M1 smoke            PASS 4/4, 60/60 EACH
+Yearly raw collection plan     FROZEN 16 SHARDS
+Exact raw-gap reconciliation   IMPLEMENTED + TESTED
+Full raw 2019-2022 M1          PENDING
+Historical gap reconciliation  PENDING RAW INVENTORY
+Trusted H1 / NY-D1 datasets    PENDING
+Detector activity counts       NOT OPENED
+Multi-market P&L               NOT AUTHORIZED
+v0.1 OOS / CONFIRM             UNOPENED
+Phase 7                        BLOCKED
+Live trading                   NOT AUTHORIZED
 ```
