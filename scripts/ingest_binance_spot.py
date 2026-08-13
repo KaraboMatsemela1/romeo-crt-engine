@@ -56,6 +56,13 @@ def _date(value: str) -> date:
     return date.fromisoformat(value)
 
 
+def _aware_datetime(value: str) -> datetime:
+    parsed = datetime.fromisoformat(value)
+    if parsed.utcoffset() is None:
+        raise argparse.ArgumentTypeError("metadata observation timestamp must be timezone-aware")
+    return parsed.astimezone(UTC)
+
+
 def _git_sha() -> str:
     result = subprocess.run(
         ["git", "rev-parse", "HEAD"],
@@ -229,6 +236,14 @@ def main() -> None:
     parser.add_argument("--data-root", type=Path, default=PROJECT_ROOT / "data")
     parser.add_argument("--lock-file", type=Path, default=PROJECT_ROOT / "requirements.lock")
     parser.add_argument(
+        "--metadata-observed-at",
+        type=_aware_datetime,
+        help=(
+            "Optional frozen metadata observation timestamp. Use only to reproduce a previously "
+            "sealed dataset identity; retrieval time remains the current ingestion time."
+        ),
+    )
+    parser.add_argument(
         "--verification-policy",
         choices=[policy.value for policy in VerificationPolicy],
         default=VerificationPolicy.REST_EVERY_ARCHIVE.value,
@@ -247,8 +262,9 @@ def main() -> None:
     args = parser.parse_args()
 
     retrieved_at = datetime.now(UTC)
+    metadata_observed_at = args.metadata_observed_at or retrieved_at
     git_revision = _git_sha()
-    metadata = fetch_exchange_info(args.symbol, observed_at=retrieved_at)
+    metadata = fetch_exchange_info(args.symbol, observed_at=metadata_observed_at)
     requested_days = _days(args.start_utc_day, args.end_utc_day)
     archives = _fetch_archives(
         args.symbol,
@@ -291,6 +307,7 @@ def main() -> None:
     print(f"manifest_sha256={dataset.manifest.manifest_sha256}")
     print(f"receipt_sha256={dataset.receipt.receipt_sha256}")
     print(f"git_revision={dataset.receipt.git_revision}")
+    print(f"metadata_observed_at={metadata.observed_at.astimezone(UTC).isoformat()}")
     print(f"verification_policy={policy.value}")
     print(f"archive_count={len(archives)}")
     print(f"excluded_archive_count={len(exclusion_diagnostics)}")
