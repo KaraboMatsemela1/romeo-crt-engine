@@ -120,9 +120,9 @@ def _build_reconciliation_evidence(manifest: dict[str, object]) -> dict[str, obj
     missing = manifest.get("missing_intervals")
     refetch = manifest.get("refetch")
     if not isinstance(missing, list):
-        raise ValueError("raw shard manifest lacks exact missing-interval inventory")
+        raise TypeError("raw shard manifest lacks exact missing-interval inventory")
     if not isinstance(refetch, dict):
-        raise ValueError("raw shard manifest lacks refetch evidence")
+        raise TypeError("raw shard manifest lacks refetch evidence")
 
     evidence: dict[str, object] = {
         "schema_version": RECONCILIATION_SCHEMA_VERSION,
