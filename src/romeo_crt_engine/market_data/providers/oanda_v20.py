@@ -293,7 +293,7 @@ def _authorized_get(
         method="GET",
     )
     with urlopen(request, timeout=timeout_seconds) as response:
-        return response.read()
+        return cast(bytes, response.read())
 
 
 def fetch_account_instruments(
