@@ -52,7 +52,7 @@ def test_parse_account_instruments_preserves_provider_semantics_without_inventin
     assert eurusd.instrument_type == "CURRENCY"
     assert eurusd.display_precision == 5
     assert eurusd.pip_location == -4
-    assert eurusd.minimum_trade_size == Decimal("1")
+    assert eurusd.minimum_trade_size == Decimal(1)
     assert eurusd.observed_at == observed_at
     assert len(eurusd.raw_sha256) == 64
 
