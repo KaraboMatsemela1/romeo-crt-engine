@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import gzip
 import json
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from hashlib import sha256
 from pathlib import Path
-from typing import Final, Sequence
+from typing import Final
 
 from romeo_crt_engine.market_data.providers.oanda_v20 import OandaPriceCandle
 
