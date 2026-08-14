@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlparse
 
+from romeo_crt_engine.research.source_acquisition_v1 import SourceIdentityV1, SourceKind
+
 
 @dataclass(frozen=True, slots=True)
 class SourceRegistryRowV1:
@@ -74,3 +76,27 @@ def load_source_registry_v1(path: Path) -> tuple[SourceRegistryRowV1, ...]:
     if len(identifiers) != len(set(identifiers)):
         raise ValueError("source registry IDs must be unique")
     return rows
+
+
+def get_registered_source_v1(
+    rows: tuple[SourceRegistryRowV1, ...], source_id: str
+) -> SourceRegistryRowV1:
+    matches = tuple(row for row in rows if row.source_id == source_id)
+    if len(matches) != 1:
+        raise ValueError(f"source_id must resolve to exactly one registered source: {source_id}")
+    return matches[0]
+
+
+def source_identity_from_registry_v1(row: SourceRegistryRowV1) -> SourceIdentityV1:
+    kind_by_type = {
+        "youtube": SourceKind.YOUTUBE,
+        "telegram": SourceKind.TELEGRAM,
+    }
+    source_kind = kind_by_type.get(row.source_type.lower(), SourceKind.OTHER_FIRST_PARTY)
+    provenance = row.notes.strip() or f"Registered first-party source: {row.title}"
+    return SourceIdentityV1(
+        source_id=row.source_id,
+        url=row.url,
+        source_kind=source_kind,
+        provenance_statement=provenance,
+    )
