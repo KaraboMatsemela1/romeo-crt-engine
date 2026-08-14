@@ -40,7 +40,7 @@ def _instrument() -> OandaInstrumentRecord:
         display_precision=5,
         pip_location=-4,
         trade_units_precision=0,
-        minimum_trade_size=Decimal("1"),
+        minimum_trade_size=Decimal(1),
         observed_at=datetime(2026, 8, 14, 10, 0, tzinfo=UTC),
         raw_sha256="d" * 64,
     )
