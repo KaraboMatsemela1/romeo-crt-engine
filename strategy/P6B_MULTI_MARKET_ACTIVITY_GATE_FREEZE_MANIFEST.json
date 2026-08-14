@@ -1,0 +1,89 @@
+{
+  "schema_version": "P6B_ACTIVITY_GATE_FREEZE_V1",
+  "status": "FROZEN_PRE_OUTCOME",
+  "frozen_at": "2026-08-13",
+  "protocol_version": "P6B-MULTI-MARKET-ACTIVITY-PROTOCOL-v1",
+  "candidate_version": "CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH",
+  "alpha_strategy_version": "CRT-C3-D1-H1-M1-BEAR-v0.1",
+  "detector_version": "CRT-DETECTOR-v0.2-MULTI-MARKET",
+  "signal_price_component": "MID",
+  "dev_window": {
+    "timezone": "America/New_York",
+    "start_local_date": "2019-01-01",
+    "end_local_date": "2022-12-31"
+  },
+  "thresholds": {
+    "minimum_accepted_instruments": 2,
+    "minimum_contributing_instruments": 2,
+    "minimum_pooled_trade_plans": 30
+  },
+  "allowed_activity_outputs": [
+    "complete_d1_bars",
+    "detector_candidates",
+    "no_signal_count",
+    "trade_plan_count",
+    "reason_code_counts",
+    "accepted_instrument_count",
+    "contributing_instrument_count",
+    "pooled_trade_plan_count",
+    "per_instrument_trade_plan_count",
+    "per_instrument_trade_plan_share"
+  ],
+  "prohibited_outputs": [
+    "pnl",
+    "win_rate",
+    "expectancy",
+    "profit_factor",
+    "drawdown",
+    "stop_target_outcomes",
+    "friction_adjusted_returns",
+    "instrument_profitability_ranking"
+  ],
+  "outcome_decisions": [
+    "INSUFFICIENT_ELIGIBLE_UNIVERSE",
+    "INSUFFICIENT_MULTI_MARKET_SAMPLE",
+    "SUFFICIENT_ACTIVITY_FOR_PERFORMANCE_PROTOCOL"
+  ],
+  "frozen_inputs": {
+    "protocol_git_blob_sha": "4d12812226e574588533ea10f822c92b4655f2ff",
+    "activity_gate_git_blob_sha": "932da523595e90a477dc1974dc12c68d69792a85",
+    "activity_gate_test_git_blob_sha": "09e27de7a9962eb7ba7d212e5d96f23143590ff6"
+  },
+  "verification": {
+    "ci_run_id": 31693150696,
+    "ci_conclusion": "success",
+    "ruff": "success",
+    "mypy": "success",
+    "pytest": "success",
+    "preserved_backtest_smoke_run_id": 31693150701,
+    "preserved_backtest_smoke_conclusion": "success"
+  },
+  "binding_rules": [
+    "Exact OANDA instrument symbols must be frozen before any detector activity count is opened.",
+    "Instrument exclusions after the universe freeze may not be based on TradePlan count or performance.",
+    "The DEV activity window may not be extended or moved after count access.",
+    "The pooled TradePlan threshold may not be lowered after count access.",
+    "At least two accepted instruments and two contributing instruments are required.",
+    "The activity workflow must not invoke the backtester or calculate any P&L outcome.",
+    "v0.1 OOS and CONFIRM outcome access remains prohibited.",
+    "A sufficient activity result authorizes only execution-model and performance-protocol engineering, not P&L access."
+  ],
+  "revalidation_triggers": [
+    "change to P6B_MULTI_MARKET_ACTIVITY_PROTOCOL_V1.md",
+    "change to activity_gate_v2.py",
+    "change to the 2/2/30 activity thresholds",
+    "change to DEV activity window",
+    "change to candidate or alpha strategy identity",
+    "change to detector version or signal price component",
+    "change to instrument-universe selection policy"
+  ],
+  "authorization": {
+    "backtest_executed": false,
+    "pnl_outcome_access_authorized": false,
+    "v0_1_oos_access_authorized": false,
+    "v0_1_confirm_access_authorized": false,
+    "paper_trading_authorized": false,
+    "shadow_trading_authorized": false,
+    "live_trading_authorized": false
+  }
+}

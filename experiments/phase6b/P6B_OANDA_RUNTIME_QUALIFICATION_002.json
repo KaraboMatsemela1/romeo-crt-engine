@@ -1,0 +1,85 @@
+{
+  "schema_version": "P6B_OANDA_RUNTIME_QUALIFICATION_RESULT_V1",
+  "result_id": "P6B_OANDA_RUNTIME_QUALIFICATION_002",
+  "observed_at_utc": "2026-08-13T11:52:15.040144+00:00",
+  "provider": "OANDA_V20",
+  "venue": "OANDA_FXTRADE",
+  "environment": "practice",
+  "account_scope": "REDACTED_RUNTIME_ACCOUNT",
+  "github_actions": {
+    "run_id": 31696424928,
+    "run_attempt": 2,
+    "job_id": 94438165028,
+    "workflow_head_sha": "c800dbf87c0757e5200cec0aba9f2579b2d6fc48"
+  },
+  "account_profile": {
+    "home_currency": "USD",
+    "margin_rate": "0.05",
+    "hedging_enabled": false,
+    "guaranteed_stop_loss_order_mode": "ALLOWED",
+    "raw_account_summary_sha256": "63cd8a2960941c199239250a12bd5954e7533113a9dfb8c9379236b4c42c9a22"
+  },
+  "available_instrument_count": 123,
+  "available_instrument_names_sha256": "2e77a962f559c51d37120ebe842ba62cd0c42e07f50fe845ced04df7ad0755d2",
+  "raw_instrument_response_sha256": "e9ea9a83b2b0f66605f79a94e9c5ca6f21549dd1f1cbbe739077165fe604ea64",
+  "matched_source_families": [
+    {
+      "family": "EUR_USD",
+      "symbol": "EUR_USD",
+      "instrument_type": "CURRENCY",
+      "display_precision": 5,
+      "pip_location": -4,
+      "trade_units_precision": 0,
+      "provider_unit_precision_step": "1",
+      "minimum_trade_size": "1",
+      "maximum_order_units": "100000000",
+      "margin_rate": "0.05"
+    },
+    {
+      "family": "GOLD_USD",
+      "symbol": "XAU_USD",
+      "instrument_type": "METAL",
+      "display_precision": 3,
+      "pip_location": -2,
+      "trade_units_precision": 1,
+      "provider_unit_precision_step": "0.1",
+      "minimum_trade_size": "0.1",
+      "maximum_order_units": "20000",
+      "margin_rate": "0.05"
+    },
+    {
+      "family": "US_NAS_100_NQ_PROXY",
+      "symbol": "NAS100_USD",
+      "instrument_type": "CFD",
+      "display_precision": 1,
+      "pip_location": 0,
+      "trade_units_precision": 2,
+      "provider_unit_precision_step": "0.01",
+      "minimum_trade_size": "0.01",
+      "maximum_order_units": "2000",
+      "margin_rate": "0.05"
+    },
+    {
+      "family": "US_SPX_500_ES_PROXY",
+      "symbol": "SPX500_USD",
+      "instrument_type": "CFD",
+      "display_precision": 1,
+      "pip_location": 0,
+      "trade_units_precision": 2,
+      "provider_unit_precision_step": "0.01",
+      "minimum_trade_size": "0.01",
+      "maximum_order_units": "10000",
+      "margin_rate": "0.05"
+    }
+  ],
+  "source_family_match_count": 4,
+  "source_family_total": 4,
+  "decision": "ELIGIBLE_UNIVERSE_DISCOVERED",
+  "instrument_universe_freeze_authorized": true,
+  "detector_activity_counts_authorized": false,
+  "strategy_outcome_access_authorized": false,
+  "pnl_outcome_access_authorized": false,
+  "paper_trading_authorized": false,
+  "shadow_trading_authorized": false,
+  "live_trading_authorized": false
+}

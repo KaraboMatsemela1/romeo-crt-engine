@@ -1,0 +1,133 @@
+name: OANDA Canonical Tail Qualification
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/phase-6b-candidate-revision
+    paths:
+      - .github/workflows/oanda-canonical-tail-qualification.yml
+      - scripts/qualify_oanda_canonical_tail.py
+      - src/romeo_crt_engine/market_data/canonical_coverage_v2.py
+
+jobs:
+  qualify-tail:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        instrument:
+          - EUR_USD
+          - XAU_USD
+          - NAS100_USD
+          - SPX500_USD
+    env:
+      OANDA_ACCOUNT_ID: ${{ secrets.OANDA_ACCOUNT_ID }}
+      OANDA_API_TOKEN: ${{ secrets.OANDA_API_TOKEN }}
+      P6B_INSTRUMENT: ${{ matrix.instrument }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+      - name: Install locked environment
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps --no-build-isolation -e .
+      - name: Require OANDA practice credentials
+        run: |
+          test -n "$OANDA_ACCOUNT_ID"
+          test -n "$OANDA_API_TOKEN"
+      - name: Qualify exact canonical tail
+        run: |
+          mkdir -p /tmp/p6b-tail
+          python scripts/qualify_oanda_canonical_tail.py \
+            --instrument "$P6B_INSTRUMENT" \
+            --output "/tmp/p6b-tail/${P6B_INSTRUMENT}.json"
+      - name: Validate redacted tail evidence
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          instrument = os.environ['P6B_INSTRUMENT']
+          path = Path('/tmp/p6b-tail') / f'{instrument}.json'
+          data = json.loads(path.read_text())
+
+          assert data['schema_version'] == 'P6B_OANDA_CANONICAL_TAIL_EVIDENCE_V1'
+          assert data['canonical_coverage_policy_version'] == 'P6B_CANONICAL_COVERAGE_V1'
+          assert data['observation_policy_version'] == 'P6B_OANDA_OBSERVATION_POLICY_V2'
+          assert data['provider'] == 'OANDA_V20'
+          assert data['environment'] == 'practice'
+          assert data['instrument'] == instrument
+          assert data['price_component'] == 'MID'
+          assert data['granularity'] == 'M1'
+          assert data['requested_start_utc'] == '2023-01-01T00:00:00+00:00'
+          assert data['requested_end_utc'] == '2023-01-01T05:00:00+00:00'
+          assert data['primary']['complete_candle_count'] == data['refetch']['complete_candle_count']
+          assert data['refetch']['status'] in {
+              'EXACT_PROVIDER_VALUE_MATCH',
+              'EXACT_PROVIDER_EMPTY_MATCH',
+          }
+          assert data['missing_interval_count'] == len(data['classifications'])
+          assert (
+              data['missing_interval_count']
+              == data['no_price_observation_gap_count']
+              + data['unresolved_provider_gap_count']
+          )
+          assert (
+              data['missing_minutes']
+              == data['no_price_observation_minutes']
+              + data['unresolved_provider_gap_minutes']
+          )
+          for flag in (
+              'trusted_dataset_authorized',
+              'detector_execution_authorized',
+              'tradeplan_count_access_authorized',
+              'backtester_authorized',
+              'pnl_outcome_access_authorized',
+              'paper_trading_authorized',
+              'shadow_trading_authorized',
+              'live_trading_authorized',
+          ):
+              assert data[flag] is False
+
+          serialized = json.dumps(data, sort_keys=True).lower()
+          for marker in (
+              'authorization',
+              'bearer ',
+              'oanda_api_token',
+              'oanda_account_id',
+              '"balance"',
+              '"nav"',
+          ):
+              assert marker not in serialized
+
+          print('canonical_tail_validation=PASS')
+          print('instrument=' + instrument)
+          print('m1_complete=' + str(data['primary']['complete_candle_count']))
+          print('missing_gaps=' + str(data['missing_interval_count']))
+          print('missing_minutes=' + str(data['missing_minutes']))
+          print('no_price_gaps=' + str(data['no_price_observation_gap_count']))
+          print('unresolved_gaps=' + str(data['unresolved_provider_gap_count']))
+          print('unresolved_minutes=' + str(data['unresolved_provider_gap_minutes']))
+          print('refetch=' + data['refetch']['status'])
+          print('detector_execution_authorized=false')
+          print('pnl_outcome_access_authorized=false')
+          PY
+      - name: Upload canonical tail evidence only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p6b-canonical-tail-${{ matrix.instrument }}
+          path: /tmp/p6b-tail/${{ matrix.instrument }}.json
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 9
+      - name: Delete local evidence copy
+        if: always()
+        run: rm -rf /tmp/p6b-tail

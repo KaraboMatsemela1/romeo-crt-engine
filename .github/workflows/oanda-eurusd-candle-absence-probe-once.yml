@@ -1,0 +1,11 @@
+name: OANDA EUR_USD Candle Absence Probe — Disabled
+
+on:
+  workflow_dispatch:
+
+jobs:
+  disabled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disabled one-shot workflow
+        run: echo "One-shot Phase 6B probe completed; no credentialed action remains configured."

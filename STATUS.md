@@ -1,171 +1,207 @@
 # Project Status
 
-Updated: 2026-08-13
+Updated: 2026-08-14
 
 | Phase | Status | Primary exit condition |
 |---|---|---|
 | 0 — Engineering foundation | **COMPLETE** | Reproducible dev + CI + logging/storage/experiment contracts |
-| 1 — Romeo corpus / reconciliation | **COMPLETE** | Evidence-indexed corpus + reconciled doctrine + explicit evidence debts |
-| 2 — Formal CRT spec | **COMPLETE — FROZEN_FOR_VALIDATION** | Deterministic CRT v0.1 with no unresolved active-path predicates |
-| 3 — Market data | **COMPLETE** | Provider-backed trusted/reproducible D1/H1 dataset |
-| 4 — CRT detector | **COMPLETE** | Frozen fixtures + trusted-data detector integration reproduced causally |
-| 5 — Backtester | **COMPLETE** | Deterministic cost-aware event-driven simulator |
-| 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Preregistered DEV gate reached a terminal written decision |
-| 7 — Paper trading | **BLOCKED FOR v0.1** | No paper promotion from insufficient validation evidence |
-| 8 — Learning engine | Not started | Requires a sufficiently evidenced deterministic baseline |
-| 9 — Shadow trading | Not started | Requires paper/production-like readiness |
-| 10 — Controlled live | **NOT AUTHORIZED** | Explicit approval + canary gates |
+| 1 — Romeo corpus / reconciliation | **COMPLETE** | Evidence-indexed corpus + explicit evidence debts |
+| 2 — Formal CRT spec | **COMPLETE — v0.1 FROZEN** | Deterministic v0.1 order path |
+| 3 — Market data | **COMPLETE FOR BINANCE/BTCUSDT v0.1 ROUTE** | Trusted/reproducible D1/H1 dataset |
+| 4 — CRT detector | **COMPLETE FOR v0.1** | Frozen deterministic detector |
+| 5 — Backtester | **COMPLETE FOR v0.1** | Deterministic cost-aware simulator |
+| 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Terminal preregistered v0.1 DEV decision |
+| 6B — Candidate revision | **COMPLETE — INSUFFICIENT_MULTI_MARKET_SAMPLE** | Terminal preregistered multi-market activity decision |
+| 7 — Paper trading | **BLOCKED** | Requires a future candidate that passes full validation |
+| 8 — Learning engine | Not started | Requires sufficient deterministic labels |
+| 9 — Shadow trading | Not started | Requires paper readiness |
+| 10 — Controlled live | **NOT AUTHORIZED** | Explicit future approval + canary gates |
 
-## Current validation disposition
-
-```text
-Strategy    CRT-C3-D1-H1-M1-BEAR-v0.1
-Detector    CRT-DETECTOR-v0.1
-Simulator   CRT-BACKTEST-v0.1.1
-Phase 6     COMPLETE
-Disposition INSUFFICIENT_EVIDENCE
-Paper       NOT AUTHORIZED
-Shadow      NOT AUTHORIZED
-Live        NOT AUTHORIZED
-```
-
-`CRT-BACKTEST-v0.1.1` is a Phase-6 data-gap compatibility patch to the v0.1 simulator. It permits ordered/non-overlapping H1 input across explicitly governed market-data gaps and does not change entry, stop, target, sizing, friction, or same-bar execution semantics.
-
-The next legitimate project track is **new evidence-backed candidate research/revision**, not Phase 7.
-
-## Phase 6 — final result
-
-The protocol was frozen before new historical outcomes were opened:
+## Frozen v0.1 result
 
 ```text
-P6-VALIDATION-PROTOCOL-v1
-DEV       2019-01-01 .. 2022-12-31
-OOS       2023-01-01 .. 2025-08-31
-QUARANTINE 2025-09-01 .. 2025-09-30
-CONFIRM   2025-10-01 .. 2026-07-31
+strategy   CRT-C3-D1-H1-M1-BEAR-v0.1
+detector   CRT-DETECTOR-v0.1
+simulator  CRT-BACKTEST-v0.1.1
+DEV        2019-01-01 .. 2022-12-31
+candidates 1,416
+TradePlans 4
+required   30
+decision   INSUFFICIENT_EVIDENCE
 ```
 
-Sequential access was enforced. DEV was opened only after its trusted dataset identity had first been sealed and then reproduced byte-for-byte on an independent provider retrieval. OOS and CONFIRM were never opened.
+The Phase-6 v0.1 result remains historical evidence and is not overwritten by Phase 6B. v0.1 OOS and CONFIRM remain unopened. Parameter optimization and paper/shadow/live promotion remain unauthorized.
 
-### Frozen DEV dataset
+## Phase 6B candidate identity
 
 ```text
-dataset_version          3e8a39fec1062ef902e8a1ad
-manifest_sha256          761b561885f94cdb440be02d3a84169549d7bafd8e820bb9654c77ed8aed9e97
-normalized_sha256        46682c2d793dbdd0a0939862f444d19b4817559c8989a7fde031598d52cb29f5
-M1 rows                  2,074,680
-H1 rows                     34,578
-complete NY D1               1,418
-raw UTC daily archives       1,461
-excluded UTC archives           20
-REST exact verification         48
-checksum verification         1,413
+candidate_version      CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH
+alpha_strategy_version CRT-C3-D1-H1-M1-BEAR-v0.1
+detector_version       CRT-DETECTOR-v0.2-MULTI-MARKET
+signal_component       MID
+alpha changes          NONE
 ```
 
-Data-quality governance:
-
-- `P6-DATA-QUALITY-AMENDMENT-001`: independently evidenced Binance trading suspension on 2019-03-12 02:00–08:00 UTC.
-- `P6-DATA-QUALITY-AMENDMENT-002`: 20 checksum-authenticated incomplete/malformed UTC archives conservatively excluded whole from normalization.
-- no missing market observations were synthesized or filled.
-
-### DEV activity gate
-
-Workflow run `31682441984`, job `94390737742`, produced:
+Frozen exact OANDA universe:
 
 ```text
-rolling detector candidates   1,416
-valid TradePlans                  4
-BASE closed trades                4
-required DEV minimum             30
-activity gate     INSUFFICIENT_DEV_SAMPLE
+EUR_USD
+XAU_USD
+NAS100_USD
+SPX500_USD
 ```
 
-Therefore the preregistered protocol requires:
+No instrument was added, removed, or substituted after detector activity was observed.
+
+## Provider qualification — COMPLETE
+
+Historical qualification is governed by `P6B-OANDA-HISTORY-QUALIFICATION-V1` and `P6B_OANDA_OBSERVATION_POLICY_V2`.
+
+All 16 preregistered 2019-2022 MID/M1 instrument/year shards were collected from OANDA practice, independently re-fetched, validated, and reduced to credential-free reconciliation evidence. Raw provider price artifacts were ephemeral and deleted after validation.
 
 ```text
-Phase-6 disposition               INSUFFICIENT_EVIDENCE
-parameter optimization            PROHIBITED
-OOS outcome access                NOT AUTHORIZED
-CONFIRM outcome access            NOT AUTHORIZED
-paper promotion                   NOT AUTHORIZED
+complete M1 candles                    5,529,393
+raw missing intervals                    122,626
+raw missing minutes                    2,885,967
+all-gap S5 evidence shards                 16/16 PASS
+NO_PRICE_OBSERVATION intervals           122,626
+NO_PRICE_OBSERVATION minutes           2,885,967
+UNRESOLVED_PROVIDER_GAP intervals              0
+UNRESOLVED_PROVIDER_GAP minutes                0
+raw-gap-qualified instruments               4/4
+independent refetch                   PASS 4/4 per instrument
 ```
 
-### Descriptive four-trade cost results
+Canonical raw-gap evidence is sealed in `experiments/phase6b/P6B_ALL_GAP_S5_UNIVERSE_001.md`.
 
-These values are preserved for audit but are statistically insufficient for edge claims.
+## New-York DEV boundary qualification — COMPLETE
 
-| Scenario | Trades | Win rate | Expectancy R | Net P&L | Profit factor | Final equity |
-|---|---:|---:|---:|---:|---:|---:|
-| IDEAL | 4 | 50% | -0.0130 | -31.03 | 0.969 | 99,968.97 |
-| BASE | 4 | 50% | -0.1264 | -256.36 | 0.743 | 99,743.64 |
-| STRESSED | 4 | 50% | -0.1963 | -395.18 | 0.604 | 99,604.82 |
-| SEVERE | 4 | 50% | -0.2659 | -533.42 | 0.465 | 99,466.58 |
-
-No sensitivity optimization, walk-forward inference, Monte Carlo inference, OOS run, or CONFIRM run was performed because the activity gate failed.
-
-Canonical Phase-6 artifacts:
-
-- `experiments/phase6/P6_VALIDATION_PROTOCOL_V1.md`
-- `experiments/phase6/P6_DATA_QUALITY_AMENDMENT_001.md`
-- `experiments/phase6/P6_DATA_QUALITY_AMENDMENT_002.md`
-- `experiments/phase6/P6_DEV_DATA_FREEZE_001.json`
-- `experiments/phase6/P6_DEV_DATA_FREEZE_001.md`
-- `experiments/phase6/P6_DEV_OUTCOME_ACCESS_GATE_001.md`
-- `experiments/phase6/P6_DEV_RESULT_001.json`
-- `experiments/phase6/P6_DEV_RESULT_001.md`
-- `docs/reviews/PHASE_6_GATE_REVIEW.md`
-- `docs/PHASE_6_COMPLETION_REPORT.md`
-- `docs/checklists/phase-6.md`
-
-## Interpretation boundary
-
-The Phase-6 result does **not** prove that all CRT trading is unprofitable and does not evaluate Romeo's entire discretionary methodology.
-
-It establishes the narrower result that the exact deterministic reproduction candidate:
+The detector-facing DEV window is frozen in New-York wall-clock time and maps to:
 
 ```text
-CRT-C3-D1-H1-M1-BEAR-v0.1
+2019-01-01T05:00:00Z .. 2023-01-01T05:00:00Z exclusive
 ```
 
-is too selective on BTCUSDT over the preregistered four-year DEV window to support statistical validation or promotion.
+The five-hour tail from `2023-01-01T00:00:00Z` to `2023-01-01T05:00:00Z` was independently qualified for all four instruments. Each tail contained zero provider M1 and S5 observations, exact empty provider re-fetch, one 300-minute `NO_PRICE_OBSERVATION` interval, and zero unresolved gaps.
 
-v0.1 must not be relaxed in place after seeing this result. Any attempt to increase activity requires a new version backed by additional source evidence or a separately proven implementation defect.
+## Trusted canonical datasets — COMPLETE 4/4
 
-## Frozen historical handoff retained
+OANDA Trusted Dataset Build run #3 (`31799895592`) completed successfully. Every instrument was freshly reconstructed from OANDA, matched the sealed provider-value and gap evidence, derived deterministic H1 and New-York-midnight D1 data, and emitted `P6B_CANONICAL_PRICE_DATASET_V2` with `quality_status = TRUSTED`.
 
-Strategy freeze artifacts remain:
+| Instrument | H1 rows | NY-D1 rows | Price quantum | Normalized H1/D1 SHA-256 |
+|---|---:|---:|---:|---|
+| `EUR_USD` | 24,902 | 1,249 | `0.00001` | `b141c402fc4a69456fa56ab074b7bf37c75465b2e1e92a4c98c8516a08f96dd8` |
+| `XAU_USD` | 23,660 | 1,244 | `0.001` | `ec349ca0f77c3827666519bb234466ff1ff3e0ba2a30e46795c597a1df79fcdd` |
+| `NAS100_USD` | 23,604 | 1,245 | `0.1` | `4c46987b424f6616116299132664ea298dab55697d240f089fe0867c5cf19181` |
+| `SPX500_USD` | 23,605 | 1,245 | `0.1` | `dae1825b057fdc1acf87278a2163b570d9f2ae3fa870484c775eec78de37c19f` |
 
-- `strategy/CRT_V0.1_FREEZE_MANIFEST.json`
-- `strategy/CRT_V0.1_DETECTOR_FREEZE_MANIFEST.json`
-- `strategy/CRT_V0.1_BACKTEST_FREEZE_MANIFEST.json`
+The exact trusted set was frozen before detector counts at commit `8214c31e09d53cffadce453727604e0847a4d22e` in:
 
-Earlier engineering evidence remains valid:
+- `experiments/phase6b/P6B_TRUSTED_DATASET_FREEZE_001.json`
+- `experiments/phase6b/P6B_TRUSTED_DATASET_FREEZE_001.md`
 
-- Phase 3 established provider-backed immutable/verified market data.
-- Phase 4 established deterministic frozen-strategy detection and fixture parity.
-- Phase 5 established causal event-driven simulation and preserved the zero-activity September 2025 quarantine result.
-- Phase 6 established a larger trusted DEV sample and correctly stopped because the frozen candidate produced only four trades.
+## Detector-only activity gate — COMPLETE
 
-## Current authorization
+Frozen preregistered thresholds:
 
 ```text
-P6_OOS_OUTCOME_ACCESS_AUTHORIZED     = false
-P6_CONFIRM_OUTCOME_ACCESS_AUTHORIZED = false
-PARAMETER_OPTIMIZATION_AUTHORIZED    = false
-PAPER_TRADING_AUTHORIZED             = false
-SHADOW_TRADING_AUTHORIZED            = false
-LIVE_TRADING_AUTHORIZED              = false
+accepted instruments      >= 2
+contributing instruments  >= 2
+pooled TradePlans         >= 30
+backtester                PROHIBITED
+P&L                       PROHIBITED
 ```
 
-## Immediate next actions — candidate revision track
+Phase 6B Detector Activity Gate run #1 (`31802738559`) verified freeze ancestry, exact trusted artifact ZIP hashes, exact H1/D1 file hashes, and trusted identities before invoking the frozen detector. It persisted counts and ReasonCode inventories only; no candidate timestamps, trade geometry, P&L, or simulator outcomes were opened.
 
-1. Preserve v0.1 and all Phase-6 evidence unchanged.
-2. Return to the evidence-debt ledger and Romeo public-source corpus.
-3. Identify source-backed variants that could legitimately broaden opportunity frequency without selecting rules because they improve historical P&L.
-4. Prefer one narrowly defined new hypothesis at a time, such as a verified additional direction/setup/timeframe path rather than a bundle of discretionary additions.
-5. Create a new strategy version (for example v0.2) rather than mutating v0.1.
-6. Build new positive/negative fixtures and deterministic rule contracts before looking at fresh validation outcomes.
-7. Repeat detector/backtester compatibility and preregistered validation gates for the new candidate.
-8. Keep OOS/CONFIRM from v0.1 untouched; they remain useful reserved evidence only if governance later defines a legitimate new protocol.
-9. Do not start Phase 7 paper trading unless a future candidate independently passes validation gates.
-10. Keep live trading disabled.
+| Instrument | Complete NY-D1 | Candidates | NO_SIGNAL | TradePlans |
+|---|---:|---:|---:|---:|
+| `EUR_USD` | 1,249 | 1,247 | 1,244 | 3 |
+| `NAS100_USD` | 1,245 | 1,243 | 1,241 | 2 |
+| `SPX500_USD` | 1,245 | 1,243 | 1,241 | 2 |
+| `XAU_USD` | 1,244 | 1,242 | 1,242 | 0 |
+| **Pooled** | — | **4,975** | **4,968** | **7** |
+
+```text
+accepted instruments       4   >= 2   PASS
+contributing instruments   3   >= 2   PASS
+pooled TradePlans           7   >= 30  FAIL
+```
+
+## Terminal Phase 6B decision
+
+```text
+INSUFFICIENT_MULTI_MARKET_SAMPLE
+```
+
+The data-quality and eligible-universe gates passed. The candidate terminates because the frozen strategy produced only **7 pooled TradePlans**, materially below the preregistered minimum of **30**.
+
+This result must not be repaired by lowering the threshold, changing alpha rules, selecting instruments based on observed counts, optimizing parameters, or opening P&L. Any future research route requires a separately justified and preregistered candidate/protocol.
+
+Canonical decision evidence:
+
+- `experiments/phase6b/P6B_MULTI_MARKET_ACTIVITY_RESULT_001.json`
+- `experiments/phase6b/P6B_MULTI_MARKET_ACTIVITY_RESULT_001.md`
+
+Activity evidence binding:
+
+```text
+freeze commit              8214c31e09d53cffadce453727604e0847a4d22e
+activity workflow run      31802738559
+activity workflow head     377fed2ffb7da7dcfef10109d39658de6516bddb
+counts artifact id         9219943258
+counts artifact zip SHA    ad5f6bd04d124344e99aaecafd19ad2a5c7480b973984aa3bc78934e814d0b66
+aggregate result file SHA  effa269e1a55cd1643c6d5c8f2dff7128a9ac6188ada6d48079efc2e511538b4
+```
+
+## Current handoff
+
+```text
+Phase 6B                         COMPLETE — INSUFFICIENT_MULTI_MARKET_SAMPLE
+Alpha changes                    NONE
+Frozen OANDA universe            4 SYMBOLS
+Provider all-gap qualification   PASS 16/16; 0 UNRESOLVED
+Canonical NY boundary            PASS 4/4; 0 UNRESOLVED
+Trusted H1 / NY-D1 datasets      PASS 4/4
+Canonical TRUSTED identities     PASS 4/4
+Exact trusted universe freeze    SEALED PRE-COUNT
+Detector activity gate           COMPLETE
+Accepted instruments             4 / required 2
+Contributing instruments         3 / required 2
+Pooled TradePlans                7 / required 30
+Performance protocol             NOT AUTHORIZED
+Multi-market P&L                 NOT AUTHORIZED
+v0.1 OOS / CONFIRM               UNOPENED
+Phase 7                          BLOCKED
+Live trading                     NOT AUTHORIZED
+```
+
+## Authorization
+
+```text
+V0_1_MUTATION_AUTHORIZED                    = false
+V0_1_OOS_OUTCOME_ACCESS_AUTHORIZED          = false
+V0_1_CONFIRM_OUTCOME_ACCESS_AUTHORIZED      = false
+PARAMETER_OPTIMIZATION_AUTHORIZED           = false
+PHASE6B_ACTIVITY_GATE_COMPLETED              = true
+NEW_PHASE6B_ACTIVITY_TUNING_AUTHORIZED       = false
+PERFORMANCE_PROTOCOL_AUTHORIZED              = false
+BACKTEST_AUTHORIZED                          = false
+MULTI_MARKET_PNL_OUTCOME_ACCESS              = false
+PAPER_TRADING_AUTHORIZED                     = false
+SHADOW_TRADING_AUTHORIZED                    = false
+LIVE_TRADING_AUTHORIZED                      = false
+```
+
+## Canonical Phase 6B records
+
+- `docs/checklists/phase-6b.md`
+- `experiments/phase6b/P6B_MULTI_MARKET_ACTIVITY_PROTOCOL_V1.md`
+- `experiments/phase6b/P6B_ALL_GAP_S5_UNIVERSE_001.md`
+- `experiments/phase6b/P6B_TRUSTED_DATASET_FREEZE_001.json`
+- `experiments/phase6b/P6B_TRUSTED_DATASET_FREEZE_001.md`
+- `experiments/phase6b/P6B_MULTI_MARKET_ACTIVITY_RESULT_001.json`
+- `experiments/phase6b/P6B_MULTI_MARKET_ACTIVITY_RESULT_001.md`
+- `src/romeo_crt_engine/market_data/trusted_oanda_dataset_v2.py`
+- `scripts/build_oanda_trusted_dataset.py`
+- `scripts/run_phase6b_detector_activity.py`
