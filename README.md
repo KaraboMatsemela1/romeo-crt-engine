@@ -4,6 +4,35 @@ Evidence-driven research, validation, and execution platform for translating Rom
 
 > **Status:** Phases 0–6 are complete for the first deterministic candidate. `CRT-C3-D1-H1-M1-BEAR-v0.1` finished Phase 6 with **`INSUFFICIENT_EVIDENCE`** because the preregistered four-year DEV window produced only 4 closed trades against a required minimum of 30. OOS and final-confirmatory windows remain unopened. Paper, shadow and live trading are not authorized.
 
+## Progress to Paper Trading
+
+This is the executive gate view of the project. The bars represent **milestone/gate maturity**, not trading performance, probability of success, or a forecast. A bar advances only when the corresponding canonical gate materially changes.
+
+```text
+FIRST-PARTY EVIDENCE
+████████████████░░░░   good corpus; predicates incomplete
+
+DETERMINISTIC CANDIDATE
+░░░░░░░░░░░░░░░░░░░░   BLOCKED — no candidate-ready predicate
+
+ACTIVITY VALIDATION
+░░░░░░░░░░░░░░░░░░░░   not authorized — candidate not frozen
+
+PERFORMANCE VALIDATION
+░░░░░░░░░░░░░░░░░░░░   not authorized — activity gate not reached
+
+OOS
+░░░░░░░░░░░░░░░░░░░░   unopened
+
+CONFIRM
+░░░░░░░░░░░░░░░░░░░░   unopened
+
+PAPER TRADING
+░░░░░░░░░░░░░░░░░░░░   BLOCKED — requires PROMOTE_TO_PAPER_CANDIDATE
+```
+
+**Current bottleneck:** direct first-party evidence must close at least one held deterministic predicate before a new candidate can be selected and preregistered. See [`STATUS.md`](STATUS.md) for the canonical evidence/authorization state and [GitHub Issues](../../issues) for the autonomous execution queue.
+
 ## Start here
 
 1. Read [`PROJECT_BIBLE.md`](PROJECT_BIBLE.md) — canonical governance and phase definitions.
