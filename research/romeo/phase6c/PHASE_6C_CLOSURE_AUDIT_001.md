@@ -1,8 +1,8 @@
 # Phase 6C — First-Party Predicate Closure Audit 001
 
-**Date:** 2026-08-14  
-**Tracking:** Issue #70  
-**Mode:** strict reproducible provenance/closure audit only  
+**Date:** 2026-08-14\
+**Tracking:** Issue #70\
+**Mode:** strict reproducible provenance/closure audit only\
 **Disposition:** **ALL HELD PREDICATES OPEN**
 
 ## Scope and method
