@@ -1,0 +1,53 @@
+{
+  "schema_version": "P6D_PREDICATE_LEDGER_V1",
+  "rows": [
+    {
+      "predicate_id": "SS_MEANING_AND_CAUSAL_RULE",
+      "description": "Romeo CRTology Episode 1 SS meaning and exact causal eligibility rule",
+      "required_fields": ["EXACT_PREDICATE", "INFORMATION_AVAILABILITY_TIME", "DIRECTION_TIMEFRAME_OWNERSHIP", "CONFIRMATION", "INVALIDATION", "EXPIRY", "DATA_REQUIREMENTS"],
+      "evidence": []
+    },
+    {
+      "predicate_id": "SMT_EXECUTABLE_SEMANTICS",
+      "description": "SMT polarity, corresponding-extreme construction, ownership, substitution, confirmation and expiry",
+      "required_fields": ["EXACT_PREDICATE", "INFORMATION_AVAILABILITY_TIME", "DIRECTION_TIMEFRAME_OWNERSHIP", "CONFIRMATION", "INVALIDATION", "EXPIRY", "DATA_REQUIREMENTS"],
+      "evidence": []
+    },
+    {
+      "predicate_id": "MODEL_1_GEOMETRY",
+      "description": "Exact Model #1 candle geometry, information timing, entry confirmation and invalidation",
+      "required_fields": ["EXACT_PREDICATE", "INFORMATION_AVAILABILITY_TIME", "DIRECTION_TIMEFRAME_OWNERSHIP", "CONFIRMATION", "INVALIDATION", "EXPIRY", "DATA_REQUIREMENTS"],
+      "evidence": []
+    },
+    {
+      "predicate_id": "TRUE_MSS_ALGORITHM",
+      "description": "Exact true-MSS swing construction, break rule, entry ownership and invalidation",
+      "required_fields": ["EXACT_PREDICATE", "INFORMATION_AVAILABILITY_TIME", "DIRECTION_TIMEFRAME_OWNERSHIP", "CONFIRMATION", "INVALIDATION", "EXPIRY", "DATA_REQUIREMENTS"],
+      "evidence": []
+    },
+    {
+      "predicate_id": "TURTLE_SOUP_CONFIRMATION",
+      "description": "Qualifying old extreme, excursion, confirmation timestamp, invalidation and expiry",
+      "required_fields": ["EXACT_PREDICATE", "INFORMATION_AVAILABILITY_TIME", "DIRECTION_TIMEFRAME_OWNERSHIP", "CONFIRMATION", "INVALIDATION", "EXPIRY", "DATA_REQUIREMENTS"],
+      "evidence": []
+    },
+    {
+      "predicate_id": "KEY_LEVEL_SELECTOR",
+      "description": "Deterministic key-level marking hierarchy and arrival/reaction confirmation",
+      "required_fields": ["EXACT_PREDICATE", "INFORMATION_AVAILABILITY_TIME", "DIRECTION_TIMEFRAME_OWNERSHIP", "CONFIRMATION", "INVALIDATION", "EXPIRY", "DATA_REQUIREMENTS"],
+      "evidence": []
+    },
+    {
+      "predicate_id": "TIME_SELECTOR",
+      "description": "Executable CRT calendar/session/key-time selector with timezone and DST ownership",
+      "required_fields": ["EXACT_PREDICATE", "INFORMATION_AVAILABILITY_TIME", "DIRECTION_TIMEFRAME_OWNERSHIP", "CONFIRMATION", "INVALIDATION", "EXPIRY", "DATA_REQUIREMENTS"],
+      "evidence": []
+    },
+    {
+      "predicate_id": "DYNAMIC_BIAS_TRANSITION",
+      "description": "Convincing opposite-CRT definition, owning timeframe, transition timestamp and expiry",
+      "required_fields": ["EXACT_PREDICATE", "INFORMATION_AVAILABILITY_TIME", "DIRECTION_TIMEFRAME_OWNERSHIP", "CONFIRMATION", "INVALIDATION", "EXPIRY", "DATA_REQUIREMENTS"],
+      "evidence": []
+    }
+  ]
+}
