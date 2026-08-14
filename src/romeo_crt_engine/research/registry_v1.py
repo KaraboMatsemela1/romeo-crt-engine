@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlparse
@@ -51,18 +52,25 @@ _REQUIRED_COLUMNS = (
 )
 
 
-def _row_from_mapping(raw: dict[str, str]) -> SourceRegistryRowV1:
+def _required_cell(raw: Mapping[str, str | None], key: str) -> str:
+    value = raw.get(key)
+    if value is None:
+        raise ValueError(f"source registry row is missing cell: {key}")
+    return value
+
+
+def _row_from_mapping(raw: Mapping[str, str | None]) -> SourceRegistryRowV1:
     return SourceRegistryRowV1(
-        source_id=raw["source_id"],
-        title=raw["title"],
-        url=raw["url"],
-        published_date=raw["published_date"],
-        duration=raw["duration"],
-        source_type=raw["source_type"],
-        relevance=raw["relevance"],
-        status=raw["status"],
-        concepts=raw["concepts"],
-        notes=raw["notes"],
+        source_id=_required_cell(raw, "source_id"),
+        title=_required_cell(raw, "title"),
+        url=_required_cell(raw, "url"),
+        published_date=_required_cell(raw, "published_date"),
+        duration=_required_cell(raw, "duration"),
+        source_type=_required_cell(raw, "source_type"),
+        relevance=_required_cell(raw, "relevance"),
+        status=_required_cell(raw, "status"),
+        concepts=_required_cell(raw, "concepts"),
+        notes=_required_cell(raw, "notes"),
     )
 
 
@@ -71,7 +79,7 @@ def load_source_registry_v1(path: Path) -> tuple[SourceRegistryRowV1, ...]:
         reader = csv.DictReader(handle)
         if reader.fieldnames is None or tuple(reader.fieldnames) != _REQUIRED_COLUMNS:
             raise ValueError("unexpected source registry columns")
-        rows = tuple(_row_from_mapping(dict(raw)) for raw in reader)
+        rows = tuple(_row_from_mapping(raw) for raw in reader)
     identifiers = [row.source_id for row in rows]
     if len(identifiers) != len(set(identifiers)):
         raise ValueError("source registry IDs must be unique")
