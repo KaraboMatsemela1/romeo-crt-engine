@@ -1,8 +1,8 @@
 # Phase 6C — CRTology Evidence & Candidate Selection Checklist
 
-**Status:** **IN PROGRESS — PRIMARY-SOURCE EVIDENCE GATE**  
+**Status:** **IN PROGRESS — 2026 SOURCE RECONCILIATION**  
 **Doctrine stream:** `CRTOLOGY_2026_RESEARCH`  
-**Primary source:** `ROMEO-2026-CRTOLOGY-01` — `CRTology episode 1: SS`  
+**Episode-1 gate:** **CLOSED — `TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT`**  
 **New alpha candidate:** **NOT SELECTED**  
 **Phase 7:** **BLOCKED**
 
@@ -32,23 +32,34 @@
 - [x] Confirm first-party publication provenance.
 - [x] Confirm title `CRTology episode 1: SS`.
 - [x] Record that the source was previously only `DISCOVERED` in the registry.
-- [ ] Capture direct transcript/captions or equivalent first-party technical frames.
-- [ ] Establish Romeo's explicit meaning of `SS`.
-- [ ] Identify whether `SS` is alpha, context, timing/session, entry, management, or non-alpha material.
-- [ ] Extract deterministic required inputs.
-- [ ] Freeze information-availability timestamp.
-- [ ] Freeze direction/timeframe semantics.
-- [ ] Freeze confirmation/invalidation/expiry if applicable.
-- [ ] Capture positive examples.
-- [ ] Capture negative/counterexamples.
-- [ ] Map the rule against `CRT_SECRETS_2025`.
-- [ ] Close Gate 6C-1 as `TECHNICAL_SOURCE_CAPTURE_SUFFICIENT` or `TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT`.
+- [x] Search direct transcript/caption, video-metadata, indexed transcript and first-party follow-up routes.
+- [x] Capture first-party follow-up clues: organised recognition lens, do-not-force warning, strong-trend caution, and weekly day-of-week observations.
+- [ ] Establish Romeo's explicit meaning of `SS` — **not captured**.
+- [ ] Identify a deterministic executable `SS` predicate — **not captured**.
+- [ ] Freeze information-availability timestamp — **not possible without predicate**.
+- [ ] Freeze direction/timeframe semantics — **not sufficiently captured**.
+- [ ] Freeze confirmation/invalidation/expiry — **not sufficiently captured**.
+- [ ] Capture unambiguous positive/negative `SS` examples — **not captured**.
+- [ ] Promote a mapped `SS` rule against `CRT_SECRETS_2025` — **not authorized**.
+- [x] Close Gate 6C-1 as `TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT`.
+- [x] Preserve re-entry condition for future direct transcript/frame/restatement evidence.
 
-## D. Candidate selection — locked until Gate 6C-1/2/3
+Canonical pass:
 
-- [ ] Complete semantic extraction for any source-supported `SS` rule.
-- [ ] Reconcile contradictions/refinements against the frozen 2025 doctrine.
-- [ ] Determine whether there is a legitimate executable delta.
+- `research/romeo/phase6c/PRIMARY_SOURCE_PASS_001.md`
+- `research/romeo/phase6c/CRTOLOGY_01_EVIDENCE_GATE.md`
+
+## D. Continue independent 2026 source reconciliation
+
+- [ ] Evidence-pass `ROMEO-2026-LIVE-02` without using Phase-6B activity/P&L to select semantics.
+- [ ] Determine whether the second live tape-reading session restates any Episode-1/2026 technical predicate directly.
+- [ ] Register any later CRTology episode only after its exact first-party source/video identity is found.
+- [ ] Reopen Episode 1 only if a later direct source explicitly disambiguates `SS`.
+- [ ] Maintain a 2025-vs-2026 reconciliation ledger for every first-party clue.
+
+## E. Candidate selection — still locked
+
+- [ ] Determine whether the 2026 source stream eventually yields a legitimate executable delta.
 - [ ] If no executable delta exists, record that result without forcing a candidate.
 - [ ] If an executable delta exists, select exactly one narrow research hypothesis.
 - [ ] Freeze inherited rules versus changed rules.
@@ -57,7 +68,7 @@
 - [ ] Freeze timeframe/calendar/data requirements.
 - [ ] Freeze activity threshold and access protocol before outcomes.
 
-## E. Implementation — not yet authorized
+## F. Implementation — not yet authorized
 
 - [ ] Create a new strategy version only after candidate precommitment.
 - [ ] Create positive/negative fixtures before historical detector outcomes.
@@ -69,12 +80,14 @@
 ## Current handoff
 
 ```text
-Phase 6C                         IN PROGRESS — PRIMARY-SOURCE EVIDENCE GATE
+Phase 6C                         IN PROGRESS — 2026 SOURCE RECONCILIATION
 Branch                           agent/phase-6c-crtology-evidence
 Doctrine stream                  CRTOLOGY_2026_RESEARCH
-Primary source                   ROMEO-2026-CRTOLOGY-01
-Source identity                  CONFIRMED
+Episode-1 source identity        CONFIRMED
+Gate 6C-1                        TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
 Technical meaning of SS          UNRESOLVED
+First-party 2026 clues           PRESERVED / NON-EXECUTABLE
+Next source                      ROMEO-2026-LIVE-02
 New alpha candidate              NOT SELECTED
 Alpha implementation             NOT AUTHORIZED
 Detector activity                NOT AUTHORIZED
