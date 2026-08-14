@@ -213,6 +213,25 @@ Canonical recovery record:
 
 - `research/romeo/phase6d/FIRST_PARTY_ARTIFACT_RECOVERY_002.md`
 
+## Phase 6D — First-Party Caption/Transcript/Frame Recovery 004
+
+The bounded Issue #16 pass exhausted one direct availability check and one
+official Romeo Telegram channel-index search for each of the six held routes.
+All twelve attempts failed during environment DNS resolution before source
+contact, so each route is recorded as `SOURCE_UNAVAILABLE`; this is not an
+observation that a video, caption, transcript, frame, or post is absent.
+
+```text
+new direct first-party artifacts  0
+CLOSING_FIELD_EVIDENCE            0
+candidate_ready_rows              0
+decision                          BLOCKED_NO_VERIFIED_PREDICATE_CLOSURE
+```
+
+Canonical recovery record:
+
+- `research/romeo/phase6d/FIRST_PARTY_CAPTION_TRANSCRIPT_FRAME_RECOVERY_004.md`
+
 ### Artifact-backed predicate state
 
 ```text
