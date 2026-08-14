@@ -1,6 +1,6 @@
 # Phase 6D — First-Party Research Infrastructure Charter
 
-**Status:** IMPLEMENTATION IN PROGRESS  
+**Status:** **COMPLETE — RESEARCH INFRASTRUCTURE V1**  
 **Mode:** research infrastructure only  
 **Predecessor:** Phase 6C `BLOCKED_NO_VERIFIED_PREDICATE_CLOSURE`
 
@@ -56,6 +56,8 @@ Every artifact records:
 
 The manifest is canonicalized and hashed. Raw captured media can remain outside Git when size/copyright constraints require it; the manifest binds the exact evidence used.
 
+The registry loader also enforces the exact CSV row width so shifted or malformed source metadata fails closed rather than silently corrupting provenance fields.
+
 ### 2. Predicate evidence ledger
 
 Machine-readable ledger:
@@ -87,7 +89,7 @@ Initial ledger rows are inherited only as unresolved evidence debts from Phase 6
 - `TIME_SELECTOR`
 - `DYNAMIC_BIAS_TRANSITION`
 
-No row is candidate-ready at Phase-6D start.
+No row is candidate-ready at Phase-6D V1 completion.
 
 ### 3. Doctrine delta validation
 
@@ -125,6 +127,8 @@ detector_activity_authorized  = false
 outcome_access_authorized     = false
 ```
 
+The checked-in registry and predicate ledger are exercised by the unit suite. At V1 completion, CI passed Ruff, MyPy and **133 pytest tests**.
+
 A future closed predicate triggers human/research review; it does not automatically authorize implementation.
 
 ## Acquisition workflow
@@ -140,7 +144,7 @@ A future closed predicate triggers human/research review; it does not automatica
 
 ## Version boundary
 
-Phase 6D tooling may improve research quality, but it may not mutate historical strategy identities or decisions:
+Phase 6D tooling improves research quality but does not mutate historical strategy identities or decisions:
 
 ```text
 Phase 6 v0.1 = INSUFFICIENT_EVIDENCE
@@ -149,3 +153,18 @@ Phase 6C     = BLOCKED_NO_VERIFIED_PREDICATE_CLOSURE
 ```
 
 These remain immutable evidence.
+
+## V1 completion result
+
+```text
+RESEARCH_INFRASTRUCTURE_V1      COMPLETE
+SOURCE_PROVENANCE_GATE          IMPLEMENTED
+PREDICATE_CLOSURE_GATE          IMPLEMENTED
+DOCTRINE_DELTA_GATE             IMPLEMENTED
+POSITIVE_NEGATIVE_FIXTURE_GATE  IMPLEMENTED
+CORPUS_INDEX                    IMPLEMENTED
+READINESS_AUDIT                 IMPLEMENTED
+CANDIDATE_READY_ROWS            0
+STRATEGY_IMPLEMENTATION         NOT AUTHORIZED
+DETECTOR / PNL / OOS / CONFIRM  NOT AUTHORIZED
+```
