@@ -7,7 +7,8 @@ from romeo_crt_engine.market_data.price_data_v2 import CanonicalPriceBarV2
 
 NEW_YORK = ZoneInfo("America/New_York")
 
-# The Phase-6B activity protocol is frozen in New-York wall-clock time.
+# The Phase-6B activity protocol is frozen in New-York wall-clock time. The
+# trusted-dataset workflow consumes these exact bounds without widening DEV.
 ACTIVITY_START_NY = datetime(2019, 1, 1, 0, 0, tzinfo=NEW_YORK)
 ACTIVITY_END_NY_EXCLUSIVE = datetime(2023, 1, 1, 0, 0, tzinfo=NEW_YORK)
 
