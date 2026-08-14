@@ -222,10 +222,11 @@ def test_corpus_index_is_deterministic_and_rejects_duplicate_manifest() -> None:
 def test_checked_in_phase6d_readiness_audit_stays_research_only() -> None:
     completed = subprocess.run(
         [sys.executable, "scripts/audit_phase6d_research_readiness.py"],
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
     )
+    assert completed.returncode == 0, completed.stderr
     summary = json.loads(completed.stdout)
     assert summary["candidate_ready_rows"] == 0
     assert summary["candidate_creation_authorized"] is False
