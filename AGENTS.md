@@ -19,9 +19,23 @@ If implementation conflicts with the frozen spec, do not silently “fix” the 
 - Read `PROJECT_BIBLE.md`.
 - Read `docs/ROADMAP.md` and current `STATUS.md`.
 - Read relevant ADRs.
+- Read `docs/operations/AUTONOMOUS_GITHUB_WORK_PROTOCOL.md` before claiming autonomous work.
+- Use GitHub Issue #42 as the canonical shared execution queue.
 - Determine whether the requested work is research, infrastructure, strategy logic, validation, risk, or execution.
 - Identify the applicable quality gate.
 - Do not implement unresolved Romeo concepts as facts.
+
+## Multi-agent coordination
+
+ChatGPT Work, Codex, Hermes, and other agents share the same GitHub claim/dependency protocol. Never maintain a separate hidden backlog that bypasses Issue #42.
+
+- Claim before implementation and immediately refetch issue comments to resolve claim races.
+- Never work an issue with an earlier valid active claim from another agent.
+- Follow the bounded work-in-flight rules for CI/review wait states.
+- Recheck claim ownership before opening a PR.
+- After merge, record completion and immediately return to the shared queue.
+
+Hermes-specific continuous execution and bootstrap instructions are defined in `docs/operations/HERMES_EXECUTION_PROFILE.md`.
 
 ## Research-agent rules
 
