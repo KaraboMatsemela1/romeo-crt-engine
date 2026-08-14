@@ -6,21 +6,21 @@ from romeo_crt_engine.validation_evaluator import (
 
 
 def metrics(**overrides):
-    values = dict(
-        dev_closed_trades=30,
-        oos_closed_trades=30,
-        confirm_closed_trades=20,
-        oos_base_expectancy=0.1,
-        confirm_base_expectancy=0.1,
-        combined_base_expectancy=0.1,
-        stressed_combined_expectancy=0.01,
-        combined_profit_factor=1.2,
-        max_drawdown=0.10,
-        largest_winner_share=0.20,
-        top_five_winner_share=0.50,
-        independent_review_complete=True,
-        reproducible=True,
-    )
+    values = {
+        "dev_closed_trades": 30,
+        "oos_closed_trades": 30,
+        "confirm_closed_trades": 20,
+        "oos_base_expectancy": 0.1,
+        "confirm_base_expectancy": 0.1,
+        "combined_base_expectancy": 0.1,
+        "stressed_combined_expectancy": 0.01,
+        "combined_profit_factor": 1.2,
+        "max_drawdown": 0.10,
+        "largest_winner_share": 0.20,
+        "top_five_winner_share": 0.50,
+        "independent_review_complete": True,
+        "reproducible": True,
+    }
     return ValidationMetrics(**(values | overrides))
 
 
