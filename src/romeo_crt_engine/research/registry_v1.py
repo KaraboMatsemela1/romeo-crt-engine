@@ -52,14 +52,14 @@ _REQUIRED_COLUMNS = (
 )
 
 
-def _required_cell(raw: Mapping[str, str | None], key: str) -> str:
-    value = raw.get(key)
-    if value is None:
-        raise ValueError(f"source registry row is missing cell: {key}")
-    return value
+def _required_cell(raw: Mapping[str, str], key: str) -> str:
+    try:
+        return raw[key]
+    except KeyError as exc:
+        raise ValueError(f"source registry row is missing cell: {key}") from exc
 
 
-def _row_from_mapping(raw: Mapping[str, str | None]) -> SourceRegistryRowV1:
+def _row_from_mapping(raw: Mapping[str, str]) -> SourceRegistryRowV1:
     return SourceRegistryRowV1(
         source_id=_required_cell(raw, "source_id"),
         title=_required_cell(raw, "title"),
@@ -76,10 +76,25 @@ def _row_from_mapping(raw: Mapping[str, str | None]) -> SourceRegistryRowV1:
 
 def load_source_registry_v1(path: Path) -> tuple[SourceRegistryRowV1, ...]:
     with path.open("r", encoding="utf-8", newline="") as handle:
-        reader = csv.DictReader(handle)
-        if reader.fieldnames is None or tuple(reader.fieldnames) != _REQUIRED_COLUMNS:
+        reader = csv.reader(handle)
+        try:
+            header = tuple(next(reader))
+        except StopIteration as exc:
+            raise ValueError("source registry must contain a header") from exc
+        if header != _REQUIRED_COLUMNS:
             raise ValueError("unexpected source registry columns")
-        rows = tuple(_row_from_mapping(raw) for raw in reader)
+
+        parsed_rows: list[SourceRegistryRowV1] = []
+        for line_number, values in enumerate(reader, start=2):
+            if len(values) != len(_REQUIRED_COLUMNS):
+                raise ValueError(
+                    f"source registry row {line_number} has {len(values)} columns; "
+                    f"expected {len(_REQUIRED_COLUMNS)}"
+                )
+            raw = dict(zip(_REQUIRED_COLUMNS, values, strict=True))
+            parsed_rows.append(_row_from_mapping(raw))
+
+    rows = tuple(parsed_rows)
     identifiers = [row.source_id for row in rows]
     if len(identifiers) != len(set(identifiers)):
         raise ValueError("source registry IDs must be unique")
