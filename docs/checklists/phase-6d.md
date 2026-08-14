@@ -1,6 +1,6 @@
 # Phase 6D — First-Party Research Infrastructure Checklist
 
-**Status:** **COMPLETE — V1 + CORPUS MIGRATION 001 + FIRST-PARTY RECOVERY 002**  
+**Status:** **COMPLETE — V1 + CORPUS MIGRATION 001 + FIRST-PARTY RECOVERY 002 + BOUNDED RECOVERY 003**
 **Mode:** research infrastructure / provenance only
 
 ## A. Preserve historical boundaries
@@ -133,3 +133,16 @@ PHASE_7                      = BLOCKED
 ```
 
 The remaining work is not strategy implementation. Phase 6C may reopen only when a new or newly accessible first-party technical artifact closes a deterministic held predicate and passes the existing Phase-6D research gates.
+
+## J. Bounded historical first-party transcript/frame recovery 003
+
+- [x] Re-examine the six Phase-6C direct first-party priority routes only.
+- [x] Preserve registry URL and acquisition-manifest bindings for every route.
+- [x] Record the actual retrieval methods and DNS failures without treating them as source unavailability.
+- [x] Add no payload, SHA-256, registry row, corpus entry, or ledger evidence when no source response was received.
+- [x] Keep all predicate fields non-closing and all downstream authorization false.
+- [x] Add deterministic route-inventory validation.
+
+Recovery 003 is a bounded environment-exhaustion result, recorded in
+`FIRST_PARTY_TRANSCRIPT_FRAME_RECOVERY_003.md`. It does not alter the Phase 6C
+blocker, any historical result, or project gate status.
