@@ -1,0 +1,14 @@
+{
+  "artifacts": [],
+  "manifest_sha256": "6df089c9f9376ddb2fe75280ce30b1c032abfcec0e0923791184829f58288f62",
+  "notes": "Registered first-party source identity migrated. Existing SMT summaries and direct-claim records are not replayable artifact payloads with exact source locators, so no technical artifact is promoted; status remains PARTIAL.",
+  "schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
+  "source": {
+    "first_party": true,
+    "provenance_statement": "Evidence Pass 1 completed from indexed summary plus first-party Telegram corroboration of SMT's operational role. SMT treated as cross-market context/confirmation, not standalone entry. Local Turtle Soup may not always be required when SMT supplies manipulation evidence; exact substitution and pair-direction semantics remain unresolved. Episode 9 required before freezing correct SMT usage.",
+    "source_id": "ROMEO-2025-S6",
+    "source_kind": "YOUTUBE",
+    "url": "https://www.youtube.com/watch?v=3IWgc52Dqsg"
+  },
+  "status": "PARTIAL"
+}

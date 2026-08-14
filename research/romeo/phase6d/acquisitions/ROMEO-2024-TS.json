@@ -1,0 +1,14 @@
+{
+  "artifacts": [],
+  "manifest_sha256": "e3723a33bb97d17c97c3f56bc036715be474749011c76aed4151feb0c0109e45",
+  "notes": "Registered first-party source identity migrated. Existing transcript/summary evidence is provisional and not direct first-party verified; no artifact is promoted; status remains PARTIAL.",
+  "schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
+  "source": {
+    "first_party": true,
+    "provenance_statement": "Timestamped evidence pass completed from indexed transcript/summary. Structural primitive extracted; direct first-party transcript/video verification still required before VERIFIED rule promotion.",
+    "source_id": "ROMEO-2024-TS",
+    "source_kind": "YOUTUBE",
+    "url": "https://www.youtube.com/watch?v=U-gNCwbGtTI"
+  },
+  "status": "PARTIAL"
+}

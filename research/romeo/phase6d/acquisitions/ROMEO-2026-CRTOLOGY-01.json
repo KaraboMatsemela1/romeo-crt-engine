@@ -1,0 +1,14 @@
+{
+  "artifacts": [],
+  "manifest_sha256": "4175fffb1cfbc1f1b2fb3830e66845131eb027f166a1e34c1351d9eda3918f1a",
+  "notes": "Registered first-party source identity migrated. No replayable direct technical transcript/caption/frame artifact exists in the repository corpus; status remains PARTIAL.",
+  "schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
+  "source": {
+    "first_party": true,
+    "provenance_statement": "Source/video identity and first-party provenance reconfirmed for Phase 6C. Gate 6C-1 closed TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT because explicit SS meaning/predicate and direct transcript were not captured. First-party follow-up clues are preserved but remain non-executable; re-entry requires new direct evidence.",
+    "source_id": "ROMEO-2026-CRTOLOGY-01",
+    "source_kind": "YOUTUBE",
+    "url": "https://www.youtube.com/watch?v=4DZWbCzEvhM"
+  },
+  "status": "PARTIAL"
+}

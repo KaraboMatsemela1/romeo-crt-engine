@@ -1,0 +1,14 @@
+{
+  "artifacts": [],
+  "manifest_sha256": "8dab0de549391302917da4c00f7098b623e729bd731e3cb28217ed80b09b1552",
+  "notes": "Registered first-party source identity migrated. Existing key-level evidence lacks a replayable direct first-party technical artifact with exact locator; status remains PARTIAL.",
+  "schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
+  "source": {
+    "first_party": true,
+    "provenance_statement": "Evidence Pass 1 completed from indexed transcript/summary plus first-party Telegram statement. Key level established as context rather than entry; destination-vs-reaction setup taxonomy extracted. KOD semantic tension identified for later reconciliation. Direct video verification still required before VERIFIED promotion.",
+    "source_id": "ROMEO-2025-S5",
+    "source_kind": "YOUTUBE",
+    "url": "https://www.youtube.com/watch?v=p8UYOgVn1-g"
+  },
+  "status": "PARTIAL"
+}

@@ -1,6 +1,6 @@
 # Phase 6D — First-Party Research Infrastructure Checklist
 
-**Status:** **COMPLETE — RESEARCH INFRASTRUCTURE V1**  
+**Status:** **COMPLETE — RESEARCH INFRASTRUCTURE V1 + CORPUS MIGRATION 001**  
 **Mode:** research infrastructure only
 
 ## A. Preserve historical boundaries
@@ -61,7 +61,7 @@
 - [x] Emit candidate/detector/outcome authorizations as false.
 - [x] Run the audit against the checked-in registry + ledger in pytest.
 
-## H. Validation
+## H. V1 validation
 
 - [x] Add unit tests for manifest determinism and provenance rejection.
 - [x] Add unit tests for predicate closure semantics.
@@ -69,10 +69,30 @@
 - [x] Add unit tests for positive/negative fixture gate.
 - [x] Add unit tests for registry schema/duplicate handling.
 - [x] Add unit tests for corpus index determinism.
-- [x] CI green on implementation head: Ruff PASS, MyPy PASS, **133 pytest tests PASS**.
+- [x] CI green on V1 implementation head: Ruff PASS, MyPy PASS, **133 pytest tests PASS**.
+
+## I. Existing corpus migration 001
+
+- [x] Freeze the migration to the six-source Phase-6C bounded acquisition set.
+- [x] Create six deterministic acquisition manifests.
+- [x] Record one replayable `CAPTURED` source and five `PARTIAL` identity-only sources.
+- [x] Admit only replayable artifact-backed evidence to `CORPUS_INDEX_V1.json`.
+- [x] Preserve exact SHA-256 chain of custody for `ROMEO-2026-TG-TIME-TS-6361`.
+- [x] Add `P6D_PREDICATE_LEDGER_V2` with explicit `PARTIAL` vs `CLOSING` evidence semantics.
+- [x] Attach Time + Turtle Soup evidence to `TIME_SELECTOR` as `PARTIAL` only.
+- [x] Keep `satisfied_fields = 0` for `TIME_SELECTOR`.
+- [x] Keep all other held predicates unresolved because no replayable direct technical artifact exists in the bounded corpus.
+- [x] Add `scripts/audit_phase6d_corpus_migration.py` to cross-check registry, manifest, corpus, and ledger provenance.
+- [x] Validate migration audit in pytest.
+- [x] Implementation-head CI green: Ruff PASS, MyPy PASS, **137 pytest tests PASS**.
+- [x] `closing_field_evidence = 0`.
+- [x] `candidate_ready_rows = 0`.
+- [x] Keep candidate/detector/outcome authorization false.
 
 ## Exit condition
 
-**Phase 6D V1 exit condition is satisfied.** The research-infrastructure implementation is green and all historical strategy/outcome authorizations remain false. Merge of PR #20 is the repository promotion step.
+**Phase 6D V1 and Corpus Migration 001 exit conditions are satisfied on the implementation branch.** PR #23 is the repository promotion step.
+
+The migration result is `COMPLETE_NO_PREDICATE_CLOSURE`: provenance quality improved, but Phase 6C remains blocked and no strategy implementation is authorized.
 
 A future verified source may use this infrastructure to close a predicate, but **predicate closure alone does not authorize strategy implementation**. A separate preregistered candidate decision is still required.

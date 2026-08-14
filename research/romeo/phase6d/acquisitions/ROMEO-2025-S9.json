@@ -1,0 +1,14 @@
+{
+  "artifacts": [],
+  "manifest_sha256": "b6e089683456dcd2df7a42c74292d57d98397981a04b1125caba7d1e178a8e6f",
+  "notes": "Registered first-party source identity migrated. Existing Episode-9 scope statements do not include a replayable direct technical transcript/caption/frame artifact; status remains PARTIAL.",
+  "schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
+  "source": {
+    "first_party": true,
+    "provenance_statement": "First-party video ID and intended scope directly corroborated by Romeo official Telegram. Evidence Pass 1 completed from indexed summary. Episode 9 narrows the public entry families to Model #1 or true MSS after context, filters SMT by HTF direction, and provides a structural Turtle-Soup-extreme stop reference. Exact Model #1 geometry, true-MSS algorithm, stop buffer, pair semantics and time-exit rules remain unresolved; publication date/duration still to confirm.",
+    "source_id": "ROMEO-2025-S9",
+    "source_kind": "YOUTUBE",
+    "url": "https://www.youtube.com/watch?v=2sxdsgcIeYA"
+  },
+  "status": "PARTIAL"
+}
