@@ -12,7 +12,7 @@ Updated: 2026-08-14
 | 5 — Backtester | **COMPLETE FOR v0.1** | Deterministic cost-aware simulator |
 | 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Terminal preregistered v0.1 DEV decision |
 | 6B — Candidate revision | **COMPLETE — INSUFFICIENT_MULTI_MARKET_SAMPLE** | Terminal preregistered multi-market activity decision |
-| 6C — Doctrine research | **RESEARCH OPEN — NO_EXECUTABLE_DELTA_FROM_CURRENT_PUBLIC_EVIDENCE** | Await a new verified first-party source that closes a deterministic rule delta |
+| 6C — Doctrine research | **RESEARCH OPEN — NO_EXECUTABLE_DELTA_FROM_CURRENT_PUBLIC_EVIDENCE** | Await a verified first-party source that closes a deterministic rule delta |
 | 7 — Paper trading | **BLOCKED** | Requires a future candidate that passes full validation |
 | 8 — Learning engine | Not started | Requires sufficient deterministic labels |
 | 9 — Shadow trading | Not started | Requires paper readiness |
@@ -95,16 +95,9 @@ pooled TradePlans          7 / required 30  FAIL
 
 No Phase-6B backtest/P&L outcome was opened.
 
-Canonical Phase-6B result:
-
-- `experiments/phase6b/P6B_MULTI_MARKET_ACTIVITY_RESULT_001.json`
-- `experiments/phase6b/P6B_MULTI_MARKET_ACTIVITY_RESULT_001.md`
-
 ## Phase 6C — current public-source evidence milestone
 
 Phase 6C is a fresh evidence-led doctrine route. It is not permission to lower the Phase-6B activity threshold or tune the frozen strategy against observed counts.
-
-Doctrine boundary:
 
 ```text
 historical baseline        CRT_SECRETS_2025
@@ -114,41 +107,53 @@ candidate_ready_rows       0
 current decision           NO_EXECUTABLE_DELTA_FROM_CURRENT_PUBLIC_EVIDENCE
 ```
 
-First-party 2026 evidence reinforces that core CRT and Turtle Soup remain stable while the system receives refinements/nuances. Any 2026 delta must remain version-separated and be classified before implementation.
-
-### Gate results
+### Current gate results
 
 ```text
 CRTology Episode 1 / SS     TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
 2026 Live Session 2         TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
-SMT semantics/substitution  TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
-Dynamic bias transition     TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
+SMT semantics/substitution  TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT / PARTIAL CLOSURE
+Dynamic bias transition     TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT / PARTIAL CLOSURE
+Time + Turtle Soup doctrine PARTIAL_DOCTRINE_CLOSURE / EXECUTABLE_TIME_PREDICATE_INSUFFICIENT
 ```
 
-### CRTology Episode 1
+### Time + Turtle Soup partial doctrine closure
+
+A newly reconciled direct first-party source is registered as:
 
 ```text
-source_id                    ROMEO-2026-CRTOLOGY-01
-video_id                     4DZWbCzEvhM
-source identity              CONFIRMED
-first-party provenance       CONFIRMED
-explicit meaning of SS       NOT CAPTURED
-new deterministic predicate  NOT CAPTURED
+source_id   ROMEO-2026-TG-TIME-TS-6361
+source      officialRomeotpt/6361
 ```
 
-First-party post-episode clues around organised recognition, not forcing absent setups, strong-trend caution, and weekly/day-of-week context are preserved but remain non-executable.
-
-### 2026 Live Tape-Reading Session 2
+It supports the doctrine facts:
 
 ```text
-source_id                    ROMEO-2026-LIVE-02
-video_id                     Pmmx41M7KhA
-source identity              CONFIRMED
-first-party provenance       CONFIRMED
-new deterministic predicate  NOT CAPTURED
+TIME_IS_CORE_CRT_CONTEXT = true
+TURTLE_SOUP_IS_CORE_CRT_EXECUTION_COMPONENT = true
+TIME_AND_TURTLE_SOUP_ARE_CO_DEPENDENT_WITHIN_CRT = true
 ```
 
-Preserved non-executable clues include selection-over-availability, exit-entry theory, quarter-as-candle framing, and Model #1/OTE emphasis.
+This strengthens the project from a generic “timing matters” interpretation to a direct first-party doctrine position that Time and Turtle Soup are intended to work together inside CRT.
+
+It does **not** close an executable temporal selector. Still unresolved:
+
+```text
+exact eligible weekdays / sessions
+exact key times
+timezone / DST / calendar anchor
+owning parent timeframe
+hard filter vs context/ranking semantics
+how time qualifies or rejects Turtle Soup
+Turtle Soup confirmation timestamp / expiry
+weekday-to-state-machine mapping
+```
+
+Accordingly, the previously captured Tuesday/Wednesday/Thursday-Friday statements remain context hypotheses only. No weekday-only, session-only, or invented time-window strategy is authorized.
+
+Canonical gate:
+
+- `research/romeo/phase6c/TIME_TURTLE_SOUP_EVIDENCE_GATE.md`
 
 ### SMT partial evidence closure
 
@@ -161,58 +166,33 @@ BTC  <-> ETH
 GOLD <-> SILVER
 ```
 
-Direct first-party evidence also supports the weaker doctrine fact that SMT can sometimes fulfill a manipulation/context role when an expected local Turtle Soup does not print.
-
-Still unresolved for execution:
-
-```text
-correlated-pair divergence polarity
-inverse-pair divergence polarity
-corresponding-extreme construction
-cross-market synchronization / stale-data policy
-manipulation vs confirmation ownership
-traded-instrument selection
-Model #1 / true-MSS interaction
-exact SMT-for-local-TS substitution predicate
-confirmation / invalidation / expiry
-```
-
-Generic ICT SMT conventions may not fill these fields.
+Direct evidence supports that SMT can sometimes fulfill a manipulation/context role when an expected local Turtle Soup does not print. Exact polarity, corresponding extremes, synchronization, ownership, substitution, confirmation and expiry remain unresolved.
 
 ### Dynamic bias partial evidence closure
 
-Source-supported doctrine facts:
+Source-supported:
 
 ```text
 BIAS_IS_NOT_IMMUTABLE = true
 OPPOSITE_CRT_CAN_JUSTIFY_DIRECTIONAL_RECONSIDERATION = true
 ```
 
-Still unresolved:
-
-```text
-"convincing CRT" predicate
-owning timeframe
-transition timing
-confirmation requirement
-transition expiry
-trend-strength / slowdown metric
-```
-
-No arbitrary ATR/body/displacement/ADX proxy is authorized.
+The `convincing CRT` predicate, owning timeframe, transition timing/confirmation/expiry and trend-strength/slowdown metric remain unresolved. No arbitrary ATR/body/displacement/ADX proxy is authorized.
 
 ## Current Phase 6C decision
 
 ```text
 NO_EXECUTABLE_DELTA_FROM_CURRENT_PUBLIC_EVIDENCE
+candidate_ready_rows = 0
 ```
 
-This is not a rejection of CRTology, SMT, dynamic bias, OTE, quarterly CRT, exit-entry theory, or other deferred Romeo concepts. It means the currently captured direct evidence does not close any new signal path tightly enough for a deterministic successor candidate.
+The new Time + Turtle Soup source closes doctrine ownership but not a deterministic order predicate. No new strategy candidate is selected.
 
-Canonical decision:
+Canonical decision records:
 
 - `research/romeo/phase6c/CURRENT_PUBLIC_EVIDENCE_DECISION_001.md`
 - `research/romeo/phase6c/DOCTRINE_RECONCILIATION_2026.md`
+- `research/romeo/phase6c/TIME_TURTLE_SOUP_EVIDENCE_GATE.md`
 
 ## Source horizon / re-entry trigger
 
@@ -223,9 +203,9 @@ ROMEO-2026-CRTOLOGY-INTRO  -> 8LblVvGZaGY
 ROMEO-2026-CRTOLOGY-01     -> 4DZWbCzEvhM
 ```
 
-Phase 6C research reopens when a new verified first-party source closes a strategy-critical predicate, including a future CRTology episode or newly accessible original captions/frames for existing sources.
+No verified CRTology Episode-2 technical source identity has been captured. No Episode-2 ID/title/semantics may be invented.
 
-No unverified Episode-2 ID/title/semantics may be invented.
+Phase 6C remains open for a new verified first-party source that closes a strategy-critical predicate, or newly accessible original captions/technical frames for held sources.
 
 ## Current handoff
 
@@ -236,7 +216,8 @@ Phase 6C                         RESEARCH OPEN — NO_EXECUTABLE_DELTA_FROM_CURR
 Episode-1 gate                   TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
 Live-02 gate                     TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
 SMT gate                         TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT / PARTIAL CLOSURE
-Dynamic-bias gate                TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
+Dynamic-bias gate                TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT / PARTIAL CLOSURE
+Time + Turtle Soup gate          PARTIAL_DOCTRINE_CLOSURE / EXECUTABLE_TIME_PREDICATE_INSUFFICIENT
 candidate_ready_rows             0
 New alpha candidate              NOT SELECTED
 Alpha implementation             NOT AUTHORIZED
@@ -276,6 +257,7 @@ LIVE_TRADING_AUTHORIZED                      = false
 - `research/romeo/phase6c/LIVE_02_EVIDENCE_GATE.md`
 - `research/romeo/phase6c/SMT_EVIDENCE_GATE.md`
 - `research/romeo/phase6c/DYNAMIC_BIAS_EVIDENCE_GATE.md`
+- `research/romeo/phase6c/TIME_TURTLE_SOUP_EVIDENCE_GATE.md`
 - `research/romeo/phase6c/DOCTRINE_RECONCILIATION_2026.md`
 - `research/romeo/phase6c/CURRENT_PUBLIC_EVIDENCE_DECISION_001.md`
 - `docs/checklists/phase-6c.md`

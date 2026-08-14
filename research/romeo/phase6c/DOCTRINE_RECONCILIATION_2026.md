@@ -30,11 +30,12 @@ A source-supported statement is not automatically executable. `Deterministic now
 | `ROMEO-2026-CRTOLOGY-01` — organised/collective application lens; do not force when absent | 2025 already requires context before lower-timeframe pattern and rejects pattern-first fitting | `REFINEMENT` / `UNRESOLVED` | NO | No new selector until organised state/predicate is directly defined |
 | Episode-1 follow-up — do not fade strong trend without warning signs; follow until it slows | Countertrend/strong-trend regime logic explicitly deferred in Phase 1/2 | `REFINEMENT` / `UNRESOLVED` | NO | Potential future regime/context branch; no metric or warning-sign registry yet |
 | Episode-1 follow-up — Tuesday Turtle Soup / Wednesday classic buy-sell / Thu-Fri cap weekly range | Time/context central in 2025; exact day-of-week state machine not active in v0.1 | `NEW_OPTIONAL_BRANCH` / `UNRESOLVED` | NO | Preserve as time-context hypothesis; no hard weekday filter authorized |
+| `ROMEO-2026-TG-TIME-TS-6361` — Time and Turtle Soup are co-essential functional components of CRT | 2025 already makes candle timing, key-time context and Turtle Soup central but leaves exact temporal selector unresolved | `REFINEMENT / PARTIAL EVIDENCE-DEBT CLOSURE` | NO for execution | Time ownership is now direct doctrine rather than project inference; exact calendar/session/qualification predicate remains unresolved |
 | `ROMEO-2026-LIVE-02` mall analogy — availability does not mean buy everything | v0.1 architecture already separates candidate availability from qualification/risk authorization | `CLARIFICATION` | YES as principle | Reinforces gated selection; does not define ranking among valid candidates |
 | `Every entry is an exit, and every exit is an entry` / `exit-entry theory` | 2025 predeclares entry/target/exit but lacks this exact structural theory as executable state | `REFINEMENT` / `UNRESOLVED` | NO | No target/entry changes until owning structure and lifecycle are defined |
 | `Every quarter is a candle` | CRT fractality exists; broader parent timeframes beyond W1/D1/H4 deferred | `NEW_OPTIONAL_BRANCH` | NO | Potential quarterly parent route; calendar/execution mapping unresolved |
 | Most students should trade Model #1 and OTEs for a long time | Model #1 source-supported; OTE explicitly deferred from v0.1 | `CLARIFICATION` for Model #1; `UNRESOLVED` for OTE integration | PARTIAL | No change to frozen Model #1; OTE remains excluded until deterministic |
-| Journey to key level vs reaction from key level | Already explicit in 2025 Episode 5 and Phase 1 taxonomy | `CLARIFICATION` / RESTATEMENT | YES conceptually | Does not reopen v0.1 journey branch; journey execution semantics still separately unresolved |
+| Journey to key level vs reaction from key level | Already explicit in 2025 Episode 5 and Phase 1 taxonomy | `CLARIFICATION / RESTATEMENT` | YES conceptually | Does not reopen v0.1 journey branch; journey execution semantics still separately unresolved |
 | Convincing opposite CRT can justify changing bias swiftly | 2025 failure/context work recognizes direction conflict; broad bias-transition algorithm deferred | `REFINEMENT` / `UNRESOLVED` | NO | Direct principle preserved; `convincing`, timeframe ownership, timing and expiry unresolved |
 | SMT basic pair registry: `EU-DXY`, `NQ-ES`, `BTC-ETH`, `GOLD-SILVER` | Phase 1/2 explicitly deferred SMT until pair registry/polarity could be verified | `CLARIFICATION / PARTIAL EVIDENCE-DEBT CLOSURE` | YES for registry only | These four relationships are the only currently first-party-authorized SMT research pairs; no divergence/order predicate yet |
 | Romeo case: expected local low Turtle Soup does not occur; SMT instead fulfills its Episode-6 role | Phase 1 recorded possibility that SMT may substitute for local manipulation but exact substitution semantics were unresolved | `REFINEMENT / PARTIAL EVIDENCE-DEBT CLOSURE` | NO for execution | Confirms SMT can fulfill a manipulation/context role without local Turtle Soup in at least one source case; exact substitution predicate remains unresolved |
@@ -46,6 +47,7 @@ CRTology Episode 1 / SS     TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
 2026 Live Session 2         TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
 SMT semantics/substitution  TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT (partial evidence closure preserved)
 Dynamic bias transition     TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
+Time + Turtle Soup doctrine PARTIAL_DOCTRINE_CLOSURE / EXECUTABLE_TIME_PREDICATE_INSUFFICIENT
 ```
 
 Canonical gate records:
@@ -55,6 +57,33 @@ Canonical gate records:
 - `research/romeo/phase6c/LIVE_02_EVIDENCE_GATE.md`
 - `research/romeo/phase6c/SMT_EVIDENCE_GATE.md`
 - `research/romeo/phase6c/DYNAMIC_BIAS_EVIDENCE_GATE.md`
+- `research/romeo/phase6c/TIME_TURTLE_SOUP_EVIDENCE_GATE.md`
+
+## Time + Turtle Soup partial-closure boundary
+
+Direct first-party evidence closes:
+
+```text
+TIME_IS_CORE_CRT_CONTEXT = true
+TURTLE_SOUP_IS_CORE_CRT_EXECUTION_COMPONENT = true
+TIME_AND_TURTLE_SOUP_ARE_CO_DEPENDENT_WITHIN_CRT = true
+```
+
+It does **not** close:
+
+```text
+exact eligible weekdays
+exact eligible sessions
+exact key times
+calendar timezone / DST anchor
+parent-timeframe ownership
+hard-filter vs ranking/context semantics
+Turtle Soup confirmation timestamp
+Turtle Soup expiry
+weekday-to-state-machine mapping
+```
+
+No project-authored session window or arbitrary weekday filter may fill these fields.
 
 ## SMT partial-closure boundary
 
@@ -167,6 +196,7 @@ Phase 6C currently does **not** select:
 - an SMT-direct-entry strategy;
 - an SMT-substitution strategy;
 - a weekday-only strategy;
+- an invented session/time-window strategy;
 - an OTE strategy;
 - a quarterly CRT strategy;
 - a dynamic-bias strategy;
@@ -178,6 +208,8 @@ Phase 6C currently does **not** select:
 ```text
 2025 doctrine                    PRESERVED
 2026 clues                       VERSIONED AND RECONCILED
+Time doctrine                    PARTIALLY CLOSED
+Time executable predicate        INSUFFICIENT
 SMT registry                     PARTIALLY CLOSED
 SMT substitution role            PARTIALLY CLOSED
 SMT executable semantics         INSUFFICIENT

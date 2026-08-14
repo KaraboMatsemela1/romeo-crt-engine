@@ -55,6 +55,36 @@ Preserved clues:
 
 Missing deterministic new order-path semantics.
 
+### Time + Turtle Soup doctrine
+
+```text
+source_id                    ROMEO-2026-TG-TIME-TS-6361
+first-party provenance       CONFIRMED
+time as core CRT context      SOURCE-SUPPORTED
+Turtle Soup execution role   SOURCE-SUPPORTED
+co-dependent CRT role         SOURCE-SUPPORTED
+gate                          PARTIAL_DOCTRINE_CLOSURE / EXECUTABLE_TIME_PREDICATE_INSUFFICIENT
+```
+
+This direct first-party statement strengthens the project from “time matters” to the narrower doctrine position that Time and Turtle Soup are intended to function together inside CRT.
+
+Still unresolved for execution:
+
+- eligible weekdays and sessions;
+- exact key times;
+- timezone / DST / calendar anchor;
+- owning parent timeframe;
+- hard-filter versus contextual/ranking semantics;
+- how time qualifies or rejects a Turtle Soup;
+- Turtle Soup confirmation timestamp and expiry;
+- weekday-to-state-machine mapping.
+
+Therefore this evidence does **not** authorize a weekday-only, session-only, or arbitrary time-window candidate.
+
+Canonical gate:
+
+- `research/romeo/phase6c/TIME_TURTLE_SOUP_EVIDENCE_GATE.md`
+
 ### SMT semantics / substitution
 
 ```text
@@ -141,7 +171,7 @@ ROMEO-2026-CRTOLOGY-INTRO  -> 8LblVvGZaGY
 ROMEO-2026-CRTOLOGY-01     -> 4DZWbCzEvhM
 ```
 
-Romeo's current first-party/public indexing references a future Episode 2, but this pass did not capture a verified Episode-2 YouTube video ID/title with technical source content.
+The current pass has not captured a verified CRTology Episode-2 YouTube video ID/title with technical source content.
 
 The project must not assign an Episode-2 identity or semantics until directly verified.
 
@@ -175,6 +205,7 @@ A new source must be evaluated against the same no-overfit gates before candidat
 ```text
 GUESS_SS_MEANING                         = false
 USE_GENERIC_ICT_SMT_AS_ROMEO_SPEC       = false
+INVENT_TIME_WINDOW_OR_WEEKDAY_FILTER    = false
 LOWER_PHASE6B_ACTIVITY_THRESHOLD        = false
 SELECT_DELTA_BY_EXPECTED_TRADE_COUNT     = false
 SELECT_DELTA_BY_HISTORICAL_PNL           = false

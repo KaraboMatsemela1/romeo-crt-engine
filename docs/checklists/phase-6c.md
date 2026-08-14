@@ -89,10 +89,33 @@ Canonical record:
 
 - `research/romeo/phase6c/DYNAMIC_BIAS_EVIDENCE_GATE.md`
 
-## G. 2025-vs-2026 doctrine reconciliation
+## G. Time + Turtle Soup doctrine gate
+
+Source: `ROMEO-2026-TG-TIME-TS-6361` / first-party Telegram post `officialRomeotpt/6361`.
+
+- [x] Capture direct statement assigning functional CRT roles to **Time** and **Turtle Soup**.
+- [x] Close doctrine facts:
+  - [x] `TIME_IS_CORE_CRT_CONTEXT = true`
+  - [x] `TURTLE_SOUP_IS_CORE_CRT_EXECUTION_COMPONENT = true`
+  - [x] `TIME_AND_TURTLE_SOUP_ARE_CO_DEPENDENT_WITHIN_CRT = true`
+- [x] Reconcile against existing Tuesday/Wednesday/Thursday-Friday context without promoting a weekday filter.
+- [ ] Exact eligible weekdays/sessions — **not directly closed**.
+- [ ] Exact key-time selector — **not directly closed**.
+- [ ] Calendar timezone / DST anchor — **not directly closed**.
+- [ ] Owning parent timeframe — **not directly closed**.
+- [ ] Hard-filter versus context/ranking semantics — **not directly closed**.
+- [ ] Turtle Soup confirmation timestamp / expiry — **not directly closed**.
+- [x] Close gate as `PARTIAL_DOCTRINE_CLOSURE / EXECUTABLE_TIME_PREDICATE_INSUFFICIENT`.
+- [x] Explicitly prohibit invented weekday/session windows.
+
+Canonical record:
+
+- `research/romeo/phase6c/TIME_TURTLE_SOUP_EVIDENCE_GATE.md`
+
+## H. 2025-vs-2026 doctrine reconciliation
 
 - [x] Maintain `DOCTRINE_RECONCILIATION_2026.md`.
-- [x] Reconcile Episode-1, Live-02, SMT and dynamic-bias evidence without promoting qualitative statements to alpha rules.
+- [x] Reconcile Episode-1, Live-02, SMT, dynamic-bias, and Time+Turtle-Soup evidence without promoting qualitative statements to alpha rules.
 - [x] Keep `candidate_ready_rows = 0`.
 - [x] Record the current public-evidence decision as `NO_EXECUTABLE_DELTA_FROM_CURRENT_PUBLIC_EVIDENCE`.
 
@@ -100,7 +123,7 @@ Canonical decision:
 
 - `research/romeo/phase6c/CURRENT_PUBLIC_EVIDENCE_DECISION_001.md`
 
-## H. Current source horizon
+## I. Current source horizon
 
 Verified CRTology public identities currently captured:
 
@@ -112,9 +135,9 @@ ROMEO-2026-CRTOLOGY-01     4DZWbCzEvhM
 - [x] First-party/public indexing indicates a future Episode 2 is part of the sequence.
 - [x] Do **not** invent an Episode-2 video ID/title before direct verification.
 - [ ] Reopen research when Episode 2 or another first-party source closes a strategy-critical predicate.
-- [ ] Reopen a held gate only while preserving its prior insufficient decision as historical evidence.
+- [x] Reopen a held gate only while preserving its prior insufficient decision as historical evidence — **Time gate added without rewriting prior gates**.
 
-## I. Candidate selection — locked
+## J. Candidate selection — locked
 
 - [x] Determine whether current public evidence contains a candidate-ready row: **NO**.
 - [x] Record no executable delta without forcing a candidate.
@@ -122,7 +145,7 @@ ROMEO-2026-CRTOLOGY-01     4DZWbCzEvhM
 - [ ] Freeze inherited versus changed/excluded rules before outcomes.
 - [ ] Freeze universe, timeframe/calendar/data requirements and activity threshold before outcomes.
 
-## J. Implementation — not authorized
+## K. Implementation — not authorized
 
 - [ ] Create a new strategy version only after future candidate precommitment.
 - [ ] Create positive/negative fixtures before historical detector outcomes.
@@ -135,12 +158,13 @@ ROMEO-2026-CRTOLOGY-01     4DZWbCzEvhM
 
 ```text
 Phase 6C                         RESEARCH OPEN — NO_EXECUTABLE_DELTA_FROM_CURRENT_PUBLIC_EVIDENCE
-Branch                           agent/phase-6c-crtology-evidence
+Branch                           agent/phase-6c-temporal-doctrine
 2025 doctrine                    PRESERVED
 Episode-1 gate                   TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
 Live-02 gate                     TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
 SMT gate                         TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT / PARTIAL CLOSURE
 Dynamic-bias gate                TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
+Time + Turtle Soup gate          PARTIAL_DOCTRINE_CLOSURE / EXECUTABLE_TIME_PREDICATE_INSUFFICIENT
 Doctrine reconciliation ledger   ACTIVE / candidate_ready_rows=0
 Next source horizon              NEW VERIFIED FIRST-PARTY CLOSURE / CRTOLOGY EPISODE 2
 New alpha candidate              NOT SELECTED
