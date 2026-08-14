@@ -1,0 +1,214 @@
+name: OANDA Trusted Dataset Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/phase-6b-candidate-revision
+    paths:
+      - .github/workflows/oanda-trusted-dataset-build.yml
+      - scripts/build_oanda_trusted_dataset.py
+      - src/romeo_crt_engine/market_data/trusted_oanda_dataset_v2.py
+      - src/romeo_crt_engine/market_data/aggregate_v2.py
+      - src/romeo_crt_engine/market_data/canonical_coverage_v2.py
+      - src/romeo_crt_engine/market_data/oanda_qualification.py
+      - src/romeo_crt_engine/market_data/price_data_v2.py
+      - src/romeo_crt_engine/market_data/s5_gap_policy_v2.py
+      - src/romeo_crt_engine/market_data/session_policy_v2.py
+
+jobs:
+  build-trusted-dataset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      actions: read
+      contents: read
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        include:
+          - instrument: EUR_USD
+            y2019_id: 9211249144
+            y2019_sha: ffdeb537e4f34caa2a67576fe3d5d334ec78c40672038088599a45a733dcf902
+            y2020_id: 9211563658
+            y2020_sha: 0279d631ae58b3e76ae95cd68c532dd256adf6eb9445f91f900de802ad968cf4
+            y2021_id: 9211885837
+            y2021_sha: 4e8c18b842e312203b35b635e9889b8f531516869751e8a52c4e829effdfeb28
+            y2022_id: 9212145968
+            y2022_sha: 4acd2f8007fef08c1c76f4dc910b79319d23a950c1183bbf1a2253732c69fb63
+            tail_id: 9218059952
+            tail_sha: e93c6b4e784ebe423dc16f46a302302135e8ae57ee84e0c73e5ea5cf027b85ee
+          - instrument: XAU_USD
+            y2019_id: 9217625026
+            y2019_sha: 682b1ab4247e59d16d8fe572931b1be446a99b19c5c42f177baea4573974c758
+            y2020_id: 9212541553
+            y2020_sha: 69b7c8c0451e9d34143f41b81e205ced581d102dec9abe7bf9c1869ac4656b5e
+            y2021_id: 9212873722
+            y2021_sha: 7c33eee7d27c3dd22faa097920b2918656dc552fad306e19f32402f218702cf6
+            y2022_id: 9213176421
+            y2022_sha: 7f976482bd599a18c35886af6063009c135431a9e8e8e372418918ef49ac8117
+            tail_id: 9218068363
+            tail_sha: 680351d76851df81cfad8053738ee959c2301b8310dfcd2c0344f4a962c5e616
+          - instrument: NAS100_USD
+            y2019_id: 9213538525
+            y2019_sha: c39652edfa0421c8e29a66273e3ff97c218110c2aafb5a7222545f41f7bef5ab
+            y2020_id: 9213869970
+            y2020_sha: da828205a46bfcc3073e9066c621817048f172e1d0257a6054f5893e51605358
+            y2021_id: 9214256110
+            y2021_sha: 163f4780a234d1cdb27f097205a0bffeaa16c38c5b224f6112e7036dba2a2e2b
+            y2022_id: 9214568567
+            y2022_sha: e471e5b6610093770eaf132f9efca9287cf0f03c7a2a47fd47fae352de1f51f6
+            tail_id: 9218078313
+            tail_sha: 54d6aef046f0053bf3e86eb767c30bdf54f6642fe1c0583cf131fcd92c670018
+          - instrument: SPX500_USD
+            y2019_id: 9215148643
+            y2019_sha: 72070253e90af2a3c6e9b6392ddfc8e012a2019c89b25ce7ec5b85fde9967280
+            y2020_id: 9215592916
+            y2020_sha: 81f6898907149f9c7d31101518f4f69213ded5226719a293704446d11bbdbece
+            y2021_id: 9216071013
+            y2021_sha: 08745ee3652524205e761f36f40857a399fece4f74110749afad860dffd9a182
+            y2022_id: 9216422072
+            y2022_sha: 9ed5eedfb6efeeb3ea332f6c1d10ae79a54b022b32c5819811704f7dff8ef0b0
+            tail_id: 9218086609
+            tail_sha: 57cc4aaf6ca13c9fa7f64a083a6b95c49245956fb678adc680b0a4c50c01652d
+    env:
+      OANDA_ENV: practice
+      OANDA_ACCOUNT_ID: ${{ secrets.OANDA_ACCOUNT_ID }}
+      OANDA_API_TOKEN: ${{ secrets.OANDA_API_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
+      P6B_INSTRUMENT: ${{ matrix.instrument }}
+      Y2019_ID: ${{ matrix.y2019_id }}
+      Y2019_SHA: ${{ matrix.y2019_sha }}
+      Y2020_ID: ${{ matrix.y2020_id }}
+      Y2020_SHA: ${{ matrix.y2020_sha }}
+      Y2021_ID: ${{ matrix.y2021_id }}
+      Y2021_SHA: ${{ matrix.y2021_sha }}
+      Y2022_ID: ${{ matrix.y2022_id }}
+      Y2022_SHA: ${{ matrix.y2022_sha }}
+      TAIL_ID: ${{ matrix.tail_id }}
+      TAIL_SHA: ${{ matrix.tail_sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+      - name: Install locked environment
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps --no-build-isolation -e .
+      - name: Require OANDA practice credentials
+        run: |
+          test -n "$OANDA_ACCOUNT_ID"
+          test -n "$OANDA_API_TOKEN"
+      - name: Download exact sealed provider evidence artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/p6b-evidence
+          download_artifact() {
+            local artifact_id="$1"
+            local expected_sha="$2"
+            local label="$3"
+            local zip_path="/tmp/p6b-evidence/${label}.zip"
+            gh api "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}/zip" > "$zip_path"
+            echo "${expected_sha}  ${zip_path}" | sha256sum -c -
+            unzip -q "$zip_path" -d /tmp/p6b-evidence
+            rm -f "$zip_path"
+          }
+          download_artifact "$Y2019_ID" "$Y2019_SHA" "2019"
+          download_artifact "$Y2020_ID" "$Y2020_SHA" "2020"
+          download_artifact "$Y2021_ID" "$Y2021_SHA" "2021"
+          download_artifact "$Y2022_ID" "$Y2022_SHA" "2022"
+          download_artifact "$TAIL_ID" "$TAIL_SHA" "tail"
+          find /tmp/p6b-evidence -maxdepth 1 -type f -print | sort
+      - name: Reconstruct provider history and build TRUSTED H1 / NY-D1 dataset
+        run: |
+          python scripts/build_oanda_trusted_dataset.py \
+            --instrument "$P6B_INSTRUMENT" \
+            --evidence-dir /tmp/p6b-evidence \
+            --output-dir /tmp/p6b-trusted
+      - name: Validate credential-free TRUSTED output
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          instrument = os.environ['P6B_INSTRUMENT']
+          root = Path('/tmp/p6b-trusted')
+          manifest = json.loads((root / f'{instrument}.trusted-build.json').read_text())
+          identity = json.loads((root / f'{instrument}.identity.json').read_text())
+
+          assert manifest['schema_version'] == 'P6B_OANDA_TRUSTED_DATASET_BUILD_V1'
+          assert manifest['canonical_coverage_policy_version'] == 'P6B_CANONICAL_COVERAGE_V1'
+          assert manifest['observation_policy_version'] == 'P6B_OANDA_OBSERVATION_POLICY_V2'
+          assert manifest['provider'] == 'OANDA_V20'
+          assert manifest['venue'] == 'OANDA_FXTRADE'
+          assert manifest['environment'] == 'practice'
+          assert manifest['instrument'] == instrument
+          assert manifest['price_component'] == 'MID'
+          assert manifest['canonical_coverage_start_utc'] == '2019-01-01T05:00:00+00:00'
+          assert manifest['canonical_coverage_end_utc'] == '2023-01-01T05:00:00+00:00'
+          assert manifest['quality_status'] == 'TRUSTED'
+          assert manifest['m1_persisted'] is False
+          assert manifest['raw_provider_price_artifacts_persisted'] is False
+          assert len(manifest['yearly_reconstruction']) == 4
+          assert all(item['sealed_unresolved_gap_count'] == 0 for item in manifest['yearly_reconstruction'])
+          assert identity['schema_version'] == 'P6B_CANONICAL_PRICE_DATASET_V2'
+          assert identity['quality_status'] == 'TRUSTED'
+          assert identity['provider'] == 'OANDA_V20'
+          assert identity['venue'] == 'OANDA_FXTRADE'
+          assert identity['instrument'] == instrument
+          assert identity['price_component'] == 'MID'
+          assert identity['price_quantum_source'] == 'PROVIDER_PRICE_PRECISION_POLICY'
+          assert int(identity['h1_rows']) > 0
+          assert int(identity['d1_rows']) > 0
+          assert identity['normalized_sha256'] == manifest['normalized_h1_d1_sha256']
+          assert len(identity['normalized_sha256']) == 64
+
+          for flag in (
+              'detector_execution_authorized',
+              'tradeplan_count_access_authorized',
+              'backtester_authorized',
+              'pnl_outcome_access_authorized',
+              'paper_trading_authorized',
+              'shadow_trading_authorized',
+              'live_trading_authorized',
+          ):
+              assert manifest[flag] is False
+
+          serialized = json.dumps(manifest, sort_keys=True).lower()
+          for marker in (
+              'authorization',
+              'bearer ',
+              'oanda_api_token',
+              'oanda_account_id',
+              '"balance"',
+              '"nav"',
+          ):
+              assert marker not in serialized
+
+          print('trusted_dataset_validation=PASS')
+          print('instrument=' + instrument)
+          print('h1_rows=' + str(identity['h1_rows']))
+          print('d1_rows=' + str(identity['d1_rows']))
+          print('normalized_h1_d1_sha256=' + identity['normalized_sha256'])
+          print('price_quantum=' + identity['price_quantum'])
+          print('detector_execution_authorized=false')
+          print('pnl_outcome_access_authorized=false')
+          PY
+      - name: Upload detector-facing trusted dataset only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p6b-trusted-dataset-${{ matrix.instrument }}
+          path: |
+            /tmp/p6b-trusted/${{ matrix.instrument }}.H1.jsonl
+            /tmp/p6b-trusted/${{ matrix.instrument }}.D1_NY.jsonl
+            /tmp/p6b-trusted/${{ matrix.instrument }}.identity.json
+            /tmp/p6b-trusted/${{ matrix.instrument }}.trusted-build.json
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 9
+      - name: Delete local provider/evidence/output copies
+        if: always()
+        run: rm -rf /tmp/p6b-evidence /tmp/p6b-trusted
