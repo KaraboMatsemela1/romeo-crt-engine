@@ -49,15 +49,27 @@ _REQUIRED_COLUMNS = (
 )
 
 
+def _row_from_mapping(raw: dict[str, str]) -> SourceRegistryRowV1:
+    return SourceRegistryRowV1(
+        source_id=raw["source_id"],
+        title=raw["title"],
+        url=raw["url"],
+        published_date=raw["published_date"],
+        duration=raw["duration"],
+        source_type=raw["source_type"],
+        relevance=raw["relevance"],
+        status=raw["status"],
+        concepts=raw["concepts"],
+        notes=raw["notes"],
+    )
+
+
 def load_source_registry_v1(path: Path) -> tuple[SourceRegistryRowV1, ...]:
     with path.open("r", encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle)
         if reader.fieldnames is None or tuple(reader.fieldnames) != _REQUIRED_COLUMNS:
             raise ValueError("unexpected source registry columns")
-        rows = tuple(
-            SourceRegistryRowV1(**{column: raw[column] for column in _REQUIRED_COLUMNS})
-            for raw in reader
-        )
+        rows = tuple(_row_from_mapping(dict(raw)) for raw in reader)
     identifiers = [row.source_id for row in rows]
     if len(identifiers) != len(set(identifiers)):
         raise ValueError("source registry IDs must be unique")
