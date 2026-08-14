@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal
 
 import pytest
@@ -49,8 +49,8 @@ def test_eligible_dates_are_derived_from_provider_observations() -> None:
         _bar(datetime(2019, 1, 2, 5, 0, tzinfo=UTC)),
     )
     assert eligible_new_york_dates_from_m1(bars) == (
-        datetime(2019, 1, 1).date(),
-        datetime(2019, 1, 2).date(),
+        date(2019, 1, 1),
+        date(2019, 1, 2),
     )
 
 
