@@ -1,6 +1,9 @@
 """Outcome-blind candidate preregistration contract."""
+
 from datetime import date
+
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+
 
 class CandidatePrecommitment(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -27,8 +30,14 @@ class CandidatePrecommitment(BaseModel):
     oos_min_closed_trades: int = Field(ge=30)
     confirm_min_closed_trades: int = Field(ge=20)
     reserved_outcome_fields: tuple[str, ...] = (
-        "trade_count", "closed_trades", "pnl", "return", "profit_factor",
-        "drawdown", "win_rate", "expectancy",
+        "trade_count",
+        "closed_trades",
+        "pnl",
+        "return",
+        "profit_factor",
+        "drawdown",
+        "win_rate",
+        "expectancy",
     )
 
     @model_validator(mode="after")
