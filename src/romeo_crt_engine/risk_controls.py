@@ -52,7 +52,7 @@ def rounded_units(
         raise ValueError("position sizing inputs must be positive")
     raw = equity * risk / (stop_distance * value_per_unit)
     factor = 10**precision
-    return floor(raw * factor) // factor
+    return int(floor(raw * factor) // factor)
 
 
 def check_order(config: RiskConfig, request: OrderSafetyInput) -> RiskResult:
