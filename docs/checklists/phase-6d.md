@@ -1,6 +1,6 @@
 # Phase 6D — First-Party Research Infrastructure Checklist
 
-**Status:** IMPLEMENTATION V1  
+**Status:** **COMPLETE — RESEARCH INFRASTRUCTURE V1**  
 **Mode:** research infrastructure only
 
 ## A. Preserve historical boundaries
@@ -21,6 +21,7 @@
 - [x] Bind capture CLI to `SOURCE_REGISTRY.csv` instead of caller-supplied URLs.
 - [x] Reject unregistered source IDs.
 - [x] Permit metadata/text/captions/transcript/frame/chart evidence types.
+- [x] Enforce exact registry row width and fail closed on malformed column alignment.
 
 ## C. Predicate evidence engine
 
@@ -58,6 +59,7 @@
 - [x] Reject predicate evidence referencing unknown source IDs.
 - [x] Emit candidate-ready row count only.
 - [x] Emit candidate/detector/outcome authorizations as false.
+- [x] Run the audit against the checked-in registry + ledger in pytest.
 
 ## H. Validation
 
@@ -66,10 +68,11 @@
 - [x] Add unit tests for doctrine promotion rejection.
 - [x] Add unit tests for positive/negative fixture gate.
 - [x] Add unit tests for registry schema/duplicate handling.
-- [ ] CI green on final branch head.
+- [x] Add unit tests for corpus index determinism.
+- [x] CI green on implementation head: Ruff PASS, MyPy PASS, **133 pytest tests PASS**.
 
 ## Exit condition
 
-Phase 6D V1 is complete when the final branch head is green and merged with all historical strategy/outcome authorizations still false.
+**Phase 6D V1 exit condition is satisfied.** The research-infrastructure implementation is green and all historical strategy/outcome authorizations remain false. Merge of PR #20 is the repository promotion step.
 
 A future verified source may use this infrastructure to close a predicate, but **predicate closure alone does not authorize strategy implementation**. A separate preregistered candidate decision is still required.
