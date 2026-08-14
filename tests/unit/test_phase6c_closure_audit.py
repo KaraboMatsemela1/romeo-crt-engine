@@ -71,6 +71,16 @@ def test_closure_audit_rejects_mismatched_evidence_source(tmp_path: Path) -> Non
         build_closure_report(_paths(path))
 
 
+def test_closure_audit_rejects_mismatched_evidence_locator(tmp_path: Path) -> None:
+    path, raw = _ledger_copy(tmp_path)
+    rows = raw["rows"]
+    assert isinstance(rows, list)
+    rows[0]["evidence"][0]["locator"] = "https://t.me/officialRomeotpt/6912#altered"
+    _write(path, raw)
+    with pytest.raises(ClosureAuditError, match="manifest artifact locator"):
+        build_closure_report(_paths(path))
+
+
 def test_closure_audit_rejects_duplicate_contradictory_claim(tmp_path: Path) -> None:
     path, raw = _ledger_copy(tmp_path)
     rows = raw["rows"]
