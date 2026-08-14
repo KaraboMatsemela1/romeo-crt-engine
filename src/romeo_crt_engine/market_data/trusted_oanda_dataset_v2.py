@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
-from typing import Mapping
 
 from romeo_crt_engine.market_data.canonical_coverage_v2 import (
     CANONICAL_COVERAGE_END_UTC,
