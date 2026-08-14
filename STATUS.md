@@ -11,7 +11,7 @@ Updated: 2026-08-14
 | 4 — CRT detector | **COMPLETE FOR v0.1** | Frozen deterministic detector |
 | 5 — Backtester | **COMPLETE FOR v0.1** | Deterministic cost-aware simulator |
 | 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Terminal preregistered DEV decision |
-| 6B — Candidate revision | **IN PROGRESS — ALL-GAP DATA CLASSIFICATION** | Trusted multi-market DEV datasets + detector-only activity decision |
+| 6B — Candidate revision | **IN PROGRESS — UNIVERSE ALL-GAP CLASSIFICATION** | Trusted multi-market DEV datasets + detector-only activity decision |
 | 7 — Paper trading | **BLOCKED** | Requires future validated paper promotion |
 | 8 — Learning engine | Not started | Requires sufficient deterministic labels |
 | 9 — Shadow trading | Not started | Requires paper readiness |
@@ -77,11 +77,11 @@ NAS100_USD   1,392,496 complete M1 | 11,111 gaps | 711,344 missing minutes
 SPX500_USD   1,314,678 complete M1 | 55,778 gaps | 789,162 missing minutes
 ```
 
-Every shard passed its frozen independent provider-value re-fetch. This proves deterministic provider retrieval for the observed values; it does not by itself prove that every omitted M1 observation is an acceptable market closure.
+Every shard passed its frozen independent provider-value re-fetch. This proves deterministic provider retrieval for the observed values; it does not by itself prove that every omitted M1 observation is acceptable for detector-facing data.
 
 ## Gap-classification state
 
-The V2 contract allows only these terminal classifications:
+The V2 contract allows these supported omission states:
 
 ```text
 EXPECTED_MARKET_CLOSURE
@@ -96,20 +96,31 @@ UNRESOLVED_PROVIDER_GAP
 
 and fails closed.
 
-S5 cross-granularity probes have already classified every XAU_USD M1 gap of 60 minutes or less for 2019-2022:
+The first XAU_USD S5 pass classified every M1 gap of 60 minutes or less for 2019-2022:
 
 ```text
 XAU_USD short gaps classified          17,490
 XAU_USD short-gap NO_PRICE_OBSERVATION 17,490
 XAU_USD short-gap unresolved                0
 XAU_USD no-price minutes classified    56,453
-XAU_USD longer gaps still in scope        477
-XAU_USD longer missing minutes        653,323
 ```
 
-The short-gap evidence is strong but does **not** make XAU_USD `TRUSTED`: the remaining 477 longer gaps must still receive terminal evidence.
+The controlled all-gap pilot then validated the same cross-granularity method against **every** raw gap in XAU_USD/2022:
 
-A fail-closed all-gap S5 probe path is now implemented in `scripts/probe_oanda_all_gaps_s5.py`. The first controlled all-gap pilot is XAU_USD/2022. Its validation requires the S5 evidence inventory to cover exactly the raw M1 missing-interval count; detector and P&L authorizations remain false regardless of the pilot result.
+```text
+raw gaps                          827
+classified gaps                   827
+NO_PRICE_OBSERVATION              827
+UNRESOLVED_PROVIDER_GAP             0
+raw missing minutes           172,923
+NO_PRICE_OBSERVATION minutes   172,923
+independent refetch                PASS
+all-gap validation                 PASS
+```
+
+The pilot is sealed in `experiments/phase6b/P6B_ALL_GAP_S5_PILOT_001.md`. It validates the method, not the entire XAU_USD instrument. XAU_USD 2019-2021 and all EUR_USD/NAS100_USD/SPX500_USD years still require direct all-gap classification before any instrument can be trusted.
+
+A fail-closed evidence-to-policy adapter is implemented in `src/romeo_crt_engine/market_data/s5_gap_policy_v2.py`. Partial, unresolved, coordinate-mismatched or digest-unbound S5 evidence cannot enter H1/D1 aggregation as an approved omission policy.
 
 ## Promotion rule
 
@@ -133,7 +144,7 @@ If at least two instruments become trusted, only detector activity counts may be
 ## Current handoff
 
 ```text
-Phase 6B                         IN PROGRESS — ALL-GAP DATA CLASSIFICATION
+Phase 6B                         IN PROGRESS — UNIVERSE ALL-GAP CLASSIFICATION
 Alpha changes                    NONE AUTHORIZED
 Frozen OANDA universe            4 SYMBOLS
 Yearly raw validation            PASS 16/16
@@ -141,7 +152,8 @@ Independent refetch              PASS 4/4 PER INSTRUMENT
 V2 reconciliation evidence       PASS 16/16
 Exact missing-interval inventory PASS 122,626 INTERVALS
 XAU short-gap S5 classification  PASS 17,490 / 17,490; 0 UNRESOLVED
-All-gap S5 classification        CONTROLLED PILOT ACTIVE
+XAU 2022 all-gap S5 pilot        PASS 827 / 827; 0 UNRESOLVED
+Universe all-gap classification  AUTHORIZED / NEXT
 Trusted H1 / NY-D1 datasets      PENDING
 Detector activity counts         NOT OPENED
 Multi-market P&L                 NOT AUTHORIZED
@@ -158,7 +170,10 @@ Canonical detail:
 - `experiments/phase6b/P6B_OANDA_HISTORY_SHARD_EXECUTION_V1.md`
 - `experiments/phase6b/P6B_OANDA_HISTORICAL_SESSION_EVIDENCE_001.md`
 - `experiments/phase6b/P6B_OANDA_HISTORY_COLLECTION_GATE_001.md`
+- `experiments/phase6b/P6B_RECONCILIATION_STATUS_001.md`
+- `experiments/phase6b/P6B_ALL_GAP_S5_PILOT_001.md`
 - `src/romeo_crt_engine/market_data/gap_reconciliation_v2.py`
+- `src/romeo_crt_engine/market_data/s5_gap_policy_v2.py`
 - `scripts/collect_oanda_history_shard.py`
 - `scripts/probe_oanda_all_gaps_s5.py`
 
