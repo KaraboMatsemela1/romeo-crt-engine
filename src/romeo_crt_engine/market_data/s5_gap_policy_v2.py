@@ -65,7 +65,7 @@ def _validate_identity(
     if not isinstance(instrument, str) or not instrument:
         raise ValueError("reconciliation instrument is required")
     if not isinstance(year, int):
-        raise ValueError("reconciliation year is required")
+        raise TypeError("reconciliation year must be an integer")
     if s5_evidence.get("instrument") != instrument or s5_evidence.get("year") != year:
         raise ValueError("S5 evidence identity does not match reconciliation evidence")
 
@@ -116,7 +116,7 @@ def market_gaps_from_complete_s5_evidence(
     declared_no_price = s5_evidence.get("no_price_observation_gap_count")
     declared_unresolved = s5_evidence.get("unresolved_provider_gap_count")
     if not isinstance(declared_no_price, int) or not isinstance(declared_unresolved, int):
-        raise ValueError("S5 classification counters are required")
+        raise TypeError("S5 classification counters must be integers")
     if declared_no_price + declared_unresolved != len(missing):
         raise ValueError("S5 classification counters do not balance")
     if declared_unresolved != 0:
