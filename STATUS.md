@@ -12,6 +12,7 @@ Updated: 2026-08-14
 | 5 — Backtester | **COMPLETE FOR v0.1** | Deterministic cost-aware simulator |
 | 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Terminal preregistered v0.1 DEV decision |
 | 6B — Candidate revision | **COMPLETE — INSUFFICIENT_MULTI_MARKET_SAMPLE** | Terminal preregistered multi-market activity decision |
+| 6C — CRTology evidence research | **IN PROGRESS — PRIMARY-SOURCE EVIDENCE GATE** | Close 2026 doctrine semantics before selecting any new candidate |
 | 7 — Paper trading | **BLOCKED** | Requires a future candidate that passes full validation |
 | 8 — Learning engine | Not started | Requires sufficient deterministic labels |
 | 9 — Shadow trading | Not started | Requires paper readiness |
@@ -30,9 +31,9 @@ required   30
 decision   INSUFFICIENT_EVIDENCE
 ```
 
-The Phase-6 v0.1 result remains historical evidence and is not overwritten by Phase 6B. v0.1 OOS and CONFIRM remain unopened. Parameter optimization and paper/shadow/live promotion remain unauthorized.
+The Phase-6 v0.1 result remains historical evidence and is not overwritten by Phase 6B or Phase 6C. v0.1 OOS and CONFIRM remain unopened. Parameter optimization and paper/shadow/live promotion remain unauthorized.
 
-## Phase 6B candidate identity
+## Phase 6B terminal candidate identity
 
 ```text
 candidate_version      CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH
@@ -53,7 +54,7 @@ SPX500_USD
 
 No instrument was added, removed, or substituted after detector activity was observed.
 
-## Provider qualification — COMPLETE
+## Phase 6B provider qualification — COMPLETE
 
 Historical qualification is governed by `P6B-OANDA-HISTORY-QUALIFICATION-V1` and `P6B_OANDA_OBSERVATION_POLICY_V2`.
 
@@ -74,7 +75,7 @@ independent refetch                   PASS 4/4 per instrument
 
 Canonical raw-gap evidence is sealed in `experiments/phase6b/P6B_ALL_GAP_S5_UNIVERSE_001.md`.
 
-## New-York DEV boundary qualification — COMPLETE
+## Phase 6B New-York DEV boundary qualification — COMPLETE
 
 The detector-facing DEV window is frozen in New-York wall-clock time and maps to:
 
@@ -84,7 +85,7 @@ The detector-facing DEV window is frozen in New-York wall-clock time and maps to
 
 The five-hour tail from `2023-01-01T00:00:00Z` to `2023-01-01T05:00:00Z` was independently qualified for all four instruments. Each tail contained zero provider M1 and S5 observations, exact empty provider re-fetch, one 300-minute `NO_PRICE_OBSERVATION` interval, and zero unresolved gaps.
 
-## Trusted canonical datasets — COMPLETE 4/4
+## Phase 6B trusted canonical datasets — COMPLETE 4/4
 
 OANDA Trusted Dataset Build run #3 (`31799895592`) completed successfully. Every instrument was freshly reconstructed from OANDA, matched the sealed provider-value and gap evidence, derived deterministic H1 and New-York-midnight D1 data, and emitted `P6B_CANONICAL_PRICE_DATASET_V2` with `quality_status = TRUSTED`.
 
@@ -100,7 +101,7 @@ The exact trusted set was frozen before detector counts at commit `8214c31e09d53
 - `experiments/phase6b/P6B_TRUSTED_DATASET_FREEZE_001.json`
 - `experiments/phase6b/P6B_TRUSTED_DATASET_FREEZE_001.md`
 
-## Detector-only activity gate — COMPLETE
+## Phase 6B detector-only activity gate — COMPLETE
 
 Frozen preregistered thresholds:
 
@@ -154,23 +155,48 @@ counts artifact zip SHA    ad5f6bd04d124344e99aaecafd19ad2a5c7480b973984aa3bc789
 aggregate result file SHA  effa269e1a55cd1643c6d5c8f2dff7128a9ac6188ada6d48079efc2e511538b4
 ```
 
+## Phase 6C — active evidence route
+
+Phase 6C is a fresh source-research route, not a repair or extension of the Phase 6B activity test.
+
+```text
+doctrine stream            CRTOLOGY_2026_RESEARCH
+primary source              ROMEO-2026-CRTOLOGY-01
+source title                CRTology episode 1: SS
+video id                    4DZWbCzEvhM
+source identity             CONFIRMED
+first-party provenance      CONFIRMED
+technical meaning of SS     UNRESOLVED
+new alpha candidate         NOT SELECTED
+```
+
+The existing 2025 doctrine remains versioned as `CRT_SECRETS_2025`. New 2026 statements may not silently rewrite the frozen historical strategy. Any extracted delta must first be classified as `CLARIFICATION`, `REFINEMENT`, `NEW_OPTIONAL_BRANCH`, `SUPERSEDING_RULE`, `NON_ALPHA_CONTEXT`, or `UNRESOLVED`.
+
+Gate 6C-1 remains open until direct first-party transcript/caption/frame evidence is sufficient to define the technical meaning and causal semantics of `SS` without acronym guessing or secondary-source substitution.
+
+Canonical Phase 6C records:
+
+- `research/romeo/phase6c/PHASE_6C_RESEARCH_CHARTER.md`
+- `research/romeo/phase6c/CRTOLOGY_01_EVIDENCE_GATE.md`
+- `docs/checklists/phase-6c.md`
+- `research/romeo/SOURCE_REGISTRY.csv`
+
 ## Current handoff
 
 ```text
 Phase 6B                         COMPLETE — INSUFFICIENT_MULTI_MARKET_SAMPLE
-Alpha changes                    NONE
-Frozen OANDA universe            4 SYMBOLS
-Provider all-gap qualification   PASS 16/16; 0 UNRESOLVED
-Canonical NY boundary            PASS 4/4; 0 UNRESOLVED
-Trusted H1 / NY-D1 datasets      PASS 4/4
-Canonical TRUSTED identities     PASS 4/4
-Exact trusted universe freeze    SEALED PRE-COUNT
-Detector activity gate           COMPLETE
-Accepted instruments             4 / required 2
-Contributing instruments         3 / required 2
-Pooled TradePlans                7 / required 30
+Phase 6C                         IN PROGRESS — PRIMARY-SOURCE EVIDENCE GATE
+Phase 6C branch                  agent/phase-6c-crtology-evidence
+2025 doctrine                    PRESERVED
+2026 doctrine stream             CRTOLOGY_2026_RESEARCH
+Primary source                   ROMEO-2026-CRTOLOGY-01
+Source identity                  CONFIRMED
+Technical meaning of SS          UNRESOLVED
+New alpha candidate              NOT SELECTED
+Alpha implementation             NOT AUTHORIZED
+Detector activity                NOT AUTHORIZED
 Performance protocol             NOT AUTHORIZED
-Multi-market P&L                 NOT AUTHORIZED
+Backtest / P&L                   NOT AUTHORIZED
 v0.1 OOS / CONFIRM               UNOPENED
 Phase 7                          BLOCKED
 Live trading                     NOT AUTHORIZED
@@ -185,6 +211,9 @@ V0_1_CONFIRM_OUTCOME_ACCESS_AUTHORIZED      = false
 PARAMETER_OPTIMIZATION_AUTHORIZED           = false
 PHASE6B_ACTIVITY_GATE_COMPLETED              = true
 NEW_PHASE6B_ACTIVITY_TUNING_AUTHORIZED       = false
+PHASE6C_NEW_ALPHA_CANDIDATE_SELECTED         = false
+PHASE6C_ALPHA_IMPLEMENTATION_AUTHORIZED      = false
+PHASE6C_DETECTOR_ACTIVITY_AUTHORIZED         = false
 PERFORMANCE_PROTOCOL_AUTHORIZED              = false
 BACKTEST_AUTHORIZED                          = false
 MULTI_MARKET_PNL_OUTCOME_ACCESS              = false
