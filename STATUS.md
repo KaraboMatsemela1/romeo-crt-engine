@@ -10,9 +10,9 @@ Updated: 2026-08-14
 | 3 — Market data | **COMPLETE FOR BINANCE/BTCUSDT v0.1 ROUTE** | Trusted/reproducible D1/H1 dataset |
 | 4 — CRT detector | **COMPLETE FOR v0.1** | Frozen deterministic detector |
 | 5 — Backtester | **COMPLETE FOR v0.1** | Deterministic cost-aware simulator |
-| 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Terminal preregistered DEV decision |
-| 6B — Candidate revision | **IN PROGRESS — TRUSTED DATASET CONSTRUCTION** | Trusted multi-market DEV datasets + detector-only activity decision |
-| 7 — Paper trading | **BLOCKED** | Requires future validated paper promotion |
+| 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Terminal preregistered v0.1 DEV decision |
+| 6B — Candidate revision | **COMPLETE — INSUFFICIENT_MULTI_MARKET_SAMPLE** | Terminal preregistered multi-market activity decision |
+| 7 — Paper trading | **BLOCKED** | Requires a future candidate that passes full validation |
 | 8 — Learning engine | Not started | Requires sufficient deterministic labels |
 | 9 — Shadow trading | Not started | Requires paper readiness |
 | 10 — Controlled live | **NOT AUTHORIZED** | Explicit future approval + canary gates |
@@ -30,19 +30,19 @@ required   30
 decision   INSUFFICIENT_EVIDENCE
 ```
 
-The Phase-6 v0.1 result is historical evidence and is not overwritten by Phase 6B. v0.1 OOS and CONFIRM remain unopened. Parameter optimization and paper/shadow/live promotion remain unauthorized.
+The Phase-6 v0.1 result remains historical evidence and is not overwritten by Phase 6B. v0.1 OOS and CONFIRM remain unopened. Parameter optimization and paper/shadow/live promotion remain unauthorized.
 
-## Active Phase 6B route
+## Phase 6B candidate identity
 
 ```text
 candidate_version      CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH
 alpha_strategy_version CRT-C3-D1-H1-M1-BEAR-v0.1
 detector_version       CRT-DETECTOR-v0.2-MULTI-MARKET
 signal_component       MID
-alpha changes          NONE AUTHORIZED
+alpha changes          NONE
 ```
 
-Frozen OANDA universe:
+Frozen exact OANDA universe:
 
 ```text
 EUR_USD
@@ -51,87 +51,58 @@ NAS100_USD
 SPX500_USD
 ```
 
-Historical qualification is governed by `P6B-OANDA-HISTORY-QUALIFICATION-V1` and observation contract `P6B_OANDA_OBSERVATION_POLICY_V2`.
+No instrument was added, removed, or substituted after detector activity was observed.
 
-## Historical collection and raw-gap qualification
+## Provider qualification — COMPLETE
 
-All 16 preregistered instrument/year MID/M1 shards for 2019-2022 were collected through OANDA practice, independently re-fetched, validated, and reduced to credential-free reconciliation evidence. Raw price artifacts are ephemeral and deleted after validation.
+Historical qualification is governed by `P6B-OANDA-HISTORY-QUALIFICATION-V1` and `P6B_OANDA_OBSERVATION_POLICY_V2`.
 
-Sealed raw inventory:
-
-```text
-complete M1 candles       5,529,393
-missing intervals           122,626
-missing minutes           2,885,967
-V2 evidence shards            16/16
-independent refetch       PASS 4/4 per instrument
-raw price artifacts       EPHEMERAL / DELETED
-```
-
-Per instrument:
+All 16 preregistered 2019-2022 MID/M1 instrument/year shards were collected from OANDA practice, independently re-fetched, validated, and reduced to credential-free reconciliation evidence. Raw provider price artifacts were ephemeral and deleted after validation.
 
 ```text
-EUR_USD      1,428,155 complete M1 | 37,770 gaps | 675,685 missing minutes
-XAU_USD      1,394,064 complete M1 | 17,967 gaps | 709,776 missing minutes
-NAS100_USD   1,392,496 complete M1 | 11,111 gaps | 711,344 missing minutes
-SPX500_USD   1,314,678 complete M1 | 55,778 gaps | 789,162 missing minutes
+complete M1 candles                    5,529,393
+raw missing intervals                    122,626
+raw missing minutes                    2,885,967
+all-gap S5 evidence shards                 16/16 PASS
+NO_PRICE_OBSERVATION intervals           122,626
+NO_PRICE_OBSERVATION minutes           2,885,967
+UNRESOLVED_PROVIDER_GAP intervals              0
+UNRESOLVED_PROVIDER_GAP minutes                0
+raw-gap-qualified instruments               4/4
+independent refetch                   PASS 4/4 per instrument
 ```
 
-OANDA Provider Qualification run #27 (`31778696775`) completed successfully on attempt #2 at evidence commit `b04899e03931eda642af12e39926a84c310482f6`.
+Canonical raw-gap evidence is sealed in `experiments/phase6b/P6B_ALL_GAP_S5_UNIVERSE_001.md`.
 
-Universe-wide all-gap S5 result:
+## New-York DEV boundary qualification — COMPLETE
+
+The detector-facing DEV window is frozen in New-York wall-clock time and maps to:
 
 ```text
-all-gap evidence shards             16 / 16 PASS
-raw missing intervals               122,626
-S5 classified intervals             122,626
-NO_PRICE_OBSERVATION intervals      122,626
-UNRESOLVED_PROVIDER_GAP intervals         0
-raw missing minutes               2,885,967
-NO_PRICE_OBSERVATION minutes      2,885,967
-UNRESOLVED_PROVIDER_GAP minutes           0
-raw-gap-qualified instruments          4 / 4
+2019-01-01T05:00:00Z .. 2023-01-01T05:00:00Z exclusive
 ```
 
-Per instrument qualification:
+The five-hour tail from `2023-01-01T00:00:00Z` to `2023-01-01T05:00:00Z` was independently qualified for all four instruments. Each tail contained zero provider M1 and S5 observations, exact empty provider re-fetch, one 300-minute `NO_PRICE_OBSERVATION` interval, and zero unresolved gaps.
 
-```text
-EUR_USD      37,770 / 37,770 gaps | 675,685 / 675,685 minutes | unresolved 0
-XAU_USD      17,967 / 17,967 gaps | 709,776 / 709,776 minutes | unresolved 0
-NAS100_USD   11,111 / 11,111 gaps | 711,344 / 711,344 minutes | unresolved 0
-SPX500_USD   55,778 / 55,778 gaps | 789,162 / 789,162 minutes | unresolved 0
-```
+## Trusted canonical datasets — COMPLETE 4/4
 
-The XAU_USD/2019 first execution was interrupted technically; the failed job alone was rerun on the same frozen workflow/evidence commit and passed without evidence-policy or strategy changes.
+OANDA Trusted Dataset Build run #3 (`31799895592`) completed successfully. Every instrument was freshly reconstructed from OANDA, matched the sealed provider-value and gap evidence, derived deterministic H1 and New-York-midnight D1 data, and emitted `P6B_CANONICAL_PRICE_DATASET_V2` with `quality_status = TRUSTED`.
 
-Canonical universe result: `experiments/phase6b/P6B_ALL_GAP_S5_UNIVERSE_001.md`.
+| Instrument | H1 rows | NY-D1 rows | Price quantum | Normalized H1/D1 SHA-256 |
+|---|---:|---:|---:|---|
+| `EUR_USD` | 24,902 | 1,249 | `0.00001` | `b141c402fc4a69456fa56ab074b7bf37c75465b2e1e92a4c98c8516a08f96dd8` |
+| `XAU_USD` | 23,660 | 1,244 | `0.001` | `ec349ca0f77c3827666519bb234466ff1ff3e0ba2a30e46795c597a1df79fcdd` |
+| `NAS100_USD` | 23,604 | 1,245 | `0.1` | `4c46987b424f6616116299132664ea298dab55697d240f089fe0867c5cf19181` |
+| `SPX500_USD` | 23,605 | 1,245 | `0.1` | `dae1825b057fdc1acf87278a2163b570d9f2ae3fa870484c775eec78de37c19f` |
 
-A fail-closed evidence-to-policy adapter is implemented in `src/romeo_crt_engine/market_data/s5_gap_policy_v2.py`. Partial, unresolved, coordinate-mismatched, or digest-unbound S5 evidence cannot enter aggregation as approved omission policy.
+The exact trusted set was frozen before detector counts at commit `8214c31e09d53cffadce453727604e0847a4d22e` in:
 
-## Current trusted-data gate
+- `experiments/phase6b/P6B_TRUSTED_DATASET_FREEZE_001.json`
+- `experiments/phase6b/P6B_TRUSTED_DATASET_FREEZE_001.md`
 
-`RAW_GAP_QUALIFIED` is a prerequisite, not detector-facing `TRUSTED` status.
+## Detector-only activity gate — COMPLETE
 
-Before any Phase-6B detector activity count may be opened, each accepted instrument must have:
-
-```text
-complete frozen MID/M1 source history
-independent provider-value re-fetch PASS
-all raw gaps bound to approved evidence
-zero unresolved/provider-missing intervals
-deterministic H1 derivation
-deterministic New-York-midnight D1 derivation
-frozen provider/instrument/session/price-quantum identities
-frozen normalized H1/D1 digest
-frozen P6B_CANONICAL_PRICE_DATASET_V2 identity
-quality_status = TRUSTED
-```
-
-All four raw-gap-qualified instruments may proceed to this construction gate. No instrument is called `TRUSTED` until the canonical identity is actually built and verified.
-
-After the exact trusted set is frozen, at least two trusted instruments are required to open the detector-only activity protocol. If fewer than two become trusted, Phase 6B terminates as `INSUFFICIENT_ELIGIBLE_UNIVERSE` without detector outcome access.
-
-If at least two instruments are trusted, the only next outcome surface is `P6B-MULTI-MARKET-ACTIVITY-PROTOCOL-v1`:
+Frozen preregistered thresholds:
 
 ```text
 accepted instruments      >= 2
@@ -141,57 +112,96 @@ backtester                PROHIBITED
 P&L                       PROHIBITED
 ```
 
+Phase 6B Detector Activity Gate run #1 (`31802738559`) verified freeze ancestry, exact trusted artifact ZIP hashes, exact H1/D1 file hashes, and trusted identities before invoking the frozen detector. It persisted counts and ReasonCode inventories only; no candidate timestamps, trade geometry, P&L, or simulator outcomes were opened.
+
+| Instrument | Complete NY-D1 | Candidates | NO_SIGNAL | TradePlans |
+|---|---:|---:|---:|---:|
+| `EUR_USD` | 1,249 | 1,247 | 1,244 | 3 |
+| `NAS100_USD` | 1,245 | 1,243 | 1,241 | 2 |
+| `SPX500_USD` | 1,245 | 1,243 | 1,241 | 2 |
+| `XAU_USD` | 1,244 | 1,242 | 1,242 | 0 |
+| **Pooled** | — | **4,975** | **4,968** | **7** |
+
+```text
+accepted instruments       4   >= 2   PASS
+contributing instruments   3   >= 2   PASS
+pooled TradePlans           7   >= 30  FAIL
+```
+
+## Terminal Phase 6B decision
+
+```text
+INSUFFICIENT_MULTI_MARKET_SAMPLE
+```
+
+The data-quality and eligible-universe gates passed. The candidate terminates because the frozen strategy produced only **7 pooled TradePlans**, materially below the preregistered minimum of **30**.
+
+This result must not be repaired by lowering the threshold, changing alpha rules, selecting instruments based on observed counts, optimizing parameters, or opening P&L. Any future research route requires a separately justified and preregistered candidate/protocol.
+
+Canonical decision evidence:
+
+- `experiments/phase6b/P6B_MULTI_MARKET_ACTIVITY_RESULT_001.json`
+- `experiments/phase6b/P6B_MULTI_MARKET_ACTIVITY_RESULT_001.md`
+
+Activity evidence binding:
+
+```text
+freeze commit              8214c31e09d53cffadce453727604e0847a4d22e
+activity workflow run      31802738559
+activity workflow head     377fed2ffb7da7dcfef10109d39658de6516bddb
+counts artifact id         9219943258
+counts artifact zip SHA    ad5f6bd04d124344e99aaecafd19ad2a5c7480b973984aa3bc78934e814d0b66
+aggregate result file SHA  effa269e1a55cd1643c6d5c8f2dff7128a9ac6188ada6d48079efc2e511538b4
+```
+
 ## Current handoff
 
 ```text
-Phase 6B                         IN PROGRESS — TRUSTED DATASET CONSTRUCTION
-Alpha changes                    NONE AUTHORIZED
+Phase 6B                         COMPLETE — INSUFFICIENT_MULTI_MARKET_SAMPLE
+Alpha changes                    NONE
 Frozen OANDA universe            4 SYMBOLS
-Yearly raw validation            PASS 16/16
-Independent refetch              PASS 4/4 PER INSTRUMENT
-V2 reconciliation evidence       PASS 16/16
-Exact missing-interval inventory PASS 122,626 INTERVALS
-Universe all-gap classification  PASS 16/16; 122,626 / 122,626; 0 UNRESOLVED
-Missing-minute reconciliation    PASS 2,885,967 / 2,885,967; 0 UNRESOLVED
-Raw-gap-qualified instruments    PASS 4/4
-Trusted H1 / NY-D1 datasets      PENDING / NEXT
-Canonical TRUSTED identities     PENDING
-Detector activity counts         NOT OPENED
+Provider all-gap qualification   PASS 16/16; 0 UNRESOLVED
+Canonical NY boundary            PASS 4/4; 0 UNRESOLVED
+Trusted H1 / NY-D1 datasets      PASS 4/4
+Canonical TRUSTED identities     PASS 4/4
+Exact trusted universe freeze    SEALED PRE-COUNT
+Detector activity gate           COMPLETE
+Accepted instruments             4 / required 2
+Contributing instruments         3 / required 2
+Pooled TradePlans                7 / required 30
+Performance protocol             NOT AUTHORIZED
 Multi-market P&L                 NOT AUTHORIZED
 v0.1 OOS / CONFIRM               UNOPENED
 Phase 7                          BLOCKED
 Live trading                     NOT AUTHORIZED
 ```
 
-Canonical detail:
-
-- `docs/checklists/phase-6b.md`
-- `experiments/phase6b/P6B_MULTI_MARKET_ACTIVITY_PROTOCOL_V1.md`
-- `experiments/phase6b/P6B_OANDA_HISTORY_QUALIFICATION_PROTOCOL_V1.md`
-- `experiments/phase6b/P6B_OANDA_HISTORY_SHARD_EXECUTION_V1.md`
-- `experiments/phase6b/P6B_OANDA_HISTORICAL_SESSION_EVIDENCE_001.md`
-- `experiments/phase6b/P6B_OANDA_HISTORY_COLLECTION_GATE_001.md`
-- `experiments/phase6b/P6B_RECONCILIATION_STATUS_001.md`
-- `experiments/phase6b/P6B_ALL_GAP_S5_PILOT_001.md`
-- `experiments/phase6b/P6B_ALL_GAP_S5_UNIVERSE_001.md`
-- `src/romeo_crt_engine/market_data/gap_reconciliation_v2.py`
-- `src/romeo_crt_engine/market_data/s5_gap_policy_v2.py`
-- `scripts/collect_oanda_history_shard.py`
-- `scripts/probe_oanda_all_gaps_s5.py`
-
 ## Authorization
 
 ```text
-V0_1_MUTATION_AUTHORIZED               = false
-V0_1_OOS_OUTCOME_ACCESS_AUTHORIZED     = false
-V0_1_CONFIRM_OUTCOME_ACCESS_AUTHORIZED = false
-PARAMETER_OPTIMIZATION_AUTHORIZED      = false
-FULL_RAW_HISTORY_COLLECTION_AUTHORIZED = true
-ALL_GAP_PROVIDER_CLASSIFICATION        = true
-DETECTOR_ACTIVITY_COUNTS_AUTHORIZED    = false
-BACKTEST_AUTHORIZED                    = false
-MULTI_MARKET_PNL_OUTCOME_ACCESS        = false
-PAPER_TRADING_AUTHORIZED               = false
-SHADOW_TRADING_AUTHORIZED              = false
-LIVE_TRADING_AUTHORIZED                = false
+V0_1_MUTATION_AUTHORIZED                    = false
+V0_1_OOS_OUTCOME_ACCESS_AUTHORIZED          = false
+V0_1_CONFIRM_OUTCOME_ACCESS_AUTHORIZED      = false
+PARAMETER_OPTIMIZATION_AUTHORIZED           = false
+PHASE6B_ACTIVITY_GATE_COMPLETED              = true
+NEW_PHASE6B_ACTIVITY_TUNING_AUTHORIZED       = false
+PERFORMANCE_PROTOCOL_AUTHORIZED              = false
+BACKTEST_AUTHORIZED                          = false
+MULTI_MARKET_PNL_OUTCOME_ACCESS              = false
+PAPER_TRADING_AUTHORIZED                     = false
+SHADOW_TRADING_AUTHORIZED                    = false
+LIVE_TRADING_AUTHORIZED                      = false
 ```
+
+## Canonical Phase 6B records
+
+- `docs/checklists/phase-6b.md`
+- `experiments/phase6b/P6B_MULTI_MARKET_ACTIVITY_PROTOCOL_V1.md`
+- `experiments/phase6b/P6B_ALL_GAP_S5_UNIVERSE_001.md`
+- `experiments/phase6b/P6B_TRUSTED_DATASET_FREEZE_001.json`
+- `experiments/phase6b/P6B_TRUSTED_DATASET_FREEZE_001.md`
+- `experiments/phase6b/P6B_MULTI_MARKET_ACTIVITY_RESULT_001.json`
+- `experiments/phase6b/P6B_MULTI_MARKET_ACTIVITY_RESULT_001.md`
+- `src/romeo_crt_engine/market_data/trusted_oanda_dataset_v2.py`
+- `scripts/build_oanda_trusted_dataset.py`
+- `scripts/run_phase6b_detector_activity.py`
