@@ -116,12 +116,24 @@ def test_duplicate_intent_is_idempotently_rejected_without_second_broker_submiss
     assert len(broker.submissions) == 1
 
 
-def test_broker_error_and_reconciliation_mismatch_fail_closed(tmp_path: Path) -> None:
-    errored, _ = harness(tmp_path / "error", FakeBrokerMode.ERROR)
-    assert (
-        errored.run(request(), RiskConfig(kill_switch_engaged=False)).outcome
-        is HarnessOutcome.BROKER_ERROR
+def test_broker_error_engages_kill_switch_and_blocks_later_authorized_submission(
+    tmp_path: Path,
+) -> None:
+    errored, broker = harness(tmp_path, FakeBrokerMode.ERROR)
+    result = errored.run(request(), RiskConfig(kill_switch_engaged=False))
+
+    assert result.outcome is HarnessOutcome.BROKER_ERROR
+    assert errored.kill_switch_engaged is True
+    assert len(broker.submissions) == 1
+    later_request = errored.run(
+        request(client_order_id="intent-002", execution_authorized=True),
+        RiskConfig(kill_switch_engaged=False),
     )
+    assert later_request.outcome is HarnessOutcome.REJECTED_RISK
+    assert len(broker.submissions) == 1
+
+
+def test_reconciliation_mismatch_engages_kill_switch(tmp_path: Path) -> None:
     mismatch, _ = harness(tmp_path / "mismatch", FakeBrokerMode.POSITION_MISMATCH)
     result = mismatch.run(request(), RiskConfig(kill_switch_engaged=False))
     assert result.outcome is HarnessOutcome.RECONCILIATION_MISMATCH

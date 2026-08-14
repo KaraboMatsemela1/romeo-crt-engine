@@ -217,7 +217,11 @@ class PaperInfrastructureHarness:
                     self._event(EventType.BROKER_RESPONSE, request, broker_event.status.value)
                 )
         except RuntimeError as error:
+            # A submit failure leaves the broker's final state unknown.  Latch the
+            # harness kill switch so all later requests fail closed.
+            self.kill_switch_engaged = True
             events.append(self._event(EventType.BROKER_RESPONSE, request, str(error)))
+            events.append(self._event(EventType.KILL_SWITCH, request, "broker submission error"))
             return self._result(HarnessOutcome.BROKER_ERROR, request, record.status, None, events)
 
         expected_position = PositionRecord(
