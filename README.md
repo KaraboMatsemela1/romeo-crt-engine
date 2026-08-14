@@ -2,24 +2,48 @@
 
 Evidence-driven research, validation, and execution platform for translating Romeo / @Romeotpt's publicly demonstrated CRT methodology into deterministic, testable, risk-controlled trading systems.
 
-> **Status:** Phases 0–6 are complete for the first deterministic candidate. `CRT-C3-D1-H1-M1-BEAR-v0.1` finished Phase 6 with **`INSUFFICIENT_EVIDENCE`** because the preregistered four-year DEV window produced only 4 closed trades against a required minimum of 30. OOS and final-confirmatory windows remain unopened. Paper, shadow and live trading are not authorized.
+> **Status:** Engineering phases 0–5 are complete for the frozen v0.1 route. Phase 6 completed with **`INSUFFICIENT_EVIDENCE`** and Phase 6B completed with **`INSUFFICIENT_MULTI_MARKET_SAMPLE`**. Phase 6C remains blocked on verified first-party predicate closure while Phase 6D research infrastructure is complete. OOS and CONFIRM remain unopened; paper, learning, shadow and controlled-live stages are not yet authorized.
 
-## Progress to Paper Trading
+## Project Progress
 
-This is the executive gate view of the project. The bars represent **milestone/gate maturity**, not trading performance, probability of success, or a forecast. A bar advances only when the corresponding canonical gate materially changes.
+This is the executive gate view of the **entire project lifecycle**. The bars represent **milestone/gate maturity**, not trading performance, probability of success, or a forecast. A completed validation process can still end with an insufficient/negative promotion result; infrastructure completion never authorizes strategy execution by itself.
 
 ```text
-FIRST-PARTY EVIDENCE
-████████████████░░░░   good corpus; predicates incomplete
+ENGINEERING FOUNDATION
+████████████████████   COMPLETE
 
-DETERMINISTIC CANDIDATE
+ROMEO CORPUS / RECONCILIATION
+████████████████████   COMPLETE
+
+FORMAL CRT SPEC — v0.1
+████████████████████   COMPLETE / FROZEN
+
+MARKET DATA — frozen v0.1 route
+████████████████████   COMPLETE
+
+DETERMINISTIC DETECTOR — v0.1
+████████████████████   COMPLETE
+
+BACKTESTER — v0.1
+████████████████████   COMPLETE
+
+V0.1 VALIDATION PROCESS
+████████████████████   COMPLETE — INSUFFICIENT_EVIDENCE
+
+MULTI-MARKET REVISION / PHASE 6B
+████████████████████   COMPLETE — INSUFFICIENT_MULTI_MARKET_SAMPLE
+
+FIRST-PARTY EVIDENCE / PHASE 6C–6D
+████████████████░░░░   strong provenance corpus; predicates incomplete
+
+NEXT DETERMINISTIC CANDIDATE
 ░░░░░░░░░░░░░░░░░░░░   BLOCKED — no candidate-ready predicate
 
 ACTIVITY VALIDATION
-░░░░░░░░░░░░░░░░░░░░   not authorized — candidate not frozen
+░░░░░░░░░░░░░░░░░░░░   not authorized
 
 PERFORMANCE VALIDATION
-░░░░░░░░░░░░░░░░░░░░   not authorized — activity gate not reached
+░░░░░░░░░░░░░░░░░░░░   not authorized
 
 OOS
 ░░░░░░░░░░░░░░░░░░░░   unopened
@@ -27,11 +51,51 @@ OOS
 CONFIRM
 ░░░░░░░░░░░░░░░░░░░░   unopened
 
+PAPER EXECUTION INFRASTRUCTURE
+░░░░░░░░░░░░░░░░░░░░   engineering backlog in progress; execution disabled
+
 PAPER TRADING
-░░░░░░░░░░░░░░░░░░░░   BLOCKED — requires PROMOTE_TO_PAPER_CANDIDATE
+░░░░░░░░░░░░░░░░░░░░   BLOCKED — requires PROMOTE_TO_PAPER_CANDIDATE + Phase 7 qualification
+
+LEARNING ENGINE
+░░░░░░░░░░░░░░░░░░░░   not started — requires sufficient deterministic/paper labels
+
+SHADOW TRADING
+░░░░░░░░░░░░░░░░░░░░   not started — requires paper readiness
+
+CONTROLLED LIVE
+░░░░░░░░░░░░░░░░░░░░   NOT AUTHORIZED — explicit future canary/risk approval required
 ```
 
-**Current bottleneck:** direct first-party evidence must close at least one held deterministic predicate before a new candidate can be selected and preregistered. See [`STATUS.md`](STATUS.md) for the canonical evidence/authorization state and [GitHub Issues](../../issues) for the autonomous execution queue.
+### Current Critical Path
+
+```text
+FIRST-PARTY PREDICATE CLOSURE
+          ↓
+NEXT DETERMINISTIC CANDIDATE
+          ↓
+DEV ACTIVITY + PERFORMANCE
+          ↓
+OOS
+          ↓
+CONFIRM
+          ↓
+PROMOTE_TO_PAPER_CANDIDATE
+          ↓
+PHASE-7 OPERATIONAL QUALIFICATION
+          ↓
+PAPER TRADING
+          ↓
+LEARNING-ENGINE READINESS
+          ↓
+SHADOW TRADING
+          ↓
+CONTROLLED LIVE
+```
+
+**Current bottleneck:** direct first-party evidence must close at least one held deterministic predicate before a new candidate can be selected and preregistered. See [`STATUS.md`](STATUS.md) for the canonical evidence/authorization state and [GitHub Issue #42](../../issues/42) for the autonomous full-project execution queue.
+
+Any PR that materially changes one of these gates must update this dashboard and the matching `STATUS.md` view.
 
 ## Start here
 
@@ -40,13 +104,13 @@ PAPER TRADING
 3. Read [`AGENTS.md`](AGENTS.md) — operating contract for AI/coding agents.
 4. Read [`docs/operations/AUTONOMOUS_GITHUB_WORK_PROTOCOL.md`](docs/operations/AUTONOMOUS_GITHUB_WORK_PROTOCOL.md) before claiming or executing GitHub work.
 5. Follow the protocol’s claim, dependency, CI, review, and completion-record requirements.
-4. Read [`strategy/CRT_V0.1_SPEC.md`](strategy/CRT_V0.1_SPEC.md) and its freeze manifest before touching v0.1 strategy semantics.
-5. Read [`docs/MARKET_DATA.md`](docs/MARKET_DATA.md) before touching data semantics.
-6. Read [`docs/DETECTOR.md`](docs/DETECTOR.md) before touching detector semantics.
-7. Read [`docs/BACKTESTER.md`](docs/BACKTESTER.md) before touching simulator semantics.
-8. Read [`experiments/phase6/P6_VALIDATION_PROTOCOL_V1.md`](experiments/phase6/P6_VALIDATION_PROTOCOL_V1.md) and [`docs/PHASE_6_COMPLETION_REPORT.md`](docs/PHASE_6_COMPLETION_REPORT.md) before interpreting historical performance.
-9. Follow [`docs/ROADMAP.md`](docs/ROADMAP.md) and the Project Bible for ordered gates.
-10. Use [`research/romeo/VIDEO_ANALYSIS_TEMPLATE.md`](research/romeo/VIDEO_ANALYSIS_TEMPLATE.md) for new strategy-source research.
+6. Read [`strategy/CRT_V0.1_SPEC.md`](strategy/CRT_V0.1_SPEC.md) and its freeze manifest before touching v0.1 strategy semantics.
+7. Read [`docs/MARKET_DATA.md`](docs/MARKET_DATA.md) before touching data semantics.
+8. Read [`docs/DETECTOR.md`](docs/DETECTOR.md) before touching detector semantics.
+9. Read [`docs/BACKTESTER.md`](docs/BACKTESTER.md) before touching simulator semantics.
+10. Read [`experiments/phase6/P6_VALIDATION_PROTOCOL_V1.md`](experiments/phase6/P6_VALIDATION_PROTOCOL_V1.md) and [`docs/PHASE_6_COMPLETION_REPORT.md`](docs/PHASE_6_COMPLETION_REPORT.md) before interpreting historical performance.
+11. Follow [`docs/ROADMAP.md`](docs/ROADMAP.md) and the Project Bible for ordered gates.
+12. Use [`research/romeo/VIDEO_ANALYSIS_TEMPLATE.md`](research/romeo/VIDEO_ANALYSIS_TEMPLATE.md) for new strategy-source research.
 
 ## First candidate validation chain
 
@@ -130,14 +194,14 @@ Preregistered validation
         |
         +--> insufficient evidence -> preserve candidate -> new research/version
         |
-        +--> pass -> independent risk -> paper -> shadow -> controlled live
+        +--> pass -> independent risk -> paper -> learning -> shadow -> controlled live
 ```
 
 ## Current project direction
 
 Do **not** start Phase 7 from v0.1.
 
-The next legitimate track is to return to the public-source evidence and unresolved/deferred CRT doctrine, define **one new evidence-backed strategy candidate/version** (for example v0.2), create new deterministic fixtures/tests, and then repeat the gated validation lifecycle.
+The next legitimate track is to return to the public-source evidence and unresolved/deferred CRT doctrine, define **one new evidence-backed strategy candidate/version**, create new deterministic fixtures/tests, and then repeat the gated validation lifecycle.
 
 The v0.1 OOS and CONFIRM windows remain unconsumed and must not be casually inspected.
 
