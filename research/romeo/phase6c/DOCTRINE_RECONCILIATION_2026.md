@@ -3,7 +3,7 @@
 **Date:** 2026-08-14  
 **Baseline doctrine:** `CRT_SECRETS_2025`  
 **Research stream:** `CRTOLOGY_2026_RESEARCH`  
-**Status:** **ACTIVE — SMT EVIDENCE GATE OPEN / NO NEW ALPHA CANDIDATE SELECTED**
+**Status:** **CURRENT PUBLIC EVIDENCE RECONCILED — `candidate_ready_rows = 0`**
 
 ## Purpose
 
@@ -35,13 +35,30 @@ A source-supported statement is not automatically executable. `Deterministic now
 | `Every quarter is a candle` | CRT fractality exists; broader parent timeframes beyond W1/D1/H4 deferred | `NEW_OPTIONAL_BRANCH` | NO | Potential quarterly parent route; calendar/execution mapping unresolved |
 | Most students should trade Model #1 and OTEs for a long time | Model #1 source-supported; OTE explicitly deferred from v0.1 | `CLARIFICATION` for Model #1; `UNRESOLVED` for OTE integration | PARTIAL | No change to frozen Model #1; OTE remains excluded until deterministic |
 | Journey to key level vs reaction from key level | Already explicit in 2025 Episode 5 and Phase 1 taxonomy | `CLARIFICATION` / RESTATEMENT | YES conceptually | Does not reopen v0.1 journey branch; journey execution semantics still separately unresolved |
-| Convincing opposite CRT can justify changing bias swiftly | 2025 failure/context work recognizes direction conflict; broad bias-transition algorithm deferred | `REFINEMENT` / `UNRESOLVED` | NO | Potential dynamic-bias transition branch; `convincing` predicate unresolved |
-| SMT basic pair registry: `EU-DXY`, `NQ-ES`, `BTC-ETH`, `GOLD-SILVER` | Phase 1/2 explicitly deferred SMT until pair registry/polarity could be verified | `CLARIFICATION / PARTIAL EVIDENCE-DEBT CLOSURE` | YES for registry only | These four relationships may be used as the only currently first-party-authorized SMT research pairs; no divergence/order predicate yet |
-| Romeo case: expected local low Turtle Soup does not occur; SMT is instead “playing out its role” as taught in Episode 6 | Phase 1 recorded possibility that SMT may substitute for local manipulation but exact substitution semantics were unresolved | `REFINEMENT / PARTIAL EVIDENCE-DEBT CLOSURE` | NO for execution | Confirms SMT can fulfill a manipulation/context role without local Turtle Soup in at least one source case; exact substitution predicate still unresolved |
+| Convincing opposite CRT can justify changing bias swiftly | 2025 failure/context work recognizes direction conflict; broad bias-transition algorithm deferred | `REFINEMENT` / `UNRESOLVED` | NO | Direct principle preserved; `convincing`, timeframe ownership, timing and expiry unresolved |
+| SMT basic pair registry: `EU-DXY`, `NQ-ES`, `BTC-ETH`, `GOLD-SILVER` | Phase 1/2 explicitly deferred SMT until pair registry/polarity could be verified | `CLARIFICATION / PARTIAL EVIDENCE-DEBT CLOSURE` | YES for registry only | These four relationships are the only currently first-party-authorized SMT research pairs; no divergence/order predicate yet |
+| Romeo case: expected local low Turtle Soup does not occur; SMT instead fulfills its Episode-6 role | Phase 1 recorded possibility that SMT may substitute for local manipulation but exact substitution semantics were unresolved | `REFINEMENT / PARTIAL EVIDENCE-DEBT CLOSURE` | NO for execution | Confirms SMT can fulfill a manipulation/context role without local Turtle Soup in at least one source case; exact substitution predicate remains unresolved |
+
+## Gate results
+
+```text
+CRTology Episode 1 / SS     TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
+2026 Live Session 2         TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
+SMT semantics/substitution  TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT (partial evidence closure preserved)
+Dynamic bias transition     TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
+```
+
+Canonical gate records:
+
+- `research/romeo/phase6c/CRTOLOGY_01_EVIDENCE_GATE.md`
+- `research/romeo/phase6c/PRIMARY_SOURCE_PASS_001.md`
+- `research/romeo/phase6c/LIVE_02_EVIDENCE_GATE.md`
+- `research/romeo/phase6c/SMT_EVIDENCE_GATE.md`
+- `research/romeo/phase6c/DYNAMIC_BIAS_EVIDENCE_GATE.md`
 
 ## SMT partial-closure boundary
 
-The direct first-party evidence closes **only** these facts:
+Direct first-party evidence closes only:
 
 ```text
 AUTHORIZED_RESEARCH_PAIRS = {
@@ -54,7 +71,7 @@ AUTHORIZED_RESEARCH_PAIRS = {
 SMT_CAN_SOMETIMES_FULFILL_A_ROLE_WHEN_LOCAL_TURTLE_SOUP_IS_ABSENT = true
 ```
 
-It does **not** yet close:
+It does **not** close:
 
 ```text
 exact same-direction divergence polarity
@@ -72,6 +89,28 @@ confirmation / invalidation / expiry
 ```
 
 Generic ICT/SMT conventions may not fill these fields.
+
+## Dynamic-bias partial-closure boundary
+
+Direct first-party evidence closes:
+
+```text
+BIAS_IS_NOT_IMMUTABLE = true
+OPPOSITE_CRT_CAN_JUSTIFY_DIRECTIONAL_RECONSIDERATION = true
+```
+
+It does not close:
+
+```text
+CONVINCING_CRT predicate
+owning timeframe
+transition timestamp
+confirmation requirement
+transition expiry
+trend-strength / slowdown metric
+```
+
+No project-authored ATR/body/displacement/ADX proxy may fill those fields.
 
 ## Candidate-readiness test
 
@@ -94,56 +133,30 @@ Current result:
 candidate_ready_rows = 0
 ```
 
-The SMT registry is deterministic metadata, not a strategy signal. The substitution clue is not yet a deterministic predicate.
+## Current public-evidence decision
 
-## Active research priority — SMT semantics / substitution
+Canonical decision:
 
-SMT is now the highest-priority Phase-6C branch because direct first-party evidence has closed more of its pre-existing evidence debt than the other deferred branches. This prioritization is based on source completeness, **not** on expected trade count or profitability.
+- `research/romeo/phase6c/CURRENT_PUBLIC_EVIDENCE_DECISION_001.md`
 
-Required source closure:
+Result:
 
-1. how corresponding highs/lows are aligned across paired instruments;
-2. exact take/non-take divergence condition;
-3. correlated-pair polarity;
-4. inverse-pair polarity;
-5. synchronization/time tolerance;
-6. stale/missing-data behavior;
-7. which instrument supplies confirmation/trade location;
-8. Model #1 and/or true-MSS confirmation role;
-9. when SMT replaces versus merely confirms local Turtle Soup;
-10. invalidation/expiry and traded-instrument selection.
+```text
+NO_EXECUTABLE_DELTA_FROM_CURRENT_PUBLIC_EVIDENCE
+```
 
-Disposition: `ACTIVE EVIDENCE GATE — NOT EXECUTABLE`.
+This does not reject the deferred concepts. It means the currently captured first-party material does not close any new signal path tightly enough for a deterministic successor candidate.
 
-## Other unresolved branches
+## Source horizon
 
-### Dynamic context / bias transition
+Currently verified CRTology source identities:
 
-Direct first-party material says a convincing opposite CRT can require changing bias and warns against fading strong trend without signs of slowdown.
+```text
+ROMEO-2026-CRTOLOGY-INTRO  -> 8LblVvGZaGY
+ROMEO-2026-CRTOLOGY-01     -> 4DZWbCzEvhM
+```
 
-Missing: exact `convincing CRT`, trend-strength/slowdown predicate, timeframe ownership, transition expiry, Candle-3 interaction.
-
-Disposition: `RESEARCH PRIORITY — NOT EXECUTABLE`.
-
-### Time-context / weekly organisation
-
-Direct first-party weekday observations and weekly planning/open context exist.
-
-Missing: hard-vs-tendency semantics, session boundaries, instrument scope, direction/target semantics and relationship to `SS`.
-
-Disposition: `RESEARCH PRIORITY — NOT EXECUTABLE`.
-
-### Exit-entry structural theory
-
-First-party source names the concept explicitly, but the causal object/lifecycle is not defined in accessible text.
-
-Disposition: `HIGH INTEREST — SOURCE CAPTURE REQUIRED`.
-
-### Quarterly parent/fractality expansion
-
-`Every quarter is a candle` is direct and consistent with CRT fractality, but calendar/execution mapping is unresolved.
-
-Disposition: `LATER DATA/SPEC BRANCH — NOT EXECUTABLE`.
+First-party/public indexing indicates Episode 2 is part of the sequence, but this pass did not capture a verified Episode-2 technical video identity. No ID/title/semantics may be invented before direct verification.
 
 ## Explicit non-candidates
 
@@ -167,10 +180,14 @@ Phase 6C currently does **not** select:
 2026 clues                       VERSIONED AND RECONCILED
 SMT registry                     PARTIALLY CLOSED
 SMT substitution role            PARTIALLY CLOSED
-SMT executable semantics         UNRESOLVED
-new executable delta             NONE YET
+SMT executable semantics         INSUFFICIENT
+Dynamic bias principle           PARTIALLY CLOSED
+Dynamic bias executable rule     INSUFFICIENT
+candidate_ready_rows             0
+new executable delta             NONE
 new alpha candidate              NOT SELECTED
 detector activity                NOT AUTHORIZED
 backtest / P&L                   NOT AUTHORIZED
 Phase 7                          BLOCKED
+next research trigger            NEW VERIFIED FIRST-PARTY SOURCE CLOSURE
 ```
