@@ -1,6 +1,6 @@
 # Phase 6B — Candidate Revision Checklist
 
-**Status:** **IN PROGRESS — GAP CLASSIFICATION V2**  
+**Status:** **IN PROGRESS — ALL-GAP CLASSIFICATION V2**  
 **Active research target:** `CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH`  
 **Underlying frozen alpha:** `CRT-C3-D1-H1-M1-BEAR-v0.1`  
 **Preserved failed research path:** `CRT-C3-D1-H1-M1-BULL-v0.2-RESEARCH` -> `EVIDENCE_INSUFFICIENT`  
@@ -67,6 +67,13 @@ Observation/reconciliation correction: `P6B_OANDA_OBSERVATION_POLICY_V2`.
 - [x] Extend the collector to emit credential-free `P6B_OANDA_RECONCILIATION_EVIDENCE_V2` with exact missing-interval coordinates and provenance hashes.
 - [x] Persist V2 reconciliation evidence for all 16 shards in CI artifacts.
 - [x] Inventory every missing interval from the persisted V2 evidence set.
+- [x] Probe every XAU_USD M1 gap of 60 minutes or less for 2019-2022 at S5 granularity.
+- [x] Confirm all 17,490 probed XAU_USD short gaps are `NO_PRICE_OBSERVATION` with zero `UNRESOLVED_PROVIDER_GAP` classifications.
+- [x] Preserve the remaining 477 longer XAU_USD gaps as unqualified rather than extrapolating the short-gap result.
+- [x] Add a fail-closed all-gap S5 probe path that reuses provider-safe six-hour request buckets.
+- [x] Require an all-gap evidence run to classify exactly the raw M1 missing-interval count before it can support qualification.
+- [ ] Complete the controlled XAU_USD/2022 all-gap S5 pilot.
+- [ ] Expand all-gap finer-granularity classification to every frozen instrument/year shard if the pilot validates the method.
 - [ ] Reconcile every omitted observation to date-valid session/holiday evidence or finer-granularity `NO_PRICE_OBSERVATION` evidence.
 - [ ] Leave unresolved/provider-missing intervals fail-closed.
 - [ ] Build trusted H1 and New-York-midnight D1 datasets only for independently `TRUSTED` instruments.
@@ -91,6 +98,17 @@ NAS100_USD   1,392,496 complete M1 | 11,111 gaps | 711,344 missing minutes
 SPX500_USD   1,314,678 complete M1 | 55,778 gaps | 789,162 missing minutes
 ```
 
+XAU_USD S5 short-gap evidence:
+
+```text
+short gaps classified          17,490
+NO_PRICE_OBSERVATION           17,490
+UNRESOLVED_PROVIDER_GAP             0
+no-price minutes classified    56,453
+longer gaps still in scope        477
+longer missing minutes        653,323
+```
+
 Canonical artifacts:
 
 - `experiments/phase6b/P6B_OANDA_HISTORY_QUALIFICATION_PROTOCOL_V1.md`
@@ -103,6 +121,7 @@ Canonical artifacts:
 - `research/romeo/phase6b/PRIMARY_SOURCE_PASS_003.md`
 - `src/romeo_crt_engine/market_data/gap_reconciliation_v2.py`
 - `scripts/collect_oanda_history_shard.py`
+- `scripts/probe_oanda_all_gaps_s5.py`
 - `tests/unit/test_history_qualification_v2_phase6b.py`
 
 ## E. Detector-only activity protocol
@@ -122,7 +141,7 @@ Detector execution remains blocked until trusted historical datasets exist.
 ## Current handoff
 
 ```text
-Phase 6B                         IN PROGRESS — GAP CLASSIFICATION V2
+Phase 6B                         IN PROGRESS — ALL-GAP CLASSIFICATION V2
 Alpha changes                    NONE AUTHORIZED
 Frozen OANDA universe            4 SYMBOLS
 Historical M1 smoke              PASS 4/4, 60/60 EACH
@@ -131,6 +150,8 @@ Independent refetch              PASS 4/4 PER INSTRUMENT
 Raw artifacts                    EPHEMERAL / DELETED AFTER VALIDATION
 V2 reconciliation evidence       PASS 16/16 PERSISTED
 Exact missing-interval inventory PASS 122,626 INTERVALS
+XAU short-gap S5 classification  PASS 17,490 / 17,490; 0 UNRESOLVED
+All-gap S5 classification        CONTROLLED PILOT ACTIVE
 Historical gap classification    IN PROGRESS / FAIL-CLOSED
 Trusted H1 / NY-D1 datasets      PENDING
 Detector activity counts         NOT OPENED
