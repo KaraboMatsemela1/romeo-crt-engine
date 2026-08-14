@@ -14,7 +14,12 @@ CLAIM_RE = re.compile(
     r"CLAIMED_BY:\s*(?P<agent>[^\n]+).*?CLAIMED_AT:\s*(?P<at>[^\n]+).*?BRANCH:\s*(?P<branch>[^\n]+)",
     re.DOTALL,
 )
-TERMINAL_MARKERS = ("RESULT: COMPLETE", "RESULT: BLOCKED", "RESULT: FAILED", "RELEASE_STALE_CLAIM")
+TERMINAL_MARKERS = (
+    "RESULT: COMPLETE",
+    "RESULT: BLOCKED",
+    "RESULT: FAILED",
+    "RELEASE_STALE_CLAIM",
+)
 
 
 def classify_checks(checks: list[dict[str, Any]]) -> str:
@@ -30,7 +35,11 @@ def classify_checks(checks: list[dict[str, Any]]) -> str:
 
 
 def classify_pr(
-    *, draft: bool, mergeable: bool | None, checks: list[dict[str, Any]], changes_requested: bool
+    *,
+    draft: bool,
+    mergeable: bool | None,
+    checks: list[dict[str, Any]],
+    changes_requested: bool,
 ) -> str:
     """Classify a pull request without mutating repository state."""
     ci_state = classify_checks(checks)
@@ -62,7 +71,11 @@ def is_explicitly_ready_issue(title: str, body: str) -> bool:
     text = f"{title}\n{body}".lower()
     if "[blocked]" in title.lower() or "current status\nblocked" in text:
         return False
-    return "dependency\nnone" in text or "safe to execute now" in text or "safe to implement now" in text
+    return (
+        "dependency\nnone" in text
+        or "safe to execute now" in text
+        or "safe to implement now" in text
+    )
 
 
 def claim_is_stale(
@@ -110,16 +123,24 @@ def collect_snapshot(client: GitHubClient) -> dict[str, Any]:
     pull_rows: list[dict[str, Any]] = []
     for pr in client.get("/pulls?state=open&per_page=100"):
         number = int(pr["number"])
-        sha = str(pr["head"]["sha"])
+        detail = client.get(f"/pulls/{number}")
+        sha = str(detail["head"]["sha"])
         checks = client.get(f"/commits/{sha}/check-runs?per_page=100").get("check_runs", [])
         reviews = client.get(f"/pulls/{number}/reviews?per_page=100")
         state = classify_pr(
-            draft=bool(pr.get("draft")),
-            mergeable=pr.get("mergeable"),
+            draft=bool(detail.get("draft")),
+            mergeable=detail.get("mergeable"),
             checks=checks,
             changes_requested=latest_changes_requested(reviews),
         )
-        pull_rows.append({"number": number, "head_sha": sha, "state": state, "title": pr["title"]})
+        pull_rows.append(
+            {
+                "number": number,
+                "head_sha": sha,
+                "state": state,
+                "title": detail["title"],
+            }
+        )
 
     issue_rows: list[dict[str, Any]] = []
     now = datetime.now(UTC)
@@ -127,7 +148,11 @@ def collect_snapshot(client: GitHubClient) -> dict[str, Any]:
         if "pull_request" in issue:
             continue
         number = int(issue["number"])
-        comments = client.get(f"/issues/{number}/comments?per_page=100") if issue.get("comments") else []
+        comments = (
+            client.get(f"/issues/{number}/comments?per_page=100")
+            if issue.get("comments")
+            else []
+        )
         claim = parse_active_claim(comments)
         stale = False
         if claim:
@@ -145,7 +170,9 @@ def collect_snapshot(client: GitHubClient) -> dict[str, Any]:
                 "title": issue["title"],
                 "claimed_by": claim["agent"] if claim else None,
                 "stale_claim": stale,
-                "explicitly_ready": is_explicitly_ready_issue(issue["title"], issue.get("body") or ""),
+                "explicitly_ready": is_explicitly_ready_issue(
+                    issue["title"], issue.get("body") or ""
+                ),
             }
         )
     return {"generated_at": now.isoformat(), "pull_requests": pull_rows, "issues": issue_rows}
