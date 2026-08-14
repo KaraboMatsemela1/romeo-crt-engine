@@ -145,6 +145,13 @@ ROMEO-2026-CRTOLOGY-01     4DZWbCzEvhM
 - [ ] Freeze inherited versus changed/excluded rules before outcomes.
 - [ ] Freeze universe, timeframe/calendar/data requirements and activity threshold before outcomes.
 
+## J.1 First-party closure audit 001
+
+- [x] Recompute a field-by-field closure view from the existing first-party corpus only.
+- [x] Verify registry, manifest, payload, corpus-index and ledger relationships rather than trusting report digests.
+- [x] Preserve all eight held predicates as `OPEN` (0 explicitly satisfied fields; no candidate authorization).
+- [x] Record exact minimal direct-first-party evidence debts per field in `PHASE_6C_CLOSURE_AUDIT_001.json`.
+
 ## K. Implementation — not authorized
 
 - [ ] Create a new strategy version only after future candidate precommitment.
