@@ -2,22 +2,46 @@
 
 Updated: 2026-08-14
 
-## Progress to Paper Trading
+## Project Progress
 
-This is the canonical executive gate view. The bars show **milestone/gate maturity**, not trading performance, probability of success, or a forecast. They advance only when the governing repository gate materially changes.
+This is the canonical executive gate view of the **entire project lifecycle**. The bars show **milestone/gate maturity**, not trading performance, probability of success, or a forecast. A completed validation process can still end with an insufficient/negative promotion result; infrastructure completion never authorizes strategy execution by itself.
 
 ```text
-FIRST-PARTY EVIDENCE
-████████████████░░░░   good corpus; predicates incomplete
+ENGINEERING FOUNDATION
+████████████████████   COMPLETE
 
-DETERMINISTIC CANDIDATE
+ROMEO CORPUS / RECONCILIATION
+████████████████████   COMPLETE
+
+FORMAL CRT SPEC — v0.1
+████████████████████   COMPLETE / FROZEN
+
+MARKET DATA — frozen v0.1 route
+████████████████████   COMPLETE
+
+DETERMINISTIC DETECTOR — v0.1
+████████████████████   COMPLETE
+
+BACKTESTER — v0.1
+████████████████████   COMPLETE
+
+V0.1 VALIDATION PROCESS
+████████████████████   COMPLETE — INSUFFICIENT_EVIDENCE
+
+MULTI-MARKET REVISION / PHASE 6B
+████████████████████   COMPLETE — INSUFFICIENT_MULTI_MARKET_SAMPLE
+
+FIRST-PARTY EVIDENCE / PHASE 6C–6D
+████████████████░░░░   strong provenance corpus; predicates incomplete
+
+NEXT DETERMINISTIC CANDIDATE
 ░░░░░░░░░░░░░░░░░░░░   BLOCKED — no candidate-ready predicate
 
 ACTIVITY VALIDATION
-░░░░░░░░░░░░░░░░░░░░   not authorized — candidate not frozen
+░░░░░░░░░░░░░░░░░░░░   not authorized
 
 PERFORMANCE VALIDATION
-░░░░░░░░░░░░░░░░░░░░   not authorized — activity gate not reached
+░░░░░░░░░░░░░░░░░░░░   not authorized
 
 OOS
 ░░░░░░░░░░░░░░░░░░░░   unopened
@@ -25,11 +49,49 @@ OOS
 CONFIRM
 ░░░░░░░░░░░░░░░░░░░░   unopened
 
+PAPER EXECUTION INFRASTRUCTURE
+░░░░░░░░░░░░░░░░░░░░   engineering backlog in progress; execution disabled
+
 PAPER TRADING
-░░░░░░░░░░░░░░░░░░░░   BLOCKED — requires PROMOTE_TO_PAPER_CANDIDATE
+░░░░░░░░░░░░░░░░░░░░   BLOCKED — requires PROMOTE_TO_PAPER_CANDIDATE + Phase 7 qualification
+
+LEARNING ENGINE
+░░░░░░░░░░░░░░░░░░░░   not started — requires sufficient deterministic/paper labels
+
+SHADOW TRADING
+░░░░░░░░░░░░░░░░░░░░   not started — requires paper readiness
+
+CONTROLLED LIVE
+░░░░░░░░░░░░░░░░░░░░   NOT AUTHORIZED — explicit future canary/risk approval required
 ```
 
-Current bottleneck: **Issue #16 / first-party predicate closure**. Infrastructure work may continue in parallel, but no downstream bar advances merely because supporting engineering has started. Any PR that materially changes a gate represented above must update this block and the matching README view.
+### Current Critical Path
+
+```text
+FIRST-PARTY PREDICATE CLOSURE
+          ↓
+NEXT DETERMINISTIC CANDIDATE
+          ↓
+DEV ACTIVITY + PERFORMANCE
+          ↓
+OOS
+          ↓
+CONFIRM
+          ↓
+PROMOTE_TO_PAPER_CANDIDATE
+          ↓
+PHASE-7 OPERATIONAL QUALIFICATION
+          ↓
+PAPER TRADING
+          ↓
+LEARNING-ENGINE READINESS
+          ↓
+SHADOW TRADING
+          ↓
+CONTROLLED LIVE
+```
+
+Current bottleneck: **Issue #16 / first-party predicate closure**. Infrastructure work may continue in parallel, but no downstream strategy gate advances merely because supporting engineering has started. Any PR that materially changes a gate represented above must update this block and the matching README view. The autonomous full-project queue is **Issue #42**.
 
 | Phase | Status | Primary exit condition |
 |---|---|---|
