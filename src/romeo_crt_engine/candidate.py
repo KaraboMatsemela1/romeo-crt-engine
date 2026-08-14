@@ -26,9 +26,9 @@ class CandidatePrecommitment(BaseModel):
     oos_end: date
     confirm_start: date
     confirm_end: date
-    dev_min_closed_trades: int = Field(ge=30)
-    oos_min_closed_trades: int = Field(ge=30)
-    confirm_min_closed_trades: int = Field(ge=20)
+    dev_min_closed_trades: int = Field(default=30, ge=30)
+    oos_min_closed_trades: int = Field(default=30, ge=30)
+    confirm_min_closed_trades: int = Field(default=20, ge=20)
     reserved_outcome_fields: tuple[str, ...] = (
         "trade_count",
         "closed_trades",
