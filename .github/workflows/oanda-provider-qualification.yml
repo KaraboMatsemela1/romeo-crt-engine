@@ -34,13 +34,8 @@ jobs:
       - name: Qualify practice account
         run: python scripts/qualify_oanda_v20.py --environment practice --output /tmp/oanda-instrument-discovery.json
 
-  xau-usd-s5-reconciliation:
+  xau-usd-2022-s5-all-gap-pilot:
     needs: qualify-practice-account
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        year: [2019, 2020, 2021]
     runs-on: ubuntu-latest
     timeout-minutes: 120
     permissions:
@@ -58,22 +53,21 @@ jobs:
         run: |
           pip install -r requirements.lock
           pip install --no-deps --no-build-isolation -e .
-      - name: Fetch XAU_USD and probe short gaps at S5
-        run: python scripts/collect_oanda_history_shard.py --instrument XAU_USD --year ${{ matrix.year }} --output-dir /tmp/history --probe-s5-short-gaps
-      - name: Validate redacted S5 reconciliation evidence
+      - name: Fetch XAU_USD 2022 and probe every M1 gap at S5
+        run: python scripts/probe_oanda_all_gaps_s5.py --instrument XAU_USD --year 2022 --output-dir /tmp/history
+      - name: Validate complete all-gap reconciliation evidence
         run: |
-          python - "${{ matrix.year }}" <<'PY'
-          import json,sys
+          python - <<'PY'
+          import json
           from pathlib import Path
-          year=int(sys.argv[1])
-          stem=f'XAU_USD_{year}_MID_M1'
-          base=json.loads(Path(f'/tmp/history/{stem}.reconciliation-v2.json').read_text())
-          s5=json.loads(Path(f'/tmp/history/{stem}.s5-gap-evidence-v1.json').read_text())
+          base=json.loads(Path('/tmp/history/XAU_USD_2022_MID_M1.reconciliation-v2.json').read_text())
+          s5=json.loads(Path('/tmp/history/XAU_USD_2022_MID_M1.s5-gap-evidence-v1.json').read_text())
           assert base['schema_version']=='P6B_OANDA_RECONCILIATION_EVIDENCE_V2'
-          assert base['instrument']=='XAU_USD' and base['year']==year
+          assert base['instrument']=='XAU_USD' and base['year']==2022
           assert base['refetch']['status']=='EXACT_PROVIDER_VALUE_MATCH'
-          assert s5['instrument']=='XAU_USD' and s5['year']==year
+          assert s5['instrument']=='XAU_USD' and s5['year']==2022
           assert s5['source_missing_intervals_sha256']==base['missing_intervals_sha256']
+          assert s5['eligible_gap_count']==base['missing_interval_count']
           assert s5['eligible_gap_count']==s5['no_price_observation_gap_count']+s5['unresolved_provider_gap_count']
           assert base['detector_execution_authorized'] is False
           assert base['pnl_outcome_access_authorized'] is False
@@ -82,9 +76,11 @@ jobs:
           serialized=(json.dumps(base,sort_keys=True)+json.dumps(s5,sort_keys=True)).lower()
           for marker in ('authorization','bearer ','oanda_api_token','oanda_account_id','"balance"','"nav"','.jsonl.gz'):
               assert marker not in serialized
-          print('s5_reconciliation_validation=PASS')
-          print('history_shard=XAU_USD/'+str(year))
-          print('s5_eligible_gaps='+str(s5['eligible_gap_count']))
+          print('s5_all_gap_validation=PASS')
+          print('history_shard=XAU_USD/2022')
+          print('raw_missing_gaps='+str(base['missing_interval_count']))
+          print('raw_missing_minutes='+str(base['missing_minutes']))
+          print('s5_classified_gaps='+str(s5['eligible_gap_count']))
           print('s5_no_price_gaps='+str(s5['no_price_observation_gap_count']))
           print('s5_no_price_minutes='+str(s5['no_price_observation_minutes']))
           print('s5_unresolved_gaps='+str(s5['unresolved_provider_gap_count']))
@@ -92,13 +88,13 @@ jobs:
           print('detector_execution_authorized=false')
           print('pnl_outcome_access_authorized=false')
           PY
-      - name: Upload reconciliation and S5 evidence only
+      - name: Upload all-gap reconciliation evidence only
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: p6b-s5-XAU_USD-${{ matrix.year }}
+          name: p6b-s5-all-gap-XAU_USD-2022
           path: |
-            /tmp/history/XAU_USD_${{ matrix.year }}_MID_M1.reconciliation-v2.json
-            /tmp/history/XAU_USD_${{ matrix.year }}_MID_M1.s5-gap-evidence-v1.json
+            /tmp/history/XAU_USD_2022_MID_M1.reconciliation-v2.json
+            /tmp/history/XAU_USD_2022_MID_M1.s5-gap-evidence-v1.json
           if-no-files-found: error
           retention-days: 30
           compression-level: 9
