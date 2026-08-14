@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import json
+import subprocess
+import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
 
+from romeo_crt_engine.research.corpus_index_v1 import CorpusEntryV1, CorpusIndexV1
 from romeo_crt_engine.research.doctrine_diff_v1 import (
     DoctrineDeltaClassification,
     DoctrineStatementV1,
@@ -205,3 +209,25 @@ def test_registry_loader_validates_schema_and_unique_ids(tmp_path: Path) -> None
     )
     with pytest.raises(ValueError, match="unique"):
         load_source_registry_v1(path)
+
+
+def test_corpus_index_is_deterministic_and_rejects_duplicate_manifest() -> None:
+    first = CorpusEntryV1("ROMEO-A", "a" * 64, ("1" * 64,))
+    second = CorpusEntryV1("ROMEO-B", "b" * 64, ("2" * 64, "3" * 64))
+    assert CorpusIndexV1((first, second)).digest() == CorpusIndexV1((second, first)).digest()
+    with pytest.raises(ValueError, match="manifest hashes"):
+        CorpusIndexV1((first, first))
+
+
+def test_checked_in_phase6d_readiness_audit_stays_research_only() -> None:
+    completed = subprocess.run(
+        [sys.executable, "scripts/audit_phase6d_research_readiness.py"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    summary = json.loads(completed.stdout)
+    assert summary["candidate_ready_rows"] == 0
+    assert summary["candidate_creation_authorized"] is False
+    assert summary["detector_activity_authorized"] is False
+    assert summary["outcome_access_authorized"] is False
