@@ -232,9 +232,13 @@ def build_closure_report(paths: ClosureAuditPaths) -> dict[str, Any]:
                 source_id not in registry
                 or evidence_artifact is None
                 or evidence_artifact.source_id != source_id
+                or evidence_artifact.locator != locator
                 or artifact_sha not in indexed_artifacts
             ):
-                raise ClosureAuditError("ledger evidence does not match registry, manifest, and corpus")
+                raise ClosureAuditError(
+                    "ledger evidence does not match registry, manifest, and corpus; "
+                    "manifest artifact locator must match exactly"
+                )
             claim_key = (field, source_id, locator, artifact_sha)
             claim_value = (coverage, statement)
             previous = seen_claims.get(claim_key)
