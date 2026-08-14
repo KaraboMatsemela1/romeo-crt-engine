@@ -1,0 +1,298 @@
+name: Phase 6B Detector Activity Gate
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/phase-6b-candidate-revision
+    paths:
+      - .github/workflows/phase6b-detector-activity.yml
+
+jobs:
+  detector-activity-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      FREEZE_COMMIT_SHA: 8214c31e09d53cffadce453727604e0847a4d22e
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 20
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+      - name: Install locked environment
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps --no-build-isolation -e .
+      - name: Require committed pre-count universe freeze
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$FREEZE_COMMIT_SHA" HEAD
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path('experiments/phase6b/P6B_TRUSTED_DATASET_FREEZE_001.json')
+          freeze = json.loads(path.read_text())
+          assert freeze['schema_version'] == 'P6B_TRUSTED_DATASET_FREEZE_V1'
+          assert freeze['protocol'] == 'P6B-MULTI-MARKET-ACTIVITY-PROTOCOL-v1'
+          assert freeze['candidate_version'] == 'CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH'
+          assert freeze['alpha_strategy_version'] == 'CRT-C3-D1-H1-M1-BEAR-v0.1'
+          assert freeze['detector_version'] == 'CRT-DETECTOR-v0.2-MULTI-MARKET'
+          assert freeze['signal_component'] == 'MID'
+          assert freeze['provider'] == 'OANDA_V20'
+          assert freeze['venue'] == 'OANDA_FXTRADE'
+          assert freeze['environment'] == 'practice'
+          assert freeze['canonical_coverage_start_utc'] == '2019-01-01T05:00:00+00:00'
+          assert freeze['canonical_coverage_end_utc'] == '2023-01-01T05:00:00+00:00'
+          assert freeze['accepted_instrument_count'] == 4
+          expected = {'EUR_USD', 'XAU_USD', 'NAS100_USD', 'SPX500_USD'}
+          actual = {item['exact_oanda_instrument_symbol'] for item in freeze['instruments']}
+          assert actual == expected
+          assert len(freeze['instruments']) == len(actual) == 4
+          auth = freeze['authorization_after_freeze']
+          assert auth['detector_activity_counts_authorized'] is True
+          assert auth['backtester_authorized'] is False
+          assert auth['multi_market_pnl_outcome_access_authorized'] is False
+          assert auth['paper_trading_authorized'] is False
+          assert auth['shadow_trading_authorized'] is False
+          assert auth['live_trading_authorized'] is False
+          assert os.environ['FREEZE_COMMIT_SHA'] == '8214c31e09d53cffadce453727604e0847a4d22e'
+
+          with Path('/tmp/frozen-artifacts.tsv').open('w') as handle:
+              for item in sorted(freeze['instruments'], key=lambda value: value['exact_oanda_instrument_symbol']):
+                  handle.write(
+                      f"{item['exact_oanda_instrument_symbol']}\t"
+                      f"{item['artifact_id']}\t{item['artifact_zip_sha256']}\n"
+                  )
+          print('pre_count_universe_freeze=PASS')
+          print('accepted_instruments=4')
+          print('detector_activity_counts_authorized=true')
+          print('backtester_authorized=false')
+          print('pnl_outcome_access_authorized=false')
+          PY
+      - name: Download only exact frozen trusted artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/p6b-datasets
+          while IFS=$'\t' read -r symbol artifact_id expected_sha; do
+            root="/tmp/p6b-datasets/${symbol}"
+            zip_path="/tmp/p6b-datasets/${symbol}.zip"
+            mkdir -p "$root"
+            gh api "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}/zip" > "$zip_path"
+            echo "${expected_sha}  ${zip_path}" | sha256sum -c -
+            unzip -q "$zip_path" -d "$root"
+            rm -f "$zip_path"
+          done < /tmp/frozen-artifacts.tsv
+      - name: Validate every downloaded dataset against freeze
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          freeze = json.loads(Path('experiments/phase6b/P6B_TRUSTED_DATASET_FREEZE_001.json').read_text())
+          root = Path('/tmp/p6b-datasets')
+
+          def file_sha(path: Path) -> str:
+              digest = hashlib.sha256()
+              with path.open('rb') as handle:
+                  while chunk := handle.read(1024 * 1024):
+                      digest.update(chunk)
+              return digest.hexdigest()
+
+          for item in freeze['instruments']:
+              symbol = item['exact_oanda_instrument_symbol']
+              dataset_root = root / symbol
+              expected_files = {
+                  f'{symbol}.H1.jsonl',
+                  f'{symbol}.D1_NY.jsonl',
+                  f'{symbol}.identity.json',
+                  f'{symbol}.trusted-build.json',
+              }
+              actual_files = {path.name for path in dataset_root.iterdir() if path.is_file()}
+              assert actual_files == expected_files
+
+              h1_path = dataset_root / f'{symbol}.H1.jsonl'
+              d1_path = dataset_root / f'{symbol}.D1_NY.jsonl'
+              identity = json.loads((dataset_root / f'{symbol}.identity.json').read_text())
+              manifest = json.loads((dataset_root / f'{symbol}.trusted-build.json').read_text())
+
+              assert file_sha(h1_path) == item['h1_file_sha256']
+              assert file_sha(d1_path) == item['d1_file_sha256']
+              assert identity['schema_version'] == item['dataset_schema_version'] == 'P6B_CANONICAL_PRICE_DATASET_V2'
+              assert identity['dataset_version'] == item['dataset_version']
+              assert identity['provider'] == 'OANDA_V20'
+              assert identity['venue'] == 'OANDA_FXTRADE'
+              assert identity['instrument'] == symbol
+              assert identity['price_component'] == 'MID'
+              assert identity['quality_status'] == 'TRUSTED'
+              assert identity['price_quantum'] == item['price_quantum']
+              assert identity['price_quantum_source'] == item['price_quantum_source'] == 'PROVIDER_PRICE_PRECISION_POLICY'
+              assert identity['session_policy_version'] == item['session_policy_version']
+              assert identity['instrument_metadata_sha256'] == item['instrument_metadata_sha256']
+              assert identity['normalized_sha256'] == item['normalized_h1_d1_sha256']
+              assert identity['h1_rows'] == item['h1_rows']
+              assert identity['d1_rows'] == item['d1_rows']
+              assert manifest['quality_status'] == 'TRUSTED'
+              assert manifest['normalized_h1_d1_sha256'] == item['normalized_h1_d1_sha256']
+              assert manifest['h1_file_sha256'] == item['h1_file_sha256']
+              assert manifest['d1_file_sha256'] == item['d1_file_sha256']
+              assert manifest['canonical_tail_evidence_file_sha256'] == item['canonical_tail_evidence_file_sha256']
+              assert manifest['detector_execution_authorized'] is False
+              assert manifest['tradeplan_count_access_authorized'] is False
+              assert manifest['backtester_authorized'] is False
+              assert manifest['pnl_outcome_access_authorized'] is False
+              assert manifest['paper_trading_authorized'] is False
+              assert manifest['shadow_trading_authorized'] is False
+              assert manifest['live_trading_authorized'] is False
+              print(f'trusted_artifact_validation={symbol}:PASS')
+          PY
+      - name: Execute counts-only frozen detector
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/p6b-activity
+          for symbol in EUR_USD NAS100_USD SPX500_USD XAU_USD; do
+            python scripts/run_phase6b_detector_activity.py \
+              --identity "/tmp/p6b-datasets/${symbol}/${symbol}.identity.json" \
+              --h1 "/tmp/p6b-datasets/${symbol}/${symbol}.H1.jsonl" \
+              --d1 "/tmp/p6b-datasets/${symbol}/${symbol}.D1_NY.jsonl" \
+              --output "/tmp/p6b-activity/${symbol}.json"
+          done
+      - name: Seal preregistered pooled activity decision
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from decimal import Decimal
+          from pathlib import Path
+
+          freeze_path = Path('experiments/phase6b/P6B_TRUSTED_DATASET_FREEZE_001.json')
+          freeze = json.loads(freeze_path.read_text())
+          activity_root = Path('/tmp/p6b-activity')
+          expected_symbols = sorted(item['exact_oanda_instrument_symbol'] for item in freeze['instruments'])
+          results = []
+
+          for symbol in expected_symbols:
+              result = json.loads((activity_root / f'{symbol}.json').read_text())
+              assert result['candidate_version'] == freeze['candidate_version']
+              assert result['alpha_strategy_version'] == freeze['alpha_strategy_version']
+              assert result['detector_version'] == freeze['detector_version']
+              assert result['instrument'] == symbol
+              assert result['provider'] == freeze['provider']
+              assert result['venue'] == freeze['venue']
+              assert result['price_component'] == 'MID'
+              assert result['candidate_count'] == result['no_signal_count'] + result['trade_plan_count']
+              assert sum(result['reason_code_counts'].values()) == result['candidate_count']
+              assert result['candidate_details_persisted'] is False
+              assert result['trade_plan_details_persisted'] is False
+              assert result['backtester_invoked'] is False
+              assert result['pnl_outcome_accessed'] is False
+              assert result['paper_trading_authorized'] is False
+              assert result['shadow_trading_authorized'] is False
+              assert result['live_trading_authorized'] is False
+              results.append(result)
+
+          accepted = len(results)
+          contributing = sum(result['trade_plan_count'] > 0 for result in results)
+          pooled_candidates = sum(result['candidate_count'] for result in results)
+          pooled_trade_plans = sum(result['trade_plan_count'] for result in results)
+
+          if accepted < 2:
+              decision = 'INSUFFICIENT_ELIGIBLE_UNIVERSE'
+          elif pooled_trade_plans < 30 or contributing < 2:
+              decision = 'INSUFFICIENT_MULTI_MARKET_SAMPLE'
+          else:
+              decision = 'SUFFICIENT_ACTIVITY_FOR_PERFORMANCE_PROTOCOL'
+
+          per_instrument = []
+          for result in sorted(results, key=lambda value: value['instrument']):
+              if pooled_trade_plans:
+                  share = format(Decimal(result['trade_plan_count']) / Decimal(pooled_trade_plans), 'f')
+              else:
+                  share = '0'
+              per_instrument.append(
+                  {
+                      'instrument': result['instrument'],
+                      'complete_d1_bars': result['complete_d1_bars'],
+                      'candidate_count': result['candidate_count'],
+                      'no_signal_count': result['no_signal_count'],
+                      'trade_plan_count': result['trade_plan_count'],
+                      'trade_plan_share_of_pool': share,
+                      'reason_code_counts': result['reason_code_counts'],
+                      'dataset_identity_sha256': result['dataset_identity_sha256'],
+                      'detector_run_sha256': result['run_sha256'],
+                  }
+              )
+
+          gate = {
+              'schema_version': 'P6B_MULTI_MARKET_ACTIVITY_RESULT_V1',
+              'protocol': freeze['protocol'],
+              'freeze_commit_sha': os.environ['FREEZE_COMMIT_SHA'],
+              'freeze_file_sha256': hashlib.sha256(freeze_path.read_bytes()).hexdigest(),
+              'activity_workflow_head_sha': os.environ['GITHUB_SHA'],
+              'candidate_version': freeze['candidate_version'],
+              'alpha_strategy_version': freeze['alpha_strategy_version'],
+              'detector_version': freeze['detector_version'],
+              'signal_component': 'MID',
+              'accepted_instrument_count': accepted,
+              'contributing_instrument_count': contributing,
+              'pooled_candidate_count': pooled_candidates,
+              'pooled_trade_plan_count': pooled_trade_plans,
+              'minimum_required_trade_plans': 30,
+              'minimum_required_accepted_instruments': 2,
+              'minimum_required_contributing_instruments': 2,
+              'per_instrument': per_instrument,
+              'decision': decision,
+              'candidate_details_persisted': False,
+              'trade_plan_details_persisted': False,
+              'backtester_invoked': False,
+              'pnl_outcome_accessed': False,
+              'paper_trading_authorized': False,
+              'shadow_trading_authorized': False,
+              'live_trading_authorized': False,
+          }
+          output = activity_root / 'P6B_ACTIVITY_GATE_RESULT.json'
+          output.write_text(json.dumps(gate, sort_keys=True, indent=2) + '\n')
+
+          print('phase6b_activity_gate=COMPLETE')
+          print(f'accepted_instruments={accepted}')
+          print(f'contributing_instruments={contributing}')
+          print(f'pooled_candidates={pooled_candidates}')
+          print(f'pooled_trade_plans={pooled_trade_plans}')
+          for item in per_instrument:
+              print(
+                  f"activity={item['instrument']}:"
+                  f"d1={item['complete_d1_bars']}:"
+                  f"candidates={item['candidate_count']}:"
+                  f"no_signal={item['no_signal_count']}:"
+                  f"trade_plans={item['trade_plan_count']}"
+              )
+              print('reason_code_counts=' + item['instrument'] + ':' + json.dumps(item['reason_code_counts'], sort_keys=True))
+          print(f'decision={decision}')
+          print('backtester_invoked=false')
+          print('pnl_outcome_accessed=false')
+          PY
+      - name: Upload counts-only gate evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p6b-detector-activity-gate
+          path: |
+            /tmp/p6b-activity/EUR_USD.json
+            /tmp/p6b-activity/NAS100_USD.json
+            /tmp/p6b-activity/SPX500_USD.json
+            /tmp/p6b-activity/XAU_USD.json
+            /tmp/p6b-activity/P6B_ACTIVITY_GATE_RESULT.json
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 9
+      - name: Delete downloaded detector-facing datasets
+        if: always()
+        run: rm -rf /tmp/p6b-datasets /tmp/p6b-activity /tmp/frozen-artifacts.tsv
