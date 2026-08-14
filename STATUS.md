@@ -11,7 +11,7 @@ Updated: 2026-08-14
 | 4 — CRT detector | **COMPLETE FOR v0.1** | Frozen deterministic detector |
 | 5 — Backtester | **COMPLETE FOR v0.1** | Deterministic cost-aware simulator |
 | 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Terminal preregistered DEV decision |
-| 6B — Candidate revision | **IN PROGRESS — UNIVERSE ALL-GAP CLASSIFICATION** | Trusted multi-market DEV datasets + detector-only activity decision |
+| 6B — Candidate revision | **IN PROGRESS — TRUSTED DATASET CONSTRUCTION** | Trusted multi-market DEV datasets + detector-only activity decision |
 | 7 — Paper trading | **BLOCKED** | Requires future validated paper promotion |
 | 8 — Learning engine | Not started | Requires sufficient deterministic labels |
 | 9 — Shadow trading | Not started | Requires paper readiness |
@@ -51,13 +51,13 @@ NAS100_USD
 SPX500_USD
 ```
 
-Historical qualification is governed by `P6B-OANDA-HISTORY-QUALIFICATION-V1` and the corrected observation contract `P6B_OANDA_OBSERVATION_POLICY_V2`.
+Historical qualification is governed by `P6B-OANDA-HISTORY-QUALIFICATION-V1` and observation contract `P6B_OANDA_OBSERVATION_POLICY_V2`.
 
-## Historical collection and integrity state
+## Historical collection and raw-gap qualification
 
-All 16 preregistered instrument/year MID/M1 shards for 2019-2022 have been collected through OANDA practice, independently re-fetched, validated and reduced to credential-free reconciliation evidence. Raw price artifacts remain ephemeral and are deleted after validation.
+All 16 preregistered instrument/year MID/M1 shards for 2019-2022 were collected through OANDA practice, independently re-fetched, validated, and reduced to credential-free reconciliation evidence. Raw price artifacts are ephemeral and deleted after validation.
 
-Sealed inventory:
+Sealed raw inventory:
 
 ```text
 complete M1 candles       5,529,393
@@ -77,84 +77,85 @@ NAS100_USD   1,392,496 complete M1 | 11,111 gaps | 711,344 missing minutes
 SPX500_USD   1,314,678 complete M1 | 55,778 gaps | 789,162 missing minutes
 ```
 
-Every shard passed its frozen independent provider-value re-fetch. This proves deterministic provider retrieval for the observed values; it does not by itself prove that every omitted M1 observation is acceptable for detector-facing data.
+OANDA Provider Qualification run #27 (`31778696775`) completed successfully on attempt #2 at evidence commit `b04899e03931eda642af12e39926a84c310482f6`.
 
-## Gap-classification state
-
-The V2 contract allows these supported omission states:
+Universe-wide all-gap S5 result:
 
 ```text
-EXPECTED_MARKET_CLOSURE
-NO_PRICE_OBSERVATION
+all-gap evidence shards             16 / 16 PASS
+raw missing intervals               122,626
+S5 classified intervals             122,626
+NO_PRICE_OBSERVATION intervals      122,626
+UNRESOLVED_PROVIDER_GAP intervals         0
+raw missing minutes               2,885,967
+NO_PRICE_OBSERVATION minutes      2,885,967
+UNRESOLVED_PROVIDER_GAP minutes           0
+raw-gap-qualified instruments          4 / 4
 ```
 
-Any interval that cannot be supported by date-valid market evidence or finer-granularity provider evidence remains:
+Per instrument qualification:
 
 ```text
-UNRESOLVED_PROVIDER_GAP
+EUR_USD      37,770 / 37,770 gaps | 675,685 / 675,685 minutes | unresolved 0
+XAU_USD      17,967 / 17,967 gaps | 709,776 / 709,776 minutes | unresolved 0
+NAS100_USD   11,111 / 11,111 gaps | 711,344 / 711,344 minutes | unresolved 0
+SPX500_USD   55,778 / 55,778 gaps | 789,162 / 789,162 minutes | unresolved 0
 ```
 
-and fails closed.
+The XAU_USD/2019 first execution was interrupted technically; the failed job alone was rerun on the same frozen workflow/evidence commit and passed without evidence-policy or strategy changes.
 
-The first XAU_USD S5 pass classified every M1 gap of 60 minutes or less for 2019-2022:
+Canonical universe result: `experiments/phase6b/P6B_ALL_GAP_S5_UNIVERSE_001.md`.
 
-```text
-XAU_USD short gaps classified          17,490
-XAU_USD short-gap NO_PRICE_OBSERVATION 17,490
-XAU_USD short-gap unresolved                0
-XAU_USD no-price minutes classified    56,453
-```
+A fail-closed evidence-to-policy adapter is implemented in `src/romeo_crt_engine/market_data/s5_gap_policy_v2.py`. Partial, unresolved, coordinate-mismatched, or digest-unbound S5 evidence cannot enter aggregation as approved omission policy.
 
-The controlled all-gap pilot then validated the same cross-granularity method against **every** raw gap in XAU_USD/2022:
+## Current trusted-data gate
 
-```text
-raw gaps                          827
-classified gaps                   827
-NO_PRICE_OBSERVATION              827
-UNRESOLVED_PROVIDER_GAP             0
-raw missing minutes           172,923
-NO_PRICE_OBSERVATION minutes   172,923
-independent refetch                PASS
-all-gap validation                 PASS
-```
-
-The pilot is sealed in `experiments/phase6b/P6B_ALL_GAP_S5_PILOT_001.md`. It validates the method, not the entire XAU_USD instrument. XAU_USD 2019-2021 and all EUR_USD/NAS100_USD/SPX500_USD years still require direct all-gap classification before any instrument can be trusted.
-
-A fail-closed evidence-to-policy adapter is implemented in `src/romeo_crt_engine/market_data/s5_gap_policy_v2.py`. Partial, unresolved, coordinate-mismatched or digest-unbound S5 evidence cannot enter H1/D1 aggregation as an approved omission policy.
-
-## Promotion rule
+`RAW_GAP_QUALIFIED` is a prerequisite, not detector-facing `TRUSTED` status.
 
 Before any Phase-6B detector activity count may be opened, each accepted instrument must have:
 
 ```text
 complete frozen MID/M1 source history
 independent provider-value re-fetch PASS
-every raw missing interval terminally reconciled
+all raw gaps bound to approved evidence
 zero unresolved/provider-missing intervals
-deterministic trusted H1 derivation
+deterministic H1 derivation
 deterministic New-York-midnight D1 derivation
+frozen provider/instrument/session/price-quantum identities
+frozen normalized H1/D1 digest
 frozen P6B_CANONICAL_PRICE_DATASET_V2 identity
 quality_status = TRUSTED
 ```
 
-At least two instruments must satisfy this gate. Otherwise the preregistered activity protocol terminates as `INSUFFICIENT_ELIGIBLE_UNIVERSE` without opening detector outcomes.
+All four raw-gap-qualified instruments may proceed to this construction gate. No instrument is called `TRUSTED` until the canonical identity is actually built and verified.
 
-If at least two instruments become trusted, only detector activity counts may be opened under `P6B-MULTI-MARKET-ACTIVITY-PROTOCOL-v1`. P&L and the backtester remain prohibited.
+After the exact trusted set is frozen, at least two trusted instruments are required to open the detector-only activity protocol. If fewer than two become trusted, Phase 6B terminates as `INSUFFICIENT_ELIGIBLE_UNIVERSE` without detector outcome access.
+
+If at least two instruments are trusted, the only next outcome surface is `P6B-MULTI-MARKET-ACTIVITY-PROTOCOL-v1`:
+
+```text
+accepted instruments      >= 2
+contributing instruments  >= 2
+pooled TradePlans         >= 30
+backtester                PROHIBITED
+P&L                       PROHIBITED
+```
 
 ## Current handoff
 
 ```text
-Phase 6B                         IN PROGRESS — UNIVERSE ALL-GAP CLASSIFICATION
+Phase 6B                         IN PROGRESS — TRUSTED DATASET CONSTRUCTION
 Alpha changes                    NONE AUTHORIZED
 Frozen OANDA universe            4 SYMBOLS
 Yearly raw validation            PASS 16/16
 Independent refetch              PASS 4/4 PER INSTRUMENT
 V2 reconciliation evidence       PASS 16/16
 Exact missing-interval inventory PASS 122,626 INTERVALS
-XAU short-gap S5 classification  PASS 17,490 / 17,490; 0 UNRESOLVED
-XAU 2022 all-gap S5 pilot        PASS 827 / 827; 0 UNRESOLVED
-Universe all-gap classification  AUTHORIZED / NEXT
-Trusted H1 / NY-D1 datasets      PENDING
+Universe all-gap classification  PASS 16/16; 122,626 / 122,626; 0 UNRESOLVED
+Missing-minute reconciliation    PASS 2,885,967 / 2,885,967; 0 UNRESOLVED
+Raw-gap-qualified instruments    PASS 4/4
+Trusted H1 / NY-D1 datasets      PENDING / NEXT
+Canonical TRUSTED identities     PENDING
 Detector activity counts         NOT OPENED
 Multi-market P&L                 NOT AUTHORIZED
 v0.1 OOS / CONFIRM               UNOPENED
@@ -172,6 +173,7 @@ Canonical detail:
 - `experiments/phase6b/P6B_OANDA_HISTORY_COLLECTION_GATE_001.md`
 - `experiments/phase6b/P6B_RECONCILIATION_STATUS_001.md`
 - `experiments/phase6b/P6B_ALL_GAP_S5_PILOT_001.md`
+- `experiments/phase6b/P6B_ALL_GAP_S5_UNIVERSE_001.md`
 - `src/romeo_crt_engine/market_data/gap_reconciliation_v2.py`
 - `src/romeo_crt_engine/market_data/s5_gap_policy_v2.py`
 - `scripts/collect_oanda_history_shard.py`
@@ -186,7 +188,8 @@ V0_1_CONFIRM_OUTCOME_ACCESS_AUTHORIZED = false
 PARAMETER_OPTIMIZATION_AUTHORIZED      = false
 FULL_RAW_HISTORY_COLLECTION_AUTHORIZED = true
 ALL_GAP_PROVIDER_CLASSIFICATION        = true
-MULTI_MARKET_ACTIVITY_COUNTS_OPENED    = false
+DETECTOR_ACTIVITY_COUNTS_AUTHORIZED    = false
+BACKTEST_AUTHORIZED                    = false
 MULTI_MARKET_PNL_OUTCOME_ACCESS        = false
 PAPER_TRADING_AUTHORIZED               = false
 SHADOW_TRADING_AUTHORIZED              = false
