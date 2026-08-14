@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 from enum import StrEnum
 from pathlib import Path
 from typing import Self
@@ -81,7 +80,7 @@ class ValidationAccessGuard(BaseModel):
 
     def transition(
         self, target: ValidationState, evidence: TransitionEvidence
-    ) -> "ValidationAccessGuard":
+    ) -> ValidationAccessGuard:
         """Return a new guard after validating the requested transition."""
         self._validate_transition(target, evidence)
         record = TransitionRecord(from_state=self.state, to_state=target, evidence=evidence)
