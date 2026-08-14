@@ -82,13 +82,14 @@ def test_checked_in_corpus_migration_audit_remains_research_only() -> None:
     )
     assert completed.returncode == 0, completed.stderr
     summary = json.loads(completed.stdout)
-    assert summary["acquisition_manifests"] == 6
-    assert summary["captured_manifests"] == 1
+    assert summary["acquisition_manifests"] == 21
+    assert summary["captured_manifests"] == 16
     assert summary["partial_manifests"] == 5
-    assert summary["corpus_sources"] == 1
-    assert summary["corpus_artifacts"] == 1
-    assert summary["predicate_rows_with_artifact_evidence"] == 1
-    assert summary["observed_field_evidence"] == 2
+    assert summary["corpus_sources"] == 16
+    assert summary["corpus_artifacts"] == 18
+    assert summary["payload_files_verified"] == 18
+    assert summary["predicate_rows_with_artifact_evidence"] == 7
+    assert summary["observed_field_evidence"] == 17
     assert summary["closing_field_evidence"] == 0
     assert summary["candidate_ready_rows"] == 0
     assert summary["candidate_creation_authorized"] is False

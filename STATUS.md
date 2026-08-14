@@ -13,7 +13,7 @@ Updated: 2026-08-14
 | 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Terminal preregistered v0.1 DEV decision |
 | 6B — Candidate revision | **COMPLETE — INSUFFICIENT_MULTI_MARKET_SAMPLE** | Terminal preregistered multi-market activity decision |
 | 6C — Doctrine research | **BLOCKED — NO VERIFIED FIRST-PARTY PREDICATE CLOSURE** | Resume only when direct first-party evidence closes a deterministic held predicate |
-| 6D — Research infrastructure | **COMPLETE — V1 + CORPUS MIGRATION 001** | Provenance-bound acquisition + artifact-backed predicate coverage |
+| 6D — Research infrastructure | **COMPLETE — V1 + CORPUS MIGRATION 001 + RECOVERY 002** | Provenance-bound evidence corpus; remaining blockers are unavailable technical source evidence |
 | 7 — Paper trading | **BLOCKED** | Requires a future candidate that passes full validation |
 | 8 — Learning engine | Not started | Requires sufficient deterministic labels |
 | 9 — Shadow trading | Not started | Requires paper readiness |
@@ -33,117 +33,139 @@ candidate     CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH
 alpha         CRT-C3-D1-H1-M1-BEAR-v0.1
 detector      CRT-DETECTOR-v0.2-MULTI-MARKET
 signal        MID
+TradePlans    7 / required 30
 decision      INSUFFICIENT_MULTI_MARKET_SAMPLE
+```
 
-Phase 6C
+The v0.1 OOS and CONFIRM windows remain unopened. Historical Phase-6/6B evidence may not be rewritten or repaired in place.
+
+## Phase 6C terminal research state
+
+```text
 candidate_ready_rows        0
 verified predicate closures 0
 decision                    BLOCKED_NO_VERIFIED_PREDICATE_CLOSURE
 ```
 
-The v0.1 OOS and CONFIRM windows remain unopened. Historical Phase-6/6B/6C evidence may not be rewritten or repaired in place.
+Phase 6C remains blocked. Recovery of partial doctrine or context does not authorize a candidate.
 
-## Phase 6D — First-Party Research Infrastructure V1
+## Phase 6D — Research Infrastructure V1
 
-Phase 6D addresses the source-acquisition and deterministic-evidence bottleneck discovered in Phase 6C. It is research infrastructure, not a new alpha-candidate phase.
-
-Completed V1 contracts:
+Completed:
 
 ```text
-registry-bound source capture            COMPLETE
-SHA-256 artifact provenance              COMPLETE
-canonical acquisition manifests          COMPLETE
-strict source-registry schema/row width  COMPLETE
-predicate evidence ledger                COMPLETE
-causal closure field enforcement         COMPLETE
-doctrine delta validation                COMPLETE
-positive + negative fixture gate         COMPLETE
-deterministic corpus index               COMPLETE
-research readiness audit                 COMPLETE
-V1 CI                                    RUFF + MYPY + 133 PYTEST PASS
-candidate/detector/outcome authorization FALSE
+registry-bound source capture
+SHA-256 artifact provenance
+canonical acquisition manifests
+strict source-registry validation
+predicate ledger with PARTIAL/CLOSING semantics
+doctrine delta validation
+positive + negative fixture gate
+deterministic corpus index
+research readiness audit
 ```
 
-## Phase 6D — Existing Corpus Migration 001
+Canonical infrastructure records:
 
-Canonical result:
+- `research/romeo/phase6d/PHASE_6D_RESEARCH_INFRA_CHARTER.md`
+- `research/romeo/phase6d/PREDICATE_LEDGER_V2.json`
+- `research/romeo/phase6d/CORPUS_INDEX_V1.json`
+- `research/romeo/phase6d/acquisitions/`
+- `research/romeo/phase6d/payloads/`
+- `scripts/audit_phase6d_corpus_migration.py`
+- `docs/checklists/phase-6d.md`
+
+## Phase 6D — Corpus Migration 001
+
+The initial bounded migration admitted only one replayable source from the six-source Phase-6C set and established the fail-closed provenance chain.
+
+```text
+migration decision = COMPLETE_NO_PREDICATE_CLOSURE
+```
+
+Canonical record:
 
 - `research/romeo/phase6d/CORPUS_MIGRATION_001.md`
-- `research/romeo/phase6d/CORPUS_INDEX_V1.json`
-- `research/romeo/phase6d/PREDICATE_LEDGER_V2.json`
-- `research/romeo/phase6d/acquisitions/`
-- `scripts/audit_phase6d_corpus_migration.py`
 
-The migration was bounded to the six sources already used by the terminal Phase-6C acquisition pass. No new remote research or strategy exploration was used.
+## Phase 6D — First-Party Artifact Recovery 002
 
-```text
-acquisition manifests                 6
-captured manifests                    1
-partial manifests                     5
-replayable corpus sources             1
-replayable corpus artifacts           1
-predicate rows                        8
-predicate rows with artifact evidence 1
-observed field evidence               2
-closing field evidence                0
-candidate_ready_rows                  0
-migration decision                    COMPLETE_NO_PREDICATE_CLOSURE
-implementation CI                     RUFF + MYPY + 137 PYTEST PASS
-```
+Recovery 002 searched only first-party Romeo channels for the previously quarantined technical claims. Fifteen exact Telegram post identities/payloads were recovered and admitted to the corpus.
 
-Only `ROMEO-2026-TG-TIME-TS-6361` currently has a replayable artifact chain in the bounded corpus. Its exact legacy first-party text payload is SHA-256 bound and attached to `TIME_SELECTOR` as `PARTIAL` evidence for:
+Implementation CI run `31823845361`:
 
 ```text
-EXACT_PREDICATE   PARTIAL
-DATA_REQUIREMENTS PARTIAL
+Ruff    PASS
+MyPy    PASS
+pytest  137 PASS
 ```
 
-No required field is satisfied. `TIME_SELECTOR` remains `PARTIAL`, not `CLOSED`.
-
-The other bounded routes remain registered acquisition records but do not have replayable direct technical payloads with exact locators in the repository corpus:
+Recovery inventory:
 
 ```text
-ROMEO-2026-CRTOLOGY-01  PARTIAL
-ROMEO-2025-S6           PARTIAL
-ROMEO-2025-S9           PARTIAL
-ROMEO-2024-TS           PARTIAL
-ROMEO-2025-S5           PARTIAL
+new direct first-party source records       15
+acquisition manifests total                 21
+captured manifests                          16
+partial identity-only manifests              5
+replayable corpus sources                   16
+replayable corpus artifacts                 18
+payload files independently verified        18
+predicate rows                               8
+predicate rows with artifact evidence        7
+observed PARTIAL field evidence             17
+CLOSING field evidence                       0
+candidate_ready_rows                         0
+
+decision = RECOVERY_COMPLETE_NO_PREDICATE_CLOSURE
 ```
 
-Previously documented Phase-6C doctrine claims are preserved as historical research statements but are not attached to executable predicate fields until their original first-party payload + exact source locator can be recovered and hashed.
+Canonical recovery record:
 
-`P6D_PREDICATE_LEDGER_V2` distinguishes:
+- `research/romeo/phase6d/FIRST_PARTY_ARTIFACT_RECOVERY_002.md`
+
+### Artifact-backed predicate state
 
 ```text
-PARTIAL  = relevant direct artifact evidence that does not satisfy the whole field
-CLOSING  = direct artifact evidence sufficient to satisfy the declared field
+SS_MEANING_AND_CAUSAL_RULE   PARTIAL / 0 satisfied fields
+SMT_EXECUTABLE_SEMANTICS     PARTIAL / 0 satisfied fields
+MODEL_1_GEOMETRY             PARTIAL / 0 satisfied fields
+TRUE_MSS_ALGORITHM           UNRESOLVED / 0 satisfied fields
+TURTLE_SOUP_CONFIRMATION     PARTIAL / 0 satisfied fields
+KEY_LEVEL_SELECTOR           PARTIAL / 0 satisfied fields
+TIME_SELECTOR                PARTIAL / 0 satisfied fields
+DYNAMIC_BIAS_TRANSITION      PARTIAL / 0 satisfied fields
 ```
 
-Only `CLOSING` evidence contributes to `satisfied_fields` or candidate readiness.
+`PARTIAL` evidence is observable research evidence only. Only `CLOSING` evidence may satisfy a required predicate field.
 
-## Current machine-readable predicate debts
+### Remaining evidence blockers
+
+The direct first-party recovery pass did not obtain usable original YouTube captions/transcripts for CRTology Episode 1, CRT Secrets Episodes 6/9, or the original Turtle Soup video. It also did not recover a direct first-party true-MSS algorithm.
+
+Remaining deterministic debts include:
 
 ```text
-SS_MEANING_AND_CAUSAL_RULE
-SMT_EXECUTABLE_SEMANTICS
-MODEL_1_GEOMETRY
-TRUE_MSS_ALGORITHM
-TURTLE_SOUP_CONFIRMATION
-KEY_LEVEL_SELECTOR
-TIME_SELECTOR                 PARTIAL ARTIFACT COVERAGE / 0 SATISFIED FIELDS
-DYNAMIC_BIAS_TRANSITION
+SS               meaning, geometry, ownership, lifecycle
+SMT              polarity, corresponding extreme, synchronization, leg ownership,
+                 exact TS substitution, confirmation, invalidation, expiry
+MODEL_1          exact geometry, timing, confirmation, invalidation, expiry
+TRUE_MSS         swing construction, break rule, ownership, confirmation, invalidation, expiry
+TURTLE_SOUP      qualifying old extreme, excursion, confirmation, invalidation, expiry
+KEY_LEVEL        selector/hierarchy and arrival/reaction qualification
+TIME             timezone/DST, market scope, filter semantics, confirmation, expiry
+DYNAMIC_BIAS     convincing-CRT predicate, timeframe, transition timing, confirmation, expiry
 ```
+
+These are now evidence-availability blockers rather than unfinished repository engineering.
 
 ## Phase 6C re-entry condition
 
-Phase 6C remains blocked until at least one of these becomes directly available:
+Phase 6C may reopen only when a directly verifiable first-party artifact closes a held deterministic predicate, for example:
 
-1. a verified new first-party CRTology episode with technical content;
-2. direct captions/transcript/technical frames for Episode 1, Episode 6, Episode 9, or the original Turtle Soup source;
-3. a first-party Romeo text/chart post that explicitly closes one held predicate including causal timing/ownership/confirmation semantics;
-4. recovery of an original first-party artifact + exact locator for a currently quarantined Phase-6C direct claim, followed by Phase-6D manifest/corpus admission and field-level audit.
+1. original captions/transcript/technical frames for a held source become available;
+2. a new first-party Romeo technical source defines the causal rule including ownership/timing/confirmation semantics; or
+3. a recovered original artifact closes the remaining required fields and passes the Phase-6D fixture gate.
 
-Even a fully closed predicate does not automatically authorize strategy implementation. A separate preregistered candidate decision remains required.
+Even a closed predicate does not automatically authorize strategy implementation. A separate preregistered candidate decision is required.
 
 ## Authorization
 
