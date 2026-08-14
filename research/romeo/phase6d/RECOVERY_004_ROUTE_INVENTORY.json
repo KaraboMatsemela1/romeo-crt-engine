@@ -1,0 +1,65 @@
+{
+  "schema_version": "P6D_RECOVERY_004_ROUTE_INVENTORY_V1",
+  "routes": [
+    {
+      "acquisition_manifest": "ROMEO-2026-CRTOLOGY-01.json",
+      "availability_check": {"method": "yt-dlp --list-subs --no-playlist --retries 0 --socket-timeout 15", "result": "SOURCE_UNAVAILABLE", "retrieved_at_utc": "2026-08-14T22:17:10Z", "source_contact_observed": false},
+      "channel_index_search": {"method": "curl --get --fail --silent --show-error --max-time 15 --data-urlencode q=SS", "result": "SOURCE_UNAVAILABLE", "retrieved_at_utc": "2026-08-14T22:17:15Z", "route": "https://t.me/s/officialRomeotpt?q=SS", "source_contact_observed": false},
+      "manifest_sha256": "4175fffb1cfbc1f1b2fb3830e66845131eb027f166a1e34c1351d9eda3918f1a",
+      "predicate_ids": ["SS_MEANING_AND_CAUSAL_RULE"],
+      "route": "https://www.youtube.com/watch?v=4DZWbCzEvhM",
+      "source_id": "ROMEO-2026-CRTOLOGY-01",
+      "source_kind": "YOUTUBE"
+    },
+    {
+      "acquisition_manifest": "ROMEO-2025-S6.json",
+      "availability_check": {"method": "yt-dlp --list-subs --no-playlist --retries 0 --socket-timeout 15", "result": "SOURCE_UNAVAILABLE", "retrieved_at_utc": "2026-08-14T22:17:11Z", "source_contact_observed": false},
+      "channel_index_search": {"method": "curl --get --fail --silent --show-error --max-time 15 --data-urlencode q=CRT Secrets episode 6 SMT", "result": "SOURCE_UNAVAILABLE", "retrieved_at_utc": "2026-08-14T22:17:15Z", "route": "https://t.me/s/officialRomeotpt?q=CRT%20Secrets%20episode%206%20SMT", "source_contact_observed": false},
+      "manifest_sha256": "6df089c9f9376ddb2fe75280ce30b1c032abfcec0e0923791184829f58288f62",
+      "predicate_ids": ["SMT_EXECUTABLE_SEMANTICS"],
+      "route": "https://www.youtube.com/watch?v=3IWgc52Dqsg",
+      "source_id": "ROMEO-2025-S6",
+      "source_kind": "YOUTUBE"
+    },
+    {
+      "acquisition_manifest": "ROMEO-2025-S9.json",
+      "availability_check": {"method": "yt-dlp --list-subs --no-playlist --retries 0 --socket-timeout 15", "result": "SOURCE_UNAVAILABLE", "retrieved_at_utc": "2026-08-14T22:17:12Z", "source_contact_observed": false},
+      "channel_index_search": {"method": "curl --get --fail --silent --show-error --max-time 15 --data-urlencode q=CRT Secrets episode 9", "result": "SOURCE_UNAVAILABLE", "retrieved_at_utc": "2026-08-14T22:17:15Z", "route": "https://t.me/s/officialRomeotpt?q=CRT%20Secrets%20episode%209", "source_contact_observed": false},
+      "manifest_sha256": "b6e089683456dcd2df7a42c74292d57d98397981a04b1125caba7d1e178a8e6f",
+      "predicate_ids": ["MODEL_1_GEOMETRY", "SMT_EXECUTABLE_SEMANTICS", "TRUE_MSS_ALGORITHM"],
+      "route": "https://www.youtube.com/watch?v=2sxdsgcIeYA",
+      "source_id": "ROMEO-2025-S9",
+      "source_kind": "YOUTUBE"
+    },
+    {
+      "acquisition_manifest": "ROMEO-2024-TS.json",
+      "availability_check": {"method": "yt-dlp --list-subs --no-playlist --retries 0 --socket-timeout 15", "result": "SOURCE_UNAVAILABLE", "retrieved_at_utc": "2026-08-14T22:17:13Z", "source_contact_observed": false},
+      "channel_index_search": {"method": "curl --get --fail --silent --show-error --max-time 15 --data-urlencode q=Turtle Soup", "result": "SOURCE_UNAVAILABLE", "retrieved_at_utc": "2026-08-14T22:17:15Z", "route": "https://t.me/s/officialRomeotpt?q=Turtle%20Soup", "source_contact_observed": false},
+      "manifest_sha256": "e3723a33bb97d17c97c3f56bc036715be474749011c76aed4151feb0c0109e45",
+      "predicate_ids": ["TURTLE_SOUP_CONFIRMATION"],
+      "route": "https://www.youtube.com/watch?v=U-gNCwbGtTI",
+      "source_id": "ROMEO-2024-TS",
+      "source_kind": "YOUTUBE"
+    },
+    {
+      "acquisition_manifest": "ROMEO-2025-S5.json",
+      "availability_check": {"method": "yt-dlp --list-subs --no-playlist --retries 0 --socket-timeout 15", "result": "SOURCE_UNAVAILABLE", "retrieved_at_utc": "2026-08-14T22:17:14Z", "source_contact_observed": false},
+      "channel_index_search": {"method": "curl --get --fail --silent --show-error --max-time 15 --data-urlencode q=CRT Secrets episode 5 key level", "result": "SOURCE_UNAVAILABLE", "retrieved_at_utc": "2026-08-14T22:17:15Z", "route": "https://t.me/s/officialRomeotpt?q=CRT%20Secrets%20episode%205%20key%20level", "source_contact_observed": false},
+      "manifest_sha256": "8dab0de549391302917da4c00f7098b623e729bd731e3cb28217ed80b09b1552",
+      "predicate_ids": ["KEY_LEVEL_SELECTOR"],
+      "route": "https://www.youtube.com/watch?v=p8UYOgVn1-g",
+      "source_id": "ROMEO-2025-S5",
+      "source_kind": "YOUTUBE"
+    },
+    {
+      "acquisition_manifest": "ROMEO-2026-TG-TIME-TS-6361.json",
+      "availability_check": {"method": "curl --head --fail --silent --show-error --max-time 15", "result": "SOURCE_UNAVAILABLE", "retrieved_at_utc": "2026-08-14T22:17:15Z", "source_contact_observed": false},
+      "channel_index_search": {"method": "curl --get --fail --silent --show-error --max-time 15 --data-urlencode q=Time Turtle Soup", "result": "SOURCE_UNAVAILABLE", "retrieved_at_utc": "2026-08-14T22:17:15Z", "route": "https://t.me/s/officialRomeotpt?q=Time%20Turtle%20Soup", "source_contact_observed": false},
+      "manifest_sha256": "d9dca3214c5fa1ad9c714891100f89635ad1e12f34157d1302677aa5b0e3701e",
+      "predicate_ids": ["TIME_SELECTOR", "TURTLE_SOUP_CONFIRMATION"],
+      "route": "https://t.me/officialRomeotpt/6361",
+      "source_id": "ROMEO-2026-TG-TIME-TS-6361",
+      "source_kind": "TELEGRAM"
+    }
+  ]
+}
