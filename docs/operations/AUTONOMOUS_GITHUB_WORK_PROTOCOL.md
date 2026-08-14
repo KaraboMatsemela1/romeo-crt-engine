@@ -1,6 +1,6 @@
 # Autonomous GitHub Work Protocol
 
-This protocol governs autonomous execution of the romeo-crt-engine backlog by Codex, Hermes, and other agents.
+This protocol governs autonomous execution of the romeo-crt-engine backlog by Codex, Hermes, ChatGPT, and other agents.
 
 ## 1. Claim before work
 
@@ -24,23 +24,58 @@ Claims are coordination metadata, not evidence that the task is unblocked. The a
 - PR title format: `Issue #<number>: <imperative change>`.
 - The PR body must link the issue with `Closes #<number>`, summarize safety impact, list tests, and state that no prohibited historical/OOS/CONFIRM outcome access occurred.
 - Do not reuse a branch for a different issue.
-- If `main` moved before implementation, rebase or recreate the branch so the PR is based on current `main`.
+- If `main` moved before implementation, rebase or recreate the branch so the PR is based on current `main` before merge when required.
 
-## 3. Selecting the next task
+## 3. Work states and bounded concurrency
 
-After every merged task:
+Every claimed issue/PR is classified into one of these states:
 
-1. Refresh open issues and existing claims.
-2. Exclude issues with an active claim from another agent.
-3. Exclude issues whose explicit dependencies are false.
-4. Exclude blocked issues even if their implementation would be useful.
-5. Prefer governance and safety foundations before broker integrations or strategy work.
-6. Verify the issue's safety boundary before claiming it.
-7. Claim the selected issue, then create its branch from current `main`.
+```text
+IMPLEMENTING
+CI_PENDING
+CI_FAILED
+REVIEW_PENDING
+READY_TO_MERGE
+BLOCKED
+COMPLETE
+```
+
+State meaning:
+
+- `IMPLEMENTING`: the agent is actively changing the issue branch.
+- `CI_PENDING`: required GitHub checks are still running or queued.
+- `CI_FAILED`: a required check failed and needs diagnosis/fix unless owner input is required.
+- `REVIEW_PENDING`: CI is green but required review/actionable thread resolution is incomplete.
+- `READY_TO_MERGE`: required CI is green and no unresolved actionable review thread remains.
+- `BLOCKED`: an explicit dependency, evidence gate, permission, or owner decision prevents further safe progress.
+- `COMPLETE`: the PR is merged and the issue completion record is posted.
+
+`CI_PENDING` and `REVIEW_PENDING` block only that PR's merge. They do **not** block the entire queue.
+
+Each agent may hold at most two active claims, and only when exactly one claim is in an external wait state (`CI_PENDING` or `REVIEW_PENDING`). At most one claim per agent may be `IMPLEMENTING` at a time. The second issue must be dependency-satisfied, unclaimed by another agent, and branch-independent.
+
+`CI_FAILED` has priority over starting new implementation work for that agent unless the failure cannot be resolved without owner input.
+
+## 4. Selecting the next task
+
+On every autonomous run, and after every merge:
+
+1. Refresh Issue #42, open issues, active claims, open PRs, CI results, and review threads.
+2. Service the agent's existing work-in-flight first:
+   - fix `CI_FAILED` work;
+   - merge `READY_TO_MERGE` work;
+   - record exact blockers for genuinely `BLOCKED` work.
+3. Exclude issues with an active claim from another agent.
+4. Exclude issues whose explicit dependencies are false.
+5. Exclude blocked issues even if their implementation would be useful.
+6. If the agent has one claim waiting in `CI_PENDING` or `REVIEW_PENDING`, it may claim one additional independent ready issue.
+7. Prefer governance and safety foundations before broker integrations or strategy work.
+8. Verify the issue's safety boundary before claiming it.
+9. Claim the selected issue, then create its branch from current `main`.
 
 Issue #42 is the canonical queue. Its blocked labels and dependency statements are authoritative. Never infer that a blocked issue is ready from the existence of supporting infrastructure.
 
-## 4. Stale claims
+## 5. Stale claims
 
 A claim is stale when all of the following are true:
 
@@ -59,7 +94,7 @@ NEW_AGENT: <agent-name>
 
 If the original agent resumes, it must either continue on the same branch or explicitly release the claim. When a claim is ambiguous, stop and ask the project owner rather than guessing.
 
-## 5. Implementation and safety gates
+## 6. Implementation and safety gates
 
 Before coding, read `AGENTS.md`, `PROJECT_BIBLE.md`, `STATUS.md`, the relevant roadmap/checklist, and the issue dependencies.
 
@@ -76,21 +111,38 @@ Every behavior change must include tests and documentation. Agents must:
 
 If a dependency or required evidence is missing, do not implement around it. Post `RESULT: BLOCKED` with the exact dependency and immediately return to the selection procedure.
 
-## 6. CI, review, and merge
+## 7. CI, review, and merge
 
 Before merge:
 
 1. Run the repository test and lint/type-check commands documented by the project.
 2. Open the PR against `main`.
-3. Wait for required CI checks to complete.
-4. Inspect review threads, including resolved/unresolved state where available.
-5. Fix actionable feedback and rerun CI.
-6. Merge only when required CI is green and no unresolved actionable review thread remains.
-7. Confirm the merge commit on `main`.
+3. Classify the PR as `CI_PENDING` until required checks complete.
+4. While that PR is `CI_PENDING`, another independent task may proceed only under the bounded-concurrency rule in Section 3.
+5. If CI fails, classify `CI_FAILED`, diagnose the exact failure, and prioritize the fix before new implementation work unless owner input is required.
+6. If CI passes, inspect review threads, including resolved/unresolved state where available.
+7. If actionable review remains, classify `REVIEW_PENDING`, address it, and rerun CI as needed.
+8. When CI is green and no unresolved actionable review remains, classify `READY_TO_MERGE` and merge using the expected head SHA where available.
+9. Confirm the merge commit on `main`.
+10. If another PR merged while an independent branch was waiting, refresh/rebase/recreate that branch as required before merge.
 
-A passing local test is not a substitute for GitHub CI. If CI is unavailable or required checks fail, record the exact state and do not claim completion.
+A passing local test is not a substitute for GitHub CI. A pending or failed CI state is not permission to claim completion.
 
-## 7. Completion and release records
+## 8. Unattended continuity
+
+A single Work/Codex/ChatGPT invocation is not treated as a permanent daemon. Long-running continuity is provided by scheduled orchestration that periodically revisits Issue #42 and current PR state.
+
+The scheduled queue runner must:
+
+- service existing failed/green PRs before claiming new work;
+- treat `CI_PENDING`/`REVIEW_PENDING` as external wait states rather than a global stop;
+- respect other agents' active claims;
+- preserve the two-claim/one-active-modification bound;
+- make no repository change when no safe action is available.
+
+A lightweight GitHub Actions sentinel may shorten mechanical state-detection latency, but it must not perform strategy reasoning, mutate strategy rules, open OOS/CONFIRM, place orders, or authorize paper/live trading.
+
+## 9. Completion and release records
 
 After merge, comment on the issue:
 
