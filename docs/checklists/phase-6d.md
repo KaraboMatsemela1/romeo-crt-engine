@@ -104,7 +104,7 @@
 - [x] Record unavailable technical semantics without substituting third-party inference.
 - [x] Treat remaining debts as evidence-availability blockers.
 
-## I. Validation
+## I. Validation and promotion
 
 - [x] Ruff PASS on Recovery-002 implementation head.
 - [x] MyPy PASS on Recovery-002 implementation head.
@@ -113,14 +113,14 @@
 - [x] Migration audit reports 16 corpus sources / 18 artifacts / 18 verified payload files.
 - [x] Migration audit reports 7 predicate rows with artifact evidence / 17 observed field evidences.
 - [x] Migration audit reports 0 closing evidence / 0 candidate-ready rows.
-- [ ] Final governance-head CI green after `STATUS.md` and this checklist are reconciled.
-- [ ] PR #25 merged to `main`.
-- [ ] Issue #24 closed as completed.
-- [ ] Issue #16 remains open and BLOCKED with updated evidence boundary.
+- [x] Final governance-head CI run `31824024925` green.
+- [x] PR #25 merged to `main` at `5cfcfb477e315ee68e8cbff9eec94156b8f11501`.
+- [x] Issue #24 closed as completed.
+- [x] Issue #16 remains open and BLOCKED with the Recovery-002 evidence boundary recorded.
 
 ## Exit condition
 
-Recovery 002 is complete when the final governance head is green and merged while:
+**Recovery 002 is complete.** The merged result preserves:
 
 ```text
 CLOSING_FIELD_EVIDENCE       = 0
