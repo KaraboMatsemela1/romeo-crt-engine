@@ -20,10 +20,14 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: "3.12"
+      - name: Install project
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps --no-build-isolation -e .
       - name: Classify queue state
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python scripts/queue_sentinel.py
+        run: python -m romeo_crt_engine.queue_sentinel
       - name: Show machine-readable snapshot
         if: always()
         run: cat queue-sentinel.json 2>/dev/null || true
