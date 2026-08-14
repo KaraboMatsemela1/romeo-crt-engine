@@ -16,6 +16,28 @@ A claim is active until the agent posts a completion, blocked, failed, or explic
 
 Claims are coordination metadata, not evidence that the task is unblocked. The agent must independently verify the issue dependencies and repository status.
 
+### Claim-race resolution
+
+All autonomous agents act through the same GitHub account, so GitHub author identity does not identify the owning agent. Ownership is determined by the claim comment itself and its ordering.
+
+Immediately after posting a claim, the claimant **must refetch all issue comments before creating a branch or changing files**. Among simultaneously active claims, the earliest valid claim wins. If two claim records have the same `CLAIMED_AT`, the lower GitHub comment ID wins.
+
+A later claimant that loses this recheck must post:
+
+```text
+RELEASE_DUPLICATE_CLAIM:
+CLAIMED_BY: <agent-name>
+WINNING_AGENT: <agent-name>
+WINNING_BRANCH: <branch>
+REASON: earlier active claim exists
+```
+
+and must not create or modify an implementation branch.
+
+The winning agent must refetch issue claims **again immediately before opening a PR**. If the issue has already been completed or a valid earlier claim was discovered, it must stop and release/close its duplicate work rather than compete to merge first.
+
+Scheduled runners must detect multiple active claims and preserve only the earliest valid claim. Later claims are coordination errors, not permission for parallel implementation of the same issue.
+
 ## 2. Branch and pull request convention
 
 - Start from the latest `main`.
@@ -61,17 +83,18 @@ Each agent may hold at most two active claims, and only when exactly one claim i
 On every autonomous run, and after every merge:
 
 1. Refresh Issue #42, open issues, active claims, open PRs, CI results, and review threads.
-2. Service the agent's existing work-in-flight first:
+2. Resolve duplicate claims using Section 1 before doing implementation work.
+3. Service the agent's existing work-in-flight first:
    - fix `CI_FAILED` work;
    - merge `READY_TO_MERGE` work;
    - record exact blockers for genuinely `BLOCKED` work.
-3. Exclude issues with an active claim from another agent.
-4. Exclude issues whose explicit dependencies are false.
-5. Exclude blocked issues even if their implementation would be useful.
-6. If the agent has one claim waiting in `CI_PENDING` or `REVIEW_PENDING`, it may claim one additional independent ready issue.
-7. Prefer governance and safety foundations before broker integrations or strategy work.
-8. Verify the issue's safety boundary before claiming it.
-9. Claim the selected issue, then create its branch from current `main`.
+4. Exclude issues with an active claim from another agent.
+5. Exclude issues whose explicit dependencies are false.
+6. Exclude blocked issues even if their implementation would be useful.
+7. If the agent has one claim waiting in `CI_PENDING` or `REVIEW_PENDING`, it may claim one additional independent ready issue.
+8. Prefer governance and safety foundations before broker integrations or strategy work.
+9. Verify the issue's safety boundary before claiming it.
+10. Claim the selected issue, immediately perform the post-claim race recheck, then create its branch from current `main` only if the claim still wins.
 
 Issue #42 is the canonical queue. Its blocked labels and dependency statements are authoritative. Never infer that a blocked issue is ready from the existence of supporting infrastructure.
 
@@ -116,15 +139,16 @@ If a dependency or required evidence is missing, do not implement around it. Pos
 Before merge:
 
 1. Run the repository test and lint/type-check commands documented by the project.
-2. Open the PR against `main`.
-3. Classify the PR as `CI_PENDING` until required checks complete.
-4. While that PR is `CI_PENDING`, another independent task may proceed only under the bounded-concurrency rule in Section 3.
-5. If CI fails, classify `CI_FAILED`, diagnose the exact failure, and prioritize the fix before new implementation work unless owner input is required.
-6. If CI passes, inspect review threads, including resolved/unresolved state where available.
-7. If actionable review remains, classify `REVIEW_PENDING`, address it, and rerun CI as needed.
-8. When CI is green and no unresolved actionable review remains, classify `READY_TO_MERGE` and merge using the expected head SHA where available.
-9. Confirm the merge commit on `main`.
-10. If another PR merged while an independent branch was waiting, refresh/rebase/recreate that branch as required before merge.
+2. Refetch issue claims and completion state; close/release duplicate work if another valid owner already completed or owns the issue.
+3. Open the PR against `main`.
+4. Classify the PR as `CI_PENDING` until required checks complete.
+5. While that PR is `CI_PENDING`, another independent task may proceed only under the bounded-concurrency rule in Section 3.
+6. If CI fails, classify `CI_FAILED`, diagnose the exact failure, and prioritize the fix before new implementation work unless owner input is required.
+7. If CI passes, inspect review threads, including resolved/unresolved state where available.
+8. If actionable review remains, classify `REVIEW_PENDING`, address it, and rerun CI as needed.
+9. When CI is green and no unresolved actionable review remains, classify `READY_TO_MERGE` and merge using the expected head SHA where available.
+10. Confirm the merge commit on `main`.
+11. If another PR merged while an independent branch was waiting, refresh/rebase/recreate that branch as required before merge.
 
 A passing local test is not a substitute for GitHub CI. A pending or failed CI state is not permission to claim completion.
 
@@ -135,6 +159,7 @@ A single Work/Codex/ChatGPT invocation is not treated as a permanent daemon. Lon
 The scheduled queue runner must:
 
 - service existing failed/green PRs before claiming new work;
+- resolve duplicate claims before implementation;
 - treat `CI_PENDING`/`REVIEW_PENDING` as external wait states rather than a global stop;
 - respect other agents' active claims;
 - preserve the two-claim/one-active-modification bound;
