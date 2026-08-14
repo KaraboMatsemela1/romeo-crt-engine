@@ -143,7 +143,7 @@ def main() -> int:
         "instrument": run.dataset.instrument,
         "price_component": run.dataset.price_component.value,
         "status": run.status.value,
-        "complete_d1_bars": len(run.dataset.d1) if hasattr(run.dataset, "d1") else identity.d1_rows,
+        "complete_d1_bars": identity.d1_rows,
         "candidate_count": len(run.candidates),
         "no_signal_count": run.no_signal_count,
         "trade_plan_count": run.trade_plan_count,
