@@ -1,0 +1,33 @@
+name: Queue Sentinel
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  checks: read
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  sentinel:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+      - name: Install project
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps --no-build-isolation -e .
+      - name: Classify queue state
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python -m romeo_crt_engine.queue_sentinel
+      - name: Show machine-readable snapshot
+        if: always()
+        run: cat queue-sentinel.json 2>/dev/null || true
