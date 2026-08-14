@@ -13,7 +13,7 @@ Updated: 2026-08-14
 | 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Terminal preregistered v0.1 DEV decision |
 | 6B — Candidate revision | **COMPLETE — INSUFFICIENT_MULTI_MARKET_SAMPLE** | Terminal preregistered multi-market activity decision |
 | 6C — Doctrine research | **BLOCKED — NO VERIFIED FIRST-PARTY PREDICATE CLOSURE** | Resume only when direct first-party evidence closes a deterministic held predicate |
-| 6D — Research infrastructure | **IMPLEMENTATION V1 — CI PENDING** | Provenance-bound acquisition + predicate/fixture/corpus gates merged green |
+| 6D — Research infrastructure | **COMPLETE — RESEARCH INFRASTRUCTURE V1** | Provenance-bound acquisition + predicate/fixture/corpus gates merged green |
 | 7 — Paper trading | **BLOCKED** | Requires a future candidate that passes full validation |
 | 8 — Learning engine | Not started | Requires sufficient deterministic labels |
 | 9 — Shadow trading | Not started | Requires paper readiness |
@@ -43,23 +43,24 @@ decision                    BLOCKED_NO_VERIFIED_PREDICATE_CLOSURE
 
 The v0.1 OOS and CONFIRM windows remain unopened. Historical Phase-6/6B/6C evidence may not be rewritten or repaired in place.
 
-## Phase 6D — First-Party Research Infrastructure
+## Phase 6D — First-Party Research Infrastructure V1
 
-Phase 6D addresses the source-acquisition and deterministic-evidence bottleneck discovered in Phase 6C. It is not a new alpha-candidate phase.
+Phase 6D addresses the source-acquisition and deterministic-evidence bottleneck discovered in Phase 6C. It is research infrastructure, not a new alpha-candidate phase.
 
-Implemented V1 contracts:
+Completed V1 contracts:
 
 ```text
-registry-bound source capture            IMPLEMENTED
-SHA-256 artifact provenance              IMPLEMENTED
-canonical acquisition manifests          IMPLEMENTED
-source-registry schema validation        IMPLEMENTED
-predicate evidence ledger                IMPLEMENTED
-causal closure field enforcement         IMPLEMENTED
-doctrine delta validation                IMPLEMENTED
-positive + negative fixture gate         IMPLEMENTED
-deterministic corpus index               IMPLEMENTED
-research readiness audit                 IMPLEMENTED
+registry-bound source capture            COMPLETE
+SHA-256 artifact provenance              COMPLETE
+canonical acquisition manifests          COMPLETE
+strict source-registry schema/row width  COMPLETE
+predicate evidence ledger                COMPLETE
+causal closure field enforcement         COMPLETE
+doctrine delta validation                COMPLETE
+positive + negative fixture gate         COMPLETE
+deterministic corpus index               COMPLETE
+research readiness audit                 COMPLETE
+CI                                       RUFF + MYPY + 133 PYTEST PASS
 candidate/detector/outcome authorization FALSE
 ```
 
@@ -76,7 +77,7 @@ TIME_SELECTOR
 DYNAMIC_BIAS_TRANSITION
 ```
 
-All start unresolved. Partial doctrine from Phase 6C is preserved as research evidence but is not promoted into executable predicate fields without direct artifact-level support.
+All remain unresolved at V1 completion. Partial doctrine from Phase 6C is preserved as research evidence but is not promoted into executable predicate fields without direct artifact-level support.
 
 Canonical Phase 6D records:
 
