@@ -1,0 +1,13 @@
+{
+  "corpus_index_sha256": "2ce747487990c1f883c8c93fe910cf37dc552dbcf2552bf0c82f27f857415b89",
+  "entries": [
+    {
+      "artifact_sha256s": [
+        "2f414608bccd9319eb996b5bce47354d022b192b256d606ab92a735ea5248a33"
+      ],
+      "manifest_sha256": "2b7ee573004c5e5fe8a284fa19a6b0aa9f705ab40815abc31e94faf3565a639c",
+      "source_id": "ROMEO-2026-TG-TIME-TS-6361"
+    }
+  ],
+  "schema_version": "P6D_EVIDENCE_CORPUS_INDEX_V1"
+}
