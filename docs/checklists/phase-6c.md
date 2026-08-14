@@ -1,8 +1,10 @@
-# Phase 6C — CRTology Evidence & Candidate Selection Checklist
+# Phase 6C — 2026 Doctrine Evidence & Candidate Selection Checklist
 
 **Status:** **IN PROGRESS — 2026 SOURCE RECONCILIATION**  
 **Doctrine stream:** `CRTOLOGY_2026_RESEARCH`  
 **Episode-1 gate:** **CLOSED — `TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT`**  
+**Live-02 gate:** **CLOSED — `TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT`**  
+**Active evidence priority:** **SMT SEMANTICS / SUBSTITUTION**  
 **New alpha candidate:** **NOT SELECTED**  
 **Phase 7:** **BLOCKED**
 
@@ -25,22 +27,17 @@
 - [x] Quarantine new material under `CRTOLOGY_2026_RESEARCH` until reconciled.
 - [x] Require every 2026 delta to be classified as clarification/refinement/new branch/superseding/non-alpha/unresolved.
 - [x] Prohibit silently rewriting v0.1/v0.2 rules with 2026 material.
+- [x] Preserve first-party 2026 statement that core CRT/Turtle Soup remain stable while nuances/refinements continue.
 
 ## C. CRTology Episode 1 source gate
 
 - [x] Confirm source/video ID `4DZWbCzEvhM`.
 - [x] Confirm first-party publication provenance.
 - [x] Confirm title `CRTology episode 1: SS`.
-- [x] Record that the source was previously only `DISCOVERED` in the registry.
 - [x] Search direct transcript/caption, video-metadata, indexed transcript and first-party follow-up routes.
 - [x] Capture first-party follow-up clues: organised recognition lens, do-not-force warning, strong-trend caution, and weekly day-of-week observations.
 - [ ] Establish Romeo's explicit meaning of `SS` — **not captured**.
 - [ ] Identify a deterministic executable `SS` predicate — **not captured**.
-- [ ] Freeze information-availability timestamp — **not possible without predicate**.
-- [ ] Freeze direction/timeframe semantics — **not sufficiently captured**.
-- [ ] Freeze confirmation/invalidation/expiry — **not sufficiently captured**.
-- [ ] Capture unambiguous positive/negative `SS` examples — **not captured**.
-- [ ] Promote a mapped `SS` rule against `CRT_SECRETS_2025` — **not authorized**.
 - [x] Close Gate 6C-1 as `TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT`.
 - [x] Preserve re-entry condition for future direct transcript/frame/restatement evidence.
 
@@ -49,17 +46,56 @@ Canonical pass:
 - `research/romeo/phase6c/PRIMARY_SOURCE_PASS_001.md`
 - `research/romeo/phase6c/CRTOLOGY_01_EVIDENCE_GATE.md`
 
-## D. Continue independent 2026 source reconciliation
+## D. 2026 Live Tape-Reading Session 2
 
-- [ ] Evidence-pass `ROMEO-2026-LIVE-02` without using Phase-6B activity/P&L to select semantics.
-- [ ] Determine whether the second live tape-reading session restates any Episode-1/2026 technical predicate directly.
-- [ ] Register any later CRTology episode only after its exact first-party source/video identity is found.
-- [ ] Reopen Episode 1 only if a later direct source explicitly disambiguates `SS`.
-- [ ] Maintain a 2025-vs-2026 reconciliation ledger for every first-party clue.
+- [x] Confirm source/video ID `Pmmx41M7KhA`.
+- [x] Confirm first-party provenance and technical-study intent.
+- [x] Search public transcript/caption/index routes.
+- [x] Preserve selection-over-availability clarification.
+- [x] Preserve `exit-entry theory` as unresolved refinement candidate.
+- [x] Preserve `every quarter is a candle` as unresolved optional branch.
+- [x] Preserve Model #1/OTE emphasis without adding OTE to the strategy.
+- [x] Confirm no deterministic new order-path delta was captured.
+- [x] Close source gate as `TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT`.
 
-## E. Candidate selection — still locked
+Canonical pass:
 
-- [ ] Determine whether the 2026 source stream eventually yields a legitimate executable delta.
+- `research/romeo/phase6c/LIVE_02_EVIDENCE_GATE.md`
+
+## E. 2025-vs-2026 doctrine reconciliation
+
+- [x] Create `DOCTRINE_RECONCILIATION_2026.md`.
+- [x] Record Episode-1 and Live-02 clues without promoting qualitative statements to alpha rules.
+- [x] Keep `candidate_ready_rows = 0` until a rule closes all causal fields.
+- [ ] Add and reconcile the SMT first-party evidence pass.
+- [ ] Continue updating the ledger for later first-party sources.
+
+## F. SMT evidence gate — active
+
+Direct first-party facts already captured:
+
+- [x] Basic pair registry: `EU-DXY`, `NQ-ES`, `BTC-ETH`, `GOLD-SILVER`.
+- [x] Direct role/substitution clue: Romeo describes a case where a local Turtle Soup was expected but SMT performed its Episode-6 role instead.
+
+Still required before any SMT candidate can be selected:
+
+- [ ] Exact divergence predicate for positively correlated pairs.
+- [ ] Exact divergence predicate/polarity for inverse pairs such as EU-DXY.
+- [ ] Exact definition of corresponding highs/lows/extremes.
+- [ ] Synchronization window and timestamp ownership.
+- [ ] Stale/missing cross-market data behavior.
+- [ ] Which paired instrument provides the manipulation event versus confirmation anchor.
+- [ ] Exact relation to Model #1.
+- [ ] Exact relation to true MSS.
+- [ ] Exact condition under which SMT substitutes for local Turtle Soup.
+- [ ] Traded-instrument selection when the pair diverges.
+- [ ] Confirmation, invalidation and expiry.
+- [ ] Positive/negative fixtures without future information.
+- [ ] Close SMT gate as sufficient or insufficient without using historical count/P&L to choose the semantics.
+
+## G. Candidate selection — locked
+
+- [ ] Determine whether SMT or another first-party branch yields a legitimate executable delta.
 - [ ] If no executable delta exists, record that result without forcing a candidate.
 - [ ] If an executable delta exists, select exactly one narrow research hypothesis.
 - [ ] Freeze inherited rules versus changed rules.
@@ -68,7 +104,7 @@ Canonical pass:
 - [ ] Freeze timeframe/calendar/data requirements.
 - [ ] Freeze activity threshold and access protocol before outcomes.
 
-## F. Implementation — not yet authorized
+## H. Implementation — not yet authorized
 
 - [ ] Create a new strategy version only after candidate precommitment.
 - [ ] Create positive/negative fixtures before historical detector outcomes.
@@ -83,11 +119,12 @@ Canonical pass:
 Phase 6C                         IN PROGRESS — 2026 SOURCE RECONCILIATION
 Branch                           agent/phase-6c-crtology-evidence
 Doctrine stream                  CRTOLOGY_2026_RESEARCH
-Episode-1 source identity        CONFIRMED
-Gate 6C-1                        TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
-Technical meaning of SS          UNRESOLVED
-First-party 2026 clues           PRESERVED / NON-EXECUTABLE
-Next source                      ROMEO-2026-LIVE-02
+Episode-1 gate                   TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
+Live-02 gate                     TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT
+Doctrine reconciliation ledger   ACTIVE
+SMT pair registry                DIRECT FIRST-PARTY CAPTURED
+SMT substitution-role clue       DIRECT FIRST-PARTY CAPTURED
+SMT full executable semantics    UNRESOLVED / ACTIVE GATE
 New alpha candidate              NOT SELECTED
 Alpha implementation             NOT AUTHORIZED
 Detector activity                NOT AUTHORIZED
