@@ -1,0 +1,5 @@
+SMT pairs (basic):
+EU - DXY
+NQ - ES
+BTC - ETH
+GOLD - SILVER

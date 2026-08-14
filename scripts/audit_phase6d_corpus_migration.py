@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
+from hashlib import sha256
 from pathlib import Path
 
 from romeo_crt_engine.research.corpus_index_v1 import CorpusEntryV1, CorpusIndexV1
@@ -27,6 +28,7 @@ REGISTRY_PATH = ROOT / "research/romeo/SOURCE_REGISTRY.csv"
 ACQUISITION_DIR = ROOT / "research/romeo/phase6d/acquisitions"
 CORPUS_INDEX_PATH = ROOT / "research/romeo/phase6d/CORPUS_INDEX_V1.json"
 LEDGER_PATH = ROOT / "research/romeo/phase6d/PREDICATE_LEDGER_V2.json"
+PAYLOAD_DIR = ROOT / "research/romeo/phase6d/payloads"
 
 
 def _load_manifest(path: Path) -> tuple[SourceAcquisitionManifestV1, str]:
@@ -145,6 +147,14 @@ def main() -> None:
             artifact = artifact_by_sha.get(artifact_sha)
             if artifact is None or artifact.source_id != entry.source_id:
                 raise ValueError(f"corpus artifact is not provenance-bound: {artifact_sha}")
+            payload_path = PAYLOAD_DIR / f"{artifact_sha}.txt"
+            if not payload_path.is_file():
+                raise ValueError(f"corpus artifact payload file is missing: {artifact_sha}")
+            payload = payload_path.read_bytes()
+            if sha256(payload).hexdigest() != artifact_sha:
+                raise ValueError(f"payload SHA does not match artifact: {artifact_sha}")
+            if len(payload) != artifact.byte_length:
+                raise ValueError(f"payload byte length does not match manifest: {artifact_sha}")
             indexed_artifacts.add(artifact_sha)
 
     ledger = _load_ledger()
@@ -177,6 +187,7 @@ def main() -> None:
         "corpus_index_sha256": corpus_digest,
         "corpus_sources": len(corpus.entries),
         "corpus_artifacts": len(indexed_artifacts),
+        "payload_files_verified": len(indexed_artifacts),
         "predicate_rows": len(ledger.rows),
         "predicate_rows_with_artifact_evidence": len(rows_with_evidence),
         "observed_field_evidence": len(observed_evidence),
