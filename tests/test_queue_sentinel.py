@@ -1,6 +1,6 @@
 from datetime import UTC, datetime, timedelta
 
-from scripts.queue_sentinel import (
+from romeo_crt_engine.queue_sentinel import (
     claim_is_stale,
     classify_checks,
     classify_pr,
