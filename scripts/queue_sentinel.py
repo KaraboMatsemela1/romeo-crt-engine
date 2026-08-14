@@ -82,7 +82,7 @@ def claim_is_stale(
     claim: dict[str, str], *, branch_updated_at: datetime | None, now: datetime
 ) -> bool:
     """Apply the 48-hour mechanical part of the canonical stale-claim rule."""
-    claimed_at = datetime.fromisoformat(claim["at"].replace("Z", "+00:00"))
+    claimed_at = datetime.fromisoformat(claim["at"])
     cutoff = now - timedelta(hours=48)
     if claimed_at > cutoff:
         return False
@@ -105,7 +105,7 @@ class GitHubClient:
                 "X-GitHub-Api-Version": "2022-11-28",
             },
         )
-        with urllib.request.urlopen(request, timeout=30) as response:  # noqa: S310
+        with urllib.request.urlopen(request, timeout=30) as response:
             return json.load(response)
 
 
@@ -159,7 +159,7 @@ def collect_snapshot(client: GitHubClient) -> dict[str, Any]:
             try:
                 branch = client.get(f"/branches/{claim['branch']}")
                 updated = datetime.fromisoformat(
-                    branch["commit"]["commit"]["committer"]["date"].replace("Z", "+00:00")
+                    branch["commit"]["commit"]["committer"]["date"]
                 )
                 stale = claim_is_stale(claim, branch_updated_at=updated, now=now)
             except Exception:  # noqa: BLE001
