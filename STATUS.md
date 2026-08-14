@@ -2,6 +2,35 @@
 
 Updated: 2026-08-14
 
+## Progress to Paper Trading
+
+This is the canonical executive gate view. The bars show **milestone/gate maturity**, not trading performance, probability of success, or a forecast. They advance only when the governing repository gate materially changes.
+
+```text
+FIRST-PARTY EVIDENCE
+████████████████░░░░   good corpus; predicates incomplete
+
+DETERMINISTIC CANDIDATE
+░░░░░░░░░░░░░░░░░░░░   BLOCKED — no candidate-ready predicate
+
+ACTIVITY VALIDATION
+░░░░░░░░░░░░░░░░░░░░   not authorized — candidate not frozen
+
+PERFORMANCE VALIDATION
+░░░░░░░░░░░░░░░░░░░░   not authorized — activity gate not reached
+
+OOS
+░░░░░░░░░░░░░░░░░░░░   unopened
+
+CONFIRM
+░░░░░░░░░░░░░░░░░░░░   unopened
+
+PAPER TRADING
+░░░░░░░░░░░░░░░░░░░░   BLOCKED — requires PROMOTE_TO_PAPER_CANDIDATE
+```
+
+Current bottleneck: **Issue #16 / first-party predicate closure**. Infrastructure work may continue in parallel, but no downstream bar advances merely because supporting engineering has started. Any PR that materially changes a gate represented above must update this block and the matching README view.
+
 | Phase | Status | Primary exit condition |
 |---|---|---|
 | 0 — Engineering foundation | **COMPLETE** | Reproducible dev + CI + logging/storage/experiment contracts |
