@@ -38,6 +38,8 @@ PAPER TRADING
 1. Read [`PROJECT_BIBLE.md`](PROJECT_BIBLE.md) — canonical governance and phase definitions.
 2. Read [`STATUS.md`](STATUS.md) — current candidate disposition and promotion state.
 3. Read [`AGENTS.md`](AGENTS.md) — operating contract for AI/coding agents.
+4. Read [`docs/operations/AUTONOMOUS_GITHUB_WORK_PROTOCOL.md`](docs/operations/AUTONOMOUS_GITHUB_WORK_PROTOCOL.md) before claiming or executing GitHub work.
+5. Follow the protocol’s claim, dependency, CI, review, and completion-record requirements.
 4. Read [`strategy/CRT_V0.1_SPEC.md`](strategy/CRT_V0.1_SPEC.md) and its freeze manifest before touching v0.1 strategy semantics.
 5. Read [`docs/MARKET_DATA.md`](docs/MARKET_DATA.md) before touching data semantics.
 6. Read [`docs/DETECTOR.md`](docs/DETECTOR.md) before touching detector semantics.
