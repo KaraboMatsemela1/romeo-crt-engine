@@ -4,6 +4,186 @@
     {
       "artifacts": [
         {
+          "artifact_sha256": "a114db86ddda3319adf1a76eef7a378a35a8c6ddf56e7f06d96d4949d96e9752",
+          "byte_length": 162,
+          "capture_kind": "CAPTIONS",
+          "content_type": "text/plain; charset=utf-8",
+          "first_party_verified": true,
+          "locator": "https://www.youtube.com/watch?v=U-gNCwbGtTI&t=405s#auto-en-json3-06-45-07-23_19-42-21-19",
+          "retrieved_at_utc": "2026-08-15T00:00:00+00:00"
+        }
+      ],
+      "manifest_schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
+      "manifest_sha256": "57c7cd373773d862aa11fefaa36baaacddcc25238e36a30f6db004175af3bd29",
+      "manifest_status": "CAPTURED",
+      "source_id": "ROMEO-2024-TS",
+      "source_url": "https://www.youtube.com/watch?v=U-gNCwbGtTI"
+    },
+    {
+      "artifacts": [
+        {
+          "artifact_sha256": "0f282f00bfdf78037c859a821cb5e489df877cd45cb30761146d11c90bb04aad",
+          "byte_length": 220,
+          "capture_kind": "CAPTIONS",
+          "content_type": "text/plain; charset=utf-8",
+          "first_party_verified": true,
+          "locator": "https://www.youtube.com/watch?v=T7udbrWlARI&t=618s#auto-en-json3-10-18-10-56",
+          "retrieved_at_utc": "2026-08-15T00:00:00+00:00"
+        },
+        {
+          "artifact_sha256": "99250b19cee13890422e00d2653814d156aabee2ee372e0362b71a6caf48fe8e",
+          "byte_length": 210,
+          "capture_kind": "CAPTIONS",
+          "content_type": "text/plain; charset=utf-8",
+          "first_party_verified": true,
+          "locator": "https://www.youtube.com/watch?v=T7udbrWlARI&t=905s#auto-en-json3-15-05-15-41",
+          "retrieved_at_utc": "2026-08-15T00:00:00+00:00"
+        },
+        {
+          "artifact_sha256": "cccb4366a5e4e5b50cd75d46c9453b677193ae8edf70c36879b3ea0e6f53fb9f",
+          "byte_length": 189,
+          "capture_kind": "CAPTIONS",
+          "content_type": "text/plain; charset=utf-8",
+          "first_party_verified": true,
+          "locator": "https://www.youtube.com/watch?v=T7udbrWlARI&t=992s#auto-en-json3-16-32-17-22",
+          "retrieved_at_utc": "2026-08-15T00:00:00+00:00"
+        }
+      ],
+      "manifest_schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
+      "manifest_sha256": "5005396dbde6bc1b3fd3be34b51dd985464dbc4893a5159771349da4c583f59d",
+      "manifest_status": "CAPTURED",
+      "source_id": "ROMEO-2025-S1",
+      "source_url": "https://www.youtube.com/watch?v=T7udbrWlARI"
+    },
+    {
+      "artifacts": [
+        {
+          "artifact_sha256": "ad593f7409a0bbf70a30d68a693e1d9c7e0a445d0ef9eec8c0c371e31a54d3f2",
+          "byte_length": 262,
+          "capture_kind": "CAPTIONS",
+          "content_type": "text/plain; charset=utf-8",
+          "first_party_verified": true,
+          "locator": "https://www.youtube.com/watch?v=p8UYOgVn1-g&t=498s#auto-en-json3-08-18-10-02_15-38-17-40",
+          "retrieved_at_utc": "2026-08-15T00:00:00+00:00"
+        }
+      ],
+      "manifest_schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
+      "manifest_sha256": "23924b06d88d520ec0764fb6555fb0f8739144842c0456059848c3d34656c1f4",
+      "manifest_status": "CAPTURED",
+      "source_id": "ROMEO-2025-S5",
+      "source_url": "https://www.youtube.com/watch?v=p8UYOgVn1-g"
+    },
+    {
+      "artifacts": [
+        {
+          "artifact_sha256": "fa0d51d3713aff14c96b71c8e02366fd1ca09cec074fb83c0d3f3c5f1a88378b",
+          "byte_length": 79,
+          "capture_kind": "CAPTIONS",
+          "content_type": "text/plain; charset=utf-8",
+          "first_party_verified": true,
+          "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=1379s#auto-en-json3-22-59-23-19",
+          "retrieved_at_utc": "2026-08-15T00:00:00+00:00"
+        },
+        {
+          "artifact_sha256": "a1c10ff9a7f71f968ea9a10bd9439c9dba11aacbe6f8814e7e36c120b5cfa4b4",
+          "byte_length": 205,
+          "capture_kind": "CAPTIONS",
+          "content_type": "text/plain; charset=utf-8",
+          "first_party_verified": true,
+          "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=1693s#auto-en-json3-28-13-31-56",
+          "retrieved_at_utc": "2026-08-15T00:00:00+00:00"
+        },
+        {
+          "artifact_sha256": "18a3f7c43e84e3707039ab8601ae7622e51e470e53d64c1b2d99d1da9c4e80d4",
+          "byte_length": 100,
+          "capture_kind": "CAPTIONS",
+          "content_type": "text/plain; charset=utf-8",
+          "first_party_verified": true,
+          "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=203s#auto-en-json3-03-23-03-44",
+          "retrieved_at_utc": "2026-08-15T00:00:00+00:00"
+        },
+        {
+          "artifact_sha256": "b744231c1803e76aa8fa982b885b79d36b145902db9373f6ea0369c65fae291f",
+          "byte_length": 93,
+          "capture_kind": "CAPTIONS",
+          "content_type": "text/plain; charset=utf-8",
+          "first_party_verified": true,
+          "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=795s#auto-en-json3-13-15-13-34",
+          "retrieved_at_utc": "2026-08-15T00:00:00+00:00"
+        }
+      ],
+      "manifest_schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
+      "manifest_sha256": "424a01f6a48a7e5154ec3e5f6b732cca7bea287a36d78dd306c3dad92ad6d7af",
+      "manifest_status": "CAPTURED",
+      "source_id": "ROMEO-2025-S6",
+      "source_url": "https://www.youtube.com/watch?v=3IWgc52Dqsg"
+    },
+    {
+      "artifacts": [
+        {
+          "artifact_sha256": "5cfd666a2fb8492fcaa6d258b52126660a23a97dc9fd2230dbe1c009fd5b9ab0",
+          "byte_length": 157,
+          "capture_kind": "CAPTIONS",
+          "content_type": "text/plain; charset=utf-8",
+          "first_party_verified": true,
+          "locator": "https://www.youtube.com/watch?v=2sxdsgcIeYA&t=122s#auto-en-json3-02-02-02-58",
+          "retrieved_at_utc": "2026-08-15T00:00:00+00:00"
+        },
+        {
+          "artifact_sha256": "a4e74d1145f0c8988cdad03f51108fd0029bf37d69830041bcad6377d86162c1",
+          "byte_length": 223,
+          "capture_kind": "CAPTIONS",
+          "content_type": "text/plain; charset=utf-8",
+          "first_party_verified": true,
+          "locator": "https://www.youtube.com/watch?v=2sxdsgcIeYA&t=529s#auto-en-json3-08-49-09-23",
+          "retrieved_at_utc": "2026-08-15T00:00:00+00:00"
+        },
+        {
+          "artifact_sha256": "e8a96a08580dfd76ced8f38a91d1d38a6d74476945810ed30bf462942247e85e",
+          "byte_length": 258,
+          "capture_kind": "CAPTIONS",
+          "content_type": "text/plain; charset=utf-8",
+          "first_party_verified": true,
+          "locator": "https://www.youtube.com/watch?v=2sxdsgcIeYA&t=923s#auto-en-json3-15-23-17-01",
+          "retrieved_at_utc": "2026-08-15T00:00:00+00:00"
+        }
+      ],
+      "manifest_schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
+      "manifest_sha256": "340067699cdf1cf8faa1d5f2adeeabb30cb45299874cccddaf4bce701629da35",
+      "manifest_status": "CAPTURED",
+      "source_id": "ROMEO-2025-S9",
+      "source_url": "https://www.youtube.com/watch?v=2sxdsgcIeYA"
+    },
+    {
+      "artifacts": [
+        {
+          "artifact_sha256": "c866721107d52657b4b5f5821aae2eacdf3b48da1150ad9d1ec5d680edbdf0ca",
+          "byte_length": 93,
+          "capture_kind": "CAPTIONS",
+          "content_type": "text/plain; charset=utf-8",
+          "first_party_verified": true,
+          "locator": "https://www.youtube.com/watch?v=4DZWbCzEvhM&t=287s#auto-en-json3-04-47-05-18",
+          "retrieved_at_utc": "2026-08-15T00:00:00+00:00"
+        },
+        {
+          "artifact_sha256": "ea4098ac016199587a39ccaa64f88c915bdf1d8e80e8ca79a3ecb99250fda0a8",
+          "byte_length": 212,
+          "capture_kind": "CAPTIONS",
+          "content_type": "text/plain; charset=utf-8",
+          "first_party_verified": true,
+          "locator": "https://www.youtube.com/watch?v=4DZWbCzEvhM&t=77s#auto-en-json3-01-17-02-35",
+          "retrieved_at_utc": "2026-08-15T00:00:00+00:00"
+        }
+      ],
+      "manifest_schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
+      "manifest_sha256": "153cd270554cc5c9826ca8a50f8d4eeb5ca4ce1bab2733abb94a03ed53632a18",
+      "manifest_status": "CAPTURED",
+      "source_id": "ROMEO-2026-CRTOLOGY-01",
+      "source_url": "https://www.youtube.com/watch?v=4DZWbCzEvhM"
+    },
+    {
+      "artifacts": [
+        {
           "artifact_sha256": "2f414608bccd9319eb996b5bce47354d022b192b256d606ab92a735ea5248a33",
           "byte_length": 35,
           "capture_kind": "TEXT",
@@ -309,9 +489,9 @@
     }
   ],
   "input_digests": {
-    "corpus_index_sha256": "bb5749c8f3ec9f6fbaf72b8a2a201274f641e85a6551c2e147f0724f05bf5c8c",
-    "ledger_sha256": "432b8abfcc582f5853654129655505fddb83529a5138df7955bc6067adf93c0e",
-    "registry_sha256": "6df0e28775f28d4bdeb4c768cd2b00f3a76fe4c0fa0488a142188371f65e7c09"
+    "corpus_index_sha256": "c2dcb18db9ef71d3868b257a7b8731177d287ec8b7aaffdb3c8cd7a0d53aab82",
+    "ledger_sha256": "972ffae3871618cb8b22377a0eff88201dd9d4dc74ce5db23648d7275256e0e5",
+    "registry_sha256": "6e31294658058b854ace2aae0a05c1c9d6a015f30ca562334cc255d46789073b"
   },
   "predicates": [
     {
@@ -337,6 +517,14 @@
               "locator": "https://t.me/officialRomeotpt/6912#text",
               "source_id": "ROMEO-TG-SS-CONTEXT-6912",
               "statement": "Direct text supports an organized collective application lens, but does not define SS meaning, geometry, ownership or eligibility."
+            },
+            {
+              "artifact_sha256": "ea4098ac016199587a39ccaa64f88c915bdf1d8e80e8ca79a3ecb99250fda0a8",
+              "coverage": "partial",
+              "first_party_verified": true,
+              "locator": "https://www.youtube.com/watch?v=4DZWbCzEvhM&t=77s#auto-en-json3-01-17-02-35",
+              "source_id": "ROMEO-2026-CRTOLOGY-01",
+              "statement": "SS meaning and review/preparation role."
             }
           ],
           "field": "EXACT_PREDICATE",
@@ -344,10 +532,19 @@
           "status": "partial"
         },
         {
-          "evidence": [],
+          "evidence": [
+            {
+              "artifact_sha256": "c866721107d52657b4b5f5821aae2eacdf3b48da1150ad9d1ec5d680edbdf0ca",
+              "coverage": "partial",
+              "first_party_verified": true,
+              "locator": "https://www.youtube.com/watch?v=4DZWbCzEvhM&t=287s#auto-en-json3-04-47-05-18",
+              "source_id": "ROMEO-2026-CRTOLOGY-01",
+              "statement": "Recurring operational cadence."
+            }
+          ],
           "field": "INFORMATION_AVAILABILITY_TIME",
           "minimal_missing_requirement": "direct explicit first-party causal evidence sufficient to close this field",
-          "status": "missing"
+          "status": "partial"
         },
         {
           "evidence": [],
@@ -413,6 +610,22 @@
               "locator": "https://t.me/officialRomeotpt/6520#example",
               "source_id": "ROMEO-TG-SMT-SUB-6520",
               "statement": "Direct example supports SMT playing a role when an expected local low Turtle Soup does not occur, but does not define the general substitution predicate."
+            },
+            {
+              "artifact_sha256": "18a3f7c43e84e3707039ab8601ae7622e51e470e53d64c1b2d99d1da9c4e80d4",
+              "coverage": "partial",
+              "first_party_verified": true,
+              "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=203s#auto-en-json3-03-23-03-44",
+              "source_id": "ROMEO-2025-S6",
+              "statement": "Basic divergence primitive."
+            },
+            {
+              "artifact_sha256": "b744231c1803e76aa8fa982b885b79d36b145902db9373f6ea0369c65fae291f",
+              "coverage": "partial",
+              "first_party_verified": true,
+              "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=795s#auto-en-json3-13-15-13-34",
+              "source_id": "ROMEO-2025-S6",
+              "statement": "One named SMT variant."
             }
           ],
           "field": "EXACT_PREDICATE",
@@ -426,16 +639,34 @@
           "status": "missing"
         },
         {
-          "evidence": [],
+          "evidence": [
+            {
+              "artifact_sha256": "fa0d51d3713aff14c96b71c8e02366fd1ca09cec074fb83c0d3f3c5f1a88378b",
+              "coverage": "partial",
+              "first_party_verified": true,
+              "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=1379s#auto-en-json3-22-59-23-19",
+              "source_id": "ROMEO-2025-S6",
+              "statement": "A concrete EUR/DXY inverse example."
+            }
+          ],
           "field": "DIRECTION_TIMEFRAME_OWNERSHIP",
           "minimal_missing_requirement": "direct explicit first-party causal evidence sufficient to close this field",
-          "status": "missing"
+          "status": "partial"
         },
         {
-          "evidence": [],
+          "evidence": [
+            {
+              "artifact_sha256": "a1c10ff9a7f71f968ea9a10bd9439c9dba11aacbe6f8814e7e36c120b5cfa4b4",
+              "coverage": "partial",
+              "first_party_verified": true,
+              "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=1693s#auto-en-json3-28-13-31-56",
+              "source_id": "ROMEO-2025-S6",
+              "statement": "Confirmation sequencing/hierarchy and non-standalone use."
+            }
+          ],
           "field": "CONFIRMATION",
           "minimal_missing_requirement": "direct explicit first-party causal evidence sufficient to close this field",
-          "status": "missing"
+          "status": "partial"
         },
         {
           "evidence": [],
@@ -489,6 +720,30 @@
               "locator": "https://t.me/officialRomeotpt/6180#text",
               "source_id": "ROMEO-TG-MODEL1-6180",
               "statement": "Direct text prioritizes Model #1 as an entry family for study/trading, but does not define its candle geometry, trigger, confirmation or invalidation."
+            },
+            {
+              "artifact_sha256": "0f282f00bfdf78037c859a821cb5e489df877cd45cb30761146d11c90bb04aad",
+              "coverage": "partial",
+              "first_party_verified": true,
+              "locator": "https://www.youtube.com/watch?v=T7udbrWlARI&t=618s#auto-en-json3-10-18-10-56",
+              "source_id": "ROMEO-2025-S1",
+              "statement": "Directional sweep-candle/close trigger and example risk framing."
+            },
+            {
+              "artifact_sha256": "99250b19cee13890422e00d2653814d156aabee2ee372e0362b71a6caf48fe8e",
+              "coverage": "partial",
+              "first_party_verified": true,
+              "locator": "https://www.youtube.com/watch?v=T7udbrWlARI&t=905s#auto-en-json3-15-05-15-41",
+              "source_id": "ROMEO-2025-S1",
+              "statement": "Stated bullish/bearish symmetry."
+            },
+            {
+              "artifact_sha256": "5cfd666a2fb8492fcaa6d258b52126660a23a97dc9fd2230dbe1c009fd5b9ab0",
+              "coverage": "partial",
+              "first_party_verified": true,
+              "locator": "https://www.youtube.com/watch?v=2sxdsgcIeYA&t=122s#auto-en-json3-02-02-02-58",
+              "source_id": "ROMEO-2025-S9",
+              "statement": "A specific sweep candle rather than a multi-candle zone and a close/retrace worked case."
             }
           ],
           "field": "EXACT_PREDICATE",
@@ -502,10 +757,19 @@
           "status": "missing"
         },
         {
-          "evidence": [],
+          "evidence": [
+            {
+              "artifact_sha256": "cccb4366a5e4e5b50cd75d46c9453b677193ae8edf70c36879b3ea0e6f53fb9f",
+              "coverage": "partial",
+              "first_party_verified": true,
+              "locator": "https://www.youtube.com/watch?v=T7udbrWlARI&t=992s#auto-en-json3-16-32-17-22",
+              "source_id": "ROMEO-2025-S1",
+              "statement": "Three public HTF-to-signal mappings."
+            }
+          ],
           "field": "DIRECTION_TIMEFRAME_OWNERSHIP",
           "minimal_missing_requirement": "direct explicit first-party causal evidence sufficient to close this field",
-          "status": "missing"
+          "status": "partial"
         },
         {
           "evidence": [],
@@ -548,10 +812,19 @@
       "predicate_id": "TRUE_MSS_ALGORITHM",
       "required_fields": [
         {
-          "evidence": [],
+          "evidence": [
+            {
+              "artifact_sha256": "a4e74d1145f0c8988cdad03f51108fd0029bf37d69830041bcad6377d86162c1",
+              "coverage": "partial",
+              "first_party_verified": true,
+              "locator": "https://www.youtube.com/watch?v=2sxdsgcIeYA&t=529s#auto-en-json3-08-49-09-23",
+              "source_id": "ROMEO-2025-S9",
+              "statement": "Bullish worked close rule and retracement area."
+            }
+          ],
           "field": "EXACT_PREDICATE",
           "minimal_missing_requirement": "direct explicit first-party causal evidence sufficient to close this field",
-          "status": "missing"
+          "status": "partial"
         },
         {
           "evidence": [],
@@ -566,10 +839,19 @@
           "status": "missing"
         },
         {
-          "evidence": [],
+          "evidence": [
+            {
+              "artifact_sha256": "e8a96a08580dfd76ced8f38a91d1d38a6d74476945810ed30bf462942247e85e",
+              "coverage": "partial",
+              "first_party_verified": true,
+              "locator": "https://www.youtube.com/watch?v=2sxdsgcIeYA&t=923s#auto-en-json3-15-23-17-01",
+              "source_id": "ROMEO-2025-S9",
+              "statement": "Example sequence, 5m SMT relation, retracement, and risk reference."
+            }
+          ],
           "field": "CONFIRMATION",
           "minimal_missing_requirement": "direct explicit first-party causal evidence sufficient to close this field",
-          "status": "missing"
+          "status": "partial"
         },
         {
           "evidence": [],
@@ -614,6 +896,14 @@
               "locator": "https://t.me/officialRomeotpt/6219#text",
               "source_id": "ROMEO-TG-TS-6219",
               "statement": "Direct text labels an illustrated setup as a proper Turtle Soup entry, but the text artifact does not expose qualifying geometry or confirmation."
+            },
+            {
+              "artifact_sha256": "a114db86ddda3319adf1a76eef7a378a35a8c6ddf56e7f06d96d4949d96e9752",
+              "coverage": "partial",
+              "first_party_verified": true,
+              "locator": "https://www.youtube.com/watch?v=U-gNCwbGtTI&t=405s#auto-en-json3-06-45-07-23_19-42-21-19",
+              "source_id": "ROMEO-2024-TS",
+              "statement": "Primitive and explicit rejection of a naive any-extreme selector."
             }
           ],
           "field": "EXACT_PREDICATE",
@@ -690,6 +980,14 @@
               "locator": "https://t.me/officialRomeotpt/6273#text",
               "source_id": "ROMEO-TG-KEYLEVEL-6273",
               "statement": "Direct text establishes journey-to-key-level versus reaction-from-key-level setup taxonomy, but does not define a deterministic key-level selector or ranking hierarchy."
+            },
+            {
+              "artifact_sha256": "ad593f7409a0bbf70a30d68a693e1d9c7e0a445d0ef9eec8c0c371e31a54d3f2",
+              "coverage": "partial",
+              "first_party_verified": true,
+              "locator": "https://www.youtube.com/watch?v=p8UYOgVn1-g&t=498s#auto-en-json3-08-18-10-02_15-38-17-40",
+              "source_id": "ROMEO-2025-S5",
+              "statement": "Reaction-area definition, HTF tendency, journey/reaction taxonomy, and worked MSS sequence."
             }
           ],
           "field": "EXACT_PREDICATE",
@@ -927,20 +1225,20 @@
       ]
     }
   ],
-  "report_sha256": "e0343a1466c4ce7212871927062d33bd8aa04c7b7a4ac122f994c0ab67fcfde8",
+  "report_sha256": "a71b973a2d3357ae1992f3adead56f630d085fc22a798370e5e9afdc366cbf22",
   "schema_version": "P6C_CLOSURE_AUDIT_REPORT_V1",
   "scope": "existing replayable first-party Phase-6D corpus only",
   "summary": {
     "candidate_creation_authorized": false,
     "closed_predicates": 0,
-    "corpus_artifacts": 18,
-    "corpus_sources": 16,
+    "corpus_artifacts": 32,
+    "corpus_sources": 22,
     "detector_activity_authorized": false,
     "field_status_counts": {
       "contradictory": 0,
       "explicitly_satisfied": 0,
-      "missing": 44,
-      "partial": 12
+      "missing": 38,
+      "partial": 18
     },
     "held_predicates": 8,
     "oos_confirm_authorized": false,

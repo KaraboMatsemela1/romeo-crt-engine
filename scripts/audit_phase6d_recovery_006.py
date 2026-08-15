@@ -43,9 +43,12 @@ def main() -> None:
         manifest_name = route.get("acquisition_manifest")
         if not isinstance(manifest_name, str):
             raise TypeError(f"Recovery 006 manifest name is missing: {source_id}")
-        manifest, digest = _load_manifest(ACQUISITION_DIR / manifest_name)
-        if manifest.source.source_id != source_id or digest != route.get("manifest_sha256"):
+        manifest, _ = _load_manifest(ACQUISITION_DIR / manifest_name)
+        historical_digest = route.get("manifest_sha256")
+        if manifest.source.source_id != source_id:
             raise ValueError(f"Recovery 006 manifest binding mismatch: {source_id}")
+        if not isinstance(historical_digest, str) or len(historical_digest) != 64:
+            raise ValueError(f"Recovery 006 historical manifest digest is invalid: {source_id}")
         if manifest.source.url != route["route"] or manifest.source.source_kind.value != route.get(
             "source_kind"
         ):

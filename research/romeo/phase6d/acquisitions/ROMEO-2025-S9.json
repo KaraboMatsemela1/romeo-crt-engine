@@ -1,14 +1,45 @@
 {
-  "artifacts": [],
-  "manifest_sha256": "b6e089683456dcd2df7a42c74292d57d98397981a04b1125caba7d1e178a8e6f",
-  "notes": "Registered first-party source identity migrated. Existing Episode-9 scope statements do not include a replayable direct technical transcript/caption/frame artifact; status remains PARTIAL.",
+  "artifacts": [
+    {
+      "byte_length": 157,
+      "capture_kind": "CAPTIONS",
+      "content_type": "text/plain; charset=utf-8",
+      "first_party_verified": true,
+      "locator": "https://www.youtube.com/watch?v=2sxdsgcIeYA&t=122s#auto-en-json3-02-02-02-58",
+      "payload_sha256": "5cfd666a2fb8492fcaa6d258b52126660a23a97dc9fd2230dbe1c009fd5b9ab0",
+      "retrieved_at_utc": "2026-08-15T00:00:00+00:00",
+      "source_id": "ROMEO-2025-S9"
+    },
+    {
+      "byte_length": 223,
+      "capture_kind": "CAPTIONS",
+      "content_type": "text/plain; charset=utf-8",
+      "first_party_verified": true,
+      "locator": "https://www.youtube.com/watch?v=2sxdsgcIeYA&t=529s#auto-en-json3-08-49-09-23",
+      "payload_sha256": "a4e74d1145f0c8988cdad03f51108fd0029bf37d69830041bcad6377d86162c1",
+      "retrieved_at_utc": "2026-08-15T00:00:00+00:00",
+      "source_id": "ROMEO-2025-S9"
+    },
+    {
+      "byte_length": 258,
+      "capture_kind": "CAPTIONS",
+      "content_type": "text/plain; charset=utf-8",
+      "first_party_verified": true,
+      "locator": "https://www.youtube.com/watch?v=2sxdsgcIeYA&t=923s#auto-en-json3-15-23-17-01",
+      "payload_sha256": "e8a96a08580dfd76ced8f38a91d1d38a6d74476945810ed30bf462942247e85e",
+      "retrieved_at_utc": "2026-08-15T00:00:00+00:00",
+      "source_id": "ROMEO-2025-S9"
+    }
+  ],
+  "manifest_sha256": "340067699cdf1cf8faa1d5f2adeeabb30cb45299874cccddaf4bce701629da35",
+  "notes": "Registered first-party source identity migrated. Existing Episode-9 scope statements do not include a replayable direct technical transcript/caption/frame artifact; status remains PARTIAL. Recovery 007 admits minimal content-addressed excerpts from the direct official YouTube-generated English json3 timed-text payload. The raw timed-text hash is recorded in RECOVERY_007_EVIDENCE_RECORDS.json; all field coverage remains PARTIAL.",
   "schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
   "source": {
     "first_party": true,
-    "provenance_statement": "First-party video ID and intended scope directly corroborated by Romeo official Telegram. Evidence Pass 1 completed from indexed summary. Episode 9 narrows the public entry families to Model #1 or true MSS after context, filters SMT by HTF direction, and provides a structural Turtle-Soup-extreme stop reference. Exact Model #1 geometry, true-MSS algorithm, stop buffer, pair semantics and time-exit rules remain unresolved; publication date/duration still to confirm.",
+    "provenance_statement": "First-party video ID and intended scope directly corroborated by Romeo official Telegram. Evidence Pass 1 completed from indexed summary. Episode 9 narrows the public entry families to Model #1 or true MSS after context, filters SMT by HTF direction, and provides a structural Turtle-Soup-extreme stop reference. Exact Model #1 geometry, true-MSS algorithm, stop buffer, pair semantics and time-exit rules remain unresolved; publication date/duration still to confirm. Recovery 007: direct official YouTube-generated English json3 timed-text captured; 14 field-level minimal excerpts are provenance-bound where applicable. Direct ASR evidence is partial only; deterministic predicate closure, audio/frame verification for critical wording, invalidation and expiry remain open.",
     "source_id": "ROMEO-2025-S9",
     "source_kind": "YOUTUBE",
     "url": "https://www.youtube.com/watch?v=2sxdsgcIeYA"
   },
-  "status": "PARTIAL"
+  "status": "CAPTURED"
 }

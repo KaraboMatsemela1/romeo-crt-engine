@@ -1,0 +1,147 @@
+{
+  "authorizations": {
+    "candidate_creation_authorized": false,
+    "detector_activity_authorized": false,
+    "outcome_access_authorized": false
+  },
+  "candidate_ready_rows": 0,
+  "classification": "B_STRONG_NEW_EVIDENCE_BUT_PREDICATE_INCOMPLETE",
+  "closed_predicates": 0,
+  "closing_field_evidence": 0,
+  "issue_16_recommendation": "KEEP_BLOCKED",
+  "issue_37": "MUST_NOT_START",
+  "replay_command": "yt-dlp --skip-download --write-info-json --write-auto-subs --sub-langs en --sub-format json3 --no-playlist -o \"$DIR/$VIDEO_ID.%(ext)s\" \"https://www.youtube.com/watch?v=$VIDEO_ID\"",
+  "schema_version": "P6D_RECOVERY_007_ACQUISITION_INVENTORY_V1",
+  "sources": [
+    {
+      "admitted_excerpt_artifacts": [
+        {
+          "artifact_sha256": "0f282f00bfdf78037c859a821cb5e489df877cd45cb30761146d11c90bb04aad",
+          "byte_length": 220,
+          "locator": "https://www.youtube.com/watch?v=T7udbrWlARI&t=618s#auto-en-json3-10-18-10-56"
+        },
+        {
+          "artifact_sha256": "99250b19cee13890422e00d2653814d156aabee2ee372e0362b71a6caf48fe8e",
+          "byte_length": 210,
+          "locator": "https://www.youtube.com/watch?v=T7udbrWlARI&t=905s#auto-en-json3-15-05-15-41"
+        },
+        {
+          "artifact_sha256": "cccb4366a5e4e5b50cd75d46c9453b677193ae8edf70c36879b3ea0e6f53fb9f",
+          "byte_length": 189,
+          "locator": "https://www.youtube.com/watch?v=T7udbrWlARI&t=992s#auto-en-json3-16-32-17-22"
+        }
+      ],
+      "raw_timed_text_byte_length": 398017,
+      "raw_timed_text_filename": "T7udbrWlARI.en.json3",
+      "raw_timed_text_sha256": "a54782c7f52b6ec9a09507a711fb6ef689ecd98f6e4147444fbf630c2f363bf2",
+      "source_id": "ROMEO-2025-S1",
+      "source_url": "https://www.youtube.com/watch?v=T7udbrWlARI",
+      "video_id": "T7udbrWlARI"
+    },
+    {
+      "admitted_excerpt_artifacts": [
+        {
+          "artifact_sha256": "5cfd666a2fb8492fcaa6d258b52126660a23a97dc9fd2230dbe1c009fd5b9ab0",
+          "byte_length": 157,
+          "locator": "https://www.youtube.com/watch?v=2sxdsgcIeYA&t=122s#auto-en-json3-02-02-02-58"
+        },
+        {
+          "artifact_sha256": "a4e74d1145f0c8988cdad03f51108fd0029bf37d69830041bcad6377d86162c1",
+          "byte_length": 223,
+          "locator": "https://www.youtube.com/watch?v=2sxdsgcIeYA&t=529s#auto-en-json3-08-49-09-23"
+        },
+        {
+          "artifact_sha256": "e8a96a08580dfd76ced8f38a91d1d38a6d74476945810ed30bf462942247e85e",
+          "byte_length": 258,
+          "locator": "https://www.youtube.com/watch?v=2sxdsgcIeYA&t=923s#auto-en-json3-15-23-17-01"
+        }
+      ],
+      "raw_timed_text_byte_length": 264058,
+      "raw_timed_text_filename": "2sxdsgcIeYA.en.json3",
+      "raw_timed_text_sha256": "2bfb5365e44e720bd0408f0072392b821a036d0711b7663bae6751a9d3876d3c",
+      "source_id": "ROMEO-2025-S9",
+      "source_url": "https://www.youtube.com/watch?v=2sxdsgcIeYA",
+      "video_id": "2sxdsgcIeYA"
+    },
+    {
+      "admitted_excerpt_artifacts": [
+        {
+          "artifact_sha256": "18a3f7c43e84e3707039ab8601ae7622e51e470e53d64c1b2d99d1da9c4e80d4",
+          "byte_length": 100,
+          "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=203s#auto-en-json3-03-23-03-44"
+        },
+        {
+          "artifact_sha256": "b744231c1803e76aa8fa982b885b79d36b145902db9373f6ea0369c65fae291f",
+          "byte_length": 93,
+          "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=795s#auto-en-json3-13-15-13-34"
+        },
+        {
+          "artifact_sha256": "fa0d51d3713aff14c96b71c8e02366fd1ca09cec074fb83c0d3f3c5f1a88378b",
+          "byte_length": 79,
+          "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=1379s#auto-en-json3-22-59-23-19"
+        },
+        {
+          "artifact_sha256": "a1c10ff9a7f71f968ea9a10bd9439c9dba11aacbe6f8814e7e36c120b5cfa4b4",
+          "byte_length": 205,
+          "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=1693s#auto-en-json3-28-13-31-56"
+        }
+      ],
+      "raw_timed_text_byte_length": 366643,
+      "raw_timed_text_filename": "3IWgc52Dqsg.en.json3",
+      "raw_timed_text_sha256": "84cd28204ecbceead265bee09ee9c29f6fd5b52ff38aa67e19d987f03b62c825",
+      "source_id": "ROMEO-2025-S6",
+      "source_url": "https://www.youtube.com/watch?v=3IWgc52Dqsg",
+      "video_id": "3IWgc52Dqsg"
+    },
+    {
+      "admitted_excerpt_artifacts": [
+        {
+          "artifact_sha256": "ea4098ac016199587a39ccaa64f88c915bdf1d8e80e8ca79a3ecb99250fda0a8",
+          "byte_length": 212,
+          "locator": "https://www.youtube.com/watch?v=4DZWbCzEvhM&t=77s#auto-en-json3-01-17-02-35"
+        },
+        {
+          "artifact_sha256": "c866721107d52657b4b5f5821aae2eacdf3b48da1150ad9d1ec5d680edbdf0ca",
+          "byte_length": 93,
+          "locator": "https://www.youtube.com/watch?v=4DZWbCzEvhM&t=287s#auto-en-json3-04-47-05-18"
+        }
+      ],
+      "raw_timed_text_byte_length": 313992,
+      "raw_timed_text_filename": "4DZWbCzEvhM.en.json3",
+      "raw_timed_text_sha256": "81fbfc871567ea9580d439f736cda8304f7d39898139e8b909d6557d13d11d56",
+      "source_id": "ROMEO-2026-CRTOLOGY-01",
+      "source_url": "https://www.youtube.com/watch?v=4DZWbCzEvhM",
+      "video_id": "4DZWbCzEvhM"
+    },
+    {
+      "admitted_excerpt_artifacts": [
+        {
+          "artifact_sha256": "a114db86ddda3319adf1a76eef7a378a35a8c6ddf56e7f06d96d4949d96e9752",
+          "byte_length": 162,
+          "locator": "https://www.youtube.com/watch?v=U-gNCwbGtTI&t=405s#auto-en-json3-06-45-07-23_19-42-21-19"
+        }
+      ],
+      "raw_timed_text_byte_length": 268799,
+      "raw_timed_text_filename": "U-gNCwbGtTI.en.json3",
+      "raw_timed_text_sha256": "0e85576aba75bcc038dcceb5a7db3c6d12cf1efe43c3ffd75d0f16715b60478b",
+      "source_id": "ROMEO-2024-TS",
+      "source_url": "https://www.youtube.com/watch?v=U-gNCwbGtTI",
+      "video_id": "U-gNCwbGtTI"
+    },
+    {
+      "admitted_excerpt_artifacts": [
+        {
+          "artifact_sha256": "ad593f7409a0bbf70a30d68a693e1d9c7e0a445d0ef9eec8c0c371e31a54d3f2",
+          "byte_length": 262,
+          "locator": "https://www.youtube.com/watch?v=p8UYOgVn1-g&t=498s#auto-en-json3-08-18-10-02_15-38-17-40"
+        }
+      ],
+      "raw_timed_text_byte_length": 225129,
+      "raw_timed_text_filename": "p8UYOgVn1-g.en.json3",
+      "raw_timed_text_sha256": "6058fa91b1e7f5060e5e38b7bc96f4f9fa85870d4ec4c254937ef20ea99aadff",
+      "source_id": "ROMEO-2025-S5",
+      "source_url": "https://www.youtube.com/watch?v=p8UYOgVn1-g",
+      "video_id": "p8UYOgVn1-g"
+    }
+  ]
+}

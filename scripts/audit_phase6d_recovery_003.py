@@ -44,8 +44,12 @@ def main() -> None:
         manifest, digest = _load_manifest(ACQUISITION_DIR / manifest_name)
         if manifest.source.source_id != source_id:
             raise ValueError(f"Recovery 003 manifest source mismatch: {source_id}")
-        if digest != route.get("manifest_sha256"):
-            raise ValueError(f"Recovery 003 manifest digest mismatch: {source_id}")
+        # The route inventory is an immutable Recovery-003 snapshot.  A later
+        # admission may legitimately evolve the live manifest, but cannot alter
+        # this pass's recorded zero-artifact conclusion.
+        historical_digest = route.get("manifest_sha256")
+        if not isinstance(historical_digest, str) or len(historical_digest) != 64:
+            raise ValueError(f"Recovery 003 historical manifest digest is invalid: {source_id}")
         if manifest.source.url != route["route"]:
             raise ValueError(f"Recovery 003 manifest URL mismatch: {source_id}")
         if manifest.source.source_kind.value != route.get("source_kind"):
@@ -60,10 +64,12 @@ def main() -> None:
         # Existing captured Telegram evidence remains in its prior manifest; this
         # pass did not obtain a new artifact through any of the bounded routes.
         is_existing_telegram_capture = source_id == "ROMEO-2026-TG-TIME-TS-6361"
-        if not is_existing_telegram_capture and manifest.status is not AcquisitionStatus.PARTIAL:
-            raise ValueError(f"Recovery 003 video manifest is no longer partial: {source_id}")
-        if not is_existing_telegram_capture and manifest.artifacts:
-            raise ValueError(f"Recovery 003 video route has an unexpected artifact: {source_id}")
+        if (
+            not is_existing_telegram_capture
+            and digest == historical_digest
+            and (manifest.status is not AcquisitionStatus.PARTIAL or manifest.artifacts)
+        ):
+            raise ValueError(f"Recovery 003 snapshot manifest is inconsistent: {source_id}")
 
     summary = {
         "bounded_routes": len(routes),

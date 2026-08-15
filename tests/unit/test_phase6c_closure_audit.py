@@ -46,8 +46,8 @@ def test_checked_in_closure_audit_is_complete_and_remains_open() -> None:
     assert report["summary"]["field_status_counts"] == {
         "contradictory": 0,
         "explicitly_satisfied": 0,
-        "missing": 44,
-        "partial": 12,
+        "missing": 38,
+        "partial": 18,
     }
 
 

@@ -317,3 +317,8 @@ PAPER_TRADING_AUTHORIZED                     = false
 SHADOW_TRADING_AUTHORIZED                    = false
 LIVE_TRADING_AUTHORIZED                      = false
 ```
+
+
+## Phase 6D Recovery 007 — first-party timed-text admission
+
+Recovery 007 admitted six direct official YouTube-generated `json3` timed-text payloads and 14 minimal field-level excerpts. Classification is **B — STRONG_NEW_EVIDENCE_BUT_PREDICATE_INCOMPLETE**: all coverage remains `PARTIAL`, no contradiction is established, no predicate is closed, and no candidate is ready. Issue #16 remains **KEEP_BLOCKED**; Issue #37 must not start. Candidate creation, detector activity, and outcome access remain false.

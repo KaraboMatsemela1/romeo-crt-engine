@@ -1,0 +1,1 @@
+if one asset class fills its FVG and the other one doesn't fill the FVG that is an SMT fill.

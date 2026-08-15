@@ -1,0 +1,45 @@
+{
+  "artifacts": [
+    {
+      "byte_length": 220,
+      "capture_kind": "CAPTIONS",
+      "content_type": "text/plain; charset=utf-8",
+      "first_party_verified": true,
+      "locator": "https://www.youtube.com/watch?v=T7udbrWlARI&t=618s#auto-en-json3-10-18-10-56",
+      "payload_sha256": "0f282f00bfdf78037c859a821cb5e489df877cd45cb30761146d11c90bb04aad",
+      "retrieved_at_utc": "2026-08-15T00:00:00+00:00",
+      "source_id": "ROMEO-2025-S1"
+    },
+    {
+      "byte_length": 210,
+      "capture_kind": "CAPTIONS",
+      "content_type": "text/plain; charset=utf-8",
+      "first_party_verified": true,
+      "locator": "https://www.youtube.com/watch?v=T7udbrWlARI&t=905s#auto-en-json3-15-05-15-41",
+      "payload_sha256": "99250b19cee13890422e00d2653814d156aabee2ee372e0362b71a6caf48fe8e",
+      "retrieved_at_utc": "2026-08-15T00:00:00+00:00",
+      "source_id": "ROMEO-2025-S1"
+    },
+    {
+      "byte_length": 189,
+      "capture_kind": "CAPTIONS",
+      "content_type": "text/plain; charset=utf-8",
+      "first_party_verified": true,
+      "locator": "https://www.youtube.com/watch?v=T7udbrWlARI&t=992s#auto-en-json3-16-32-17-22",
+      "payload_sha256": "cccb4366a5e4e5b50cd75d46c9453b677193ae8edf70c36879b3ea0e6f53fb9f",
+      "retrieved_at_utc": "2026-08-15T00:00:00+00:00",
+      "source_id": "ROMEO-2025-S1"
+    }
+  ],
+  "manifest_sha256": "5005396dbde6bc1b3fd3be34b51dd985464dbc4893a5159771349da4c583f59d",
+  "notes": "Recovery 007 admits minimal content-addressed excerpts from the direct official YouTube-generated English json3 timed-text payload. The raw timed-text hash is recorded in RECOVERY_007_EVIDENCE_RECORDS.json; all field coverage remains PARTIAL.",
+  "schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
+  "source": {
+    "first_party": true,
+    "provenance_statement": "Direct video ID also published by Romeo's official Telegram. Evidence pass started; summary-derived details remain provisional. Recovery 007: direct official YouTube-generated English json3 timed-text captured; 14 field-level minimal excerpts are provenance-bound where applicable. Direct ASR evidence is partial only; deterministic predicate closure, audio/frame verification for critical wording, invalidation and expiry remain open.",
+    "source_id": "ROMEO-2025-S1",
+    "source_kind": "YOUTUBE",
+    "url": "https://www.youtube.com/watch?v=T7udbrWlARI"
+  },
+  "status": "CAPTURED"
+}

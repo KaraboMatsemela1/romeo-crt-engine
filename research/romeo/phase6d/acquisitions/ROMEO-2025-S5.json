@@ -1,14 +1,25 @@
 {
-  "artifacts": [],
-  "manifest_sha256": "8dab0de549391302917da4c00f7098b623e729bd731e3cb28217ed80b09b1552",
-  "notes": "Registered first-party source identity migrated. Existing key-level evidence lacks a replayable direct first-party technical artifact with exact locator; status remains PARTIAL.",
+  "artifacts": [
+    {
+      "byte_length": 262,
+      "capture_kind": "CAPTIONS",
+      "content_type": "text/plain; charset=utf-8",
+      "first_party_verified": true,
+      "locator": "https://www.youtube.com/watch?v=p8UYOgVn1-g&t=498s#auto-en-json3-08-18-10-02_15-38-17-40",
+      "payload_sha256": "ad593f7409a0bbf70a30d68a693e1d9c7e0a445d0ef9eec8c0c371e31a54d3f2",
+      "retrieved_at_utc": "2026-08-15T00:00:00+00:00",
+      "source_id": "ROMEO-2025-S5"
+    }
+  ],
+  "manifest_sha256": "23924b06d88d520ec0764fb6555fb0f8739144842c0456059848c3d34656c1f4",
+  "notes": "Registered first-party source identity migrated. Existing key-level evidence lacks a replayable direct first-party technical artifact with exact locator; status remains PARTIAL. Recovery 007 admits minimal content-addressed excerpts from the direct official YouTube-generated English json3 timed-text payload. The raw timed-text hash is recorded in RECOVERY_007_EVIDENCE_RECORDS.json; all field coverage remains PARTIAL.",
   "schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
   "source": {
     "first_party": true,
-    "provenance_statement": "Evidence Pass 1 completed from indexed transcript/summary plus first-party Telegram statement. Key level established as context rather than entry; destination-vs-reaction setup taxonomy extracted. KOD semantic tension identified for later reconciliation. Direct video verification still required before VERIFIED promotion.",
+    "provenance_statement": "Evidence Pass 1 completed from indexed transcript/summary plus first-party Telegram statement. Key level established as context rather than entry; destination-vs-reaction setup taxonomy extracted. KOD semantic tension identified for later reconciliation. Direct video verification still required before VERIFIED promotion. Recovery 007: direct official YouTube-generated English json3 timed-text captured; 14 field-level minimal excerpts are provenance-bound where applicable. Direct ASR evidence is partial only; deterministic predicate closure, audio/frame verification for critical wording, invalidation and expiry remain open.",
     "source_id": "ROMEO-2025-S5",
     "source_kind": "YOUTUBE",
     "url": "https://www.youtube.com/watch?v=p8UYOgVn1-g"
   },
-  "status": "PARTIAL"
+  "status": "CAPTURED"
 }
