@@ -1,0 +1,103 @@
+{
+  "schema_version": "P6D_RECOVERY_006_ROUTE_INVENTORY_V1",
+  "decision": "BLOCKED_NO_VERIFIED_PREDICATE_CLOSURE",
+  "routes": [
+    {
+      "source_id": "ROMEO-2026-CRTOLOGY-01",
+      "route": "https://www.youtube.com/watch?v=4DZWbCzEvhM",
+      "source_kind": "YOUTUBE",
+      "acquisition_manifest": "ROMEO-2026-CRTOLOGY-01.json",
+      "manifest_sha256": "4175fffb1cfbc1f1b2fb3830e66845131eb027f166a1e34c1351d9eda3918f1a",
+      "predicate_ids": ["SS_MEANING_AND_CAUSAL_RULE"],
+      "attempt": {
+        "method": "yt-dlp --list-subs --no-playlist",
+        "target_payload": "official YouTube-generated English json3 timed-text",
+        "retrieved_at_utc": "2026-08-15T08:22:28Z",
+        "result": "ENVIRONMENT_DNS_UNAVAILABLE_NO_SOURCE_OBSERVATION",
+        "source_contact_observed": false
+      }
+    },
+    {
+      "source_id": "ROMEO-2025-S6",
+      "route": "https://www.youtube.com/watch?v=3IWgc52Dqsg",
+      "source_kind": "YOUTUBE",
+      "acquisition_manifest": "ROMEO-2025-S6.json",
+      "manifest_sha256": "6df089c9f9376ddb2fe75280ce30b1c032abfcec0e0923791184829f58288f62",
+      "predicate_ids": ["SMT_EXECUTABLE_SEMANTICS"],
+      "attempt": {
+        "method": "yt-dlp --list-subs --no-playlist",
+        "target_payload": "official YouTube-generated English json3 timed-text",
+        "retrieved_at_utc": "2026-08-15T08:22:29Z",
+        "result": "ENVIRONMENT_DNS_UNAVAILABLE_NO_SOURCE_OBSERVATION",
+        "source_contact_observed": false
+      }
+    },
+    {
+      "source_id": "ROMEO-2025-S9",
+      "route": "https://www.youtube.com/watch?v=2sxdsgcIeYA",
+      "source_kind": "YOUTUBE",
+      "acquisition_manifest": "ROMEO-2025-S9.json",
+      "manifest_sha256": "b6e089683456dcd2df7a42c74292d57d98397981a04b1125caba7d1e178a8e6f",
+      "predicate_ids": ["MODEL_1_GEOMETRY", "SMT_EXECUTABLE_SEMANTICS", "TRUE_MSS_ALGORITHM"],
+      "attempt": {
+        "method": "yt-dlp --list-subs --no-playlist",
+        "target_payload": "official YouTube-generated English json3 timed-text",
+        "retrieved_at_utc": "2026-08-15T08:22:30Z",
+        "result": "ENVIRONMENT_DNS_UNAVAILABLE_NO_SOURCE_OBSERVATION",
+        "source_contact_observed": false
+      }
+    },
+    {
+      "source_id": "ROMEO-2024-TS",
+      "route": "https://www.youtube.com/watch?v=U-gNCwbGtTI",
+      "source_kind": "YOUTUBE",
+      "acquisition_manifest": "ROMEO-2024-TS.json",
+      "manifest_sha256": "e3723a33bb97d17c97c3f56bc036715be474749011c76aed4151feb0c0109e45",
+      "predicate_ids": ["TURTLE_SOUP_CONFIRMATION"],
+      "attempt": {
+        "method": "yt-dlp --list-subs --no-playlist",
+        "target_payload": "official YouTube-generated English json3 timed-text",
+        "retrieved_at_utc": "2026-08-15T08:22:31Z",
+        "result": "ENVIRONMENT_DNS_UNAVAILABLE_NO_SOURCE_OBSERVATION",
+        "source_contact_observed": false
+      }
+    },
+    {
+      "source_id": "ROMEO-2025-S5",
+      "route": "https://www.youtube.com/watch?v=p8UYOgVn1-g",
+      "source_kind": "YOUTUBE",
+      "acquisition_manifest": "ROMEO-2025-S5.json",
+      "manifest_sha256": "8dab0de549391302917da4c00f7098b623e729bd731e3cb28217ed80b09b1552",
+      "predicate_ids": ["KEY_LEVEL_SELECTOR"],
+      "attempt": {
+        "method": "yt-dlp --list-subs --no-playlist",
+        "target_payload": "official YouTube-generated English json3 timed-text",
+        "retrieved_at_utc": "2026-08-15T08:22:32Z",
+        "result": "ENVIRONMENT_DNS_UNAVAILABLE_NO_SOURCE_OBSERVATION",
+        "source_contact_observed": false
+      }
+    },
+    {
+      "source_id": "ROMEO-2026-TG-TIME-TS-6361",
+      "route": "https://t.me/officialRomeotpt/6361",
+      "source_kind": "TELEGRAM",
+      "acquisition_manifest": "ROMEO-2026-TG-TIME-TS-6361.json",
+      "manifest_sha256": "d9dca3214c5fa1ad9c714891100f89635ad1e12f34157d1302677aa5b0e3701e",
+      "predicate_ids": ["TIME_SELECTOR", "TURTLE_SOUP_CONFIRMATION"],
+      "attempt": {
+        "method": "curl --head --fail --silent --show-error --max-time 20",
+        "target_payload": "direct official Telegram post payload; not a YouTube timed-text route",
+        "retrieved_at_utc": "2026-08-15T08:22:33Z",
+        "result": "ENVIRONMENT_DNS_UNAVAILABLE_NO_SOURCE_OBSERVATION",
+        "source_contact_observed": false
+      }
+    }
+  ],
+  "new_replayable_artifacts": 0,
+  "new_payload_sha256s": 0,
+  "new_acquisition_manifests": 0,
+  "new_corpus_index_entries": 0,
+  "new_closing_field_evidence": 0,
+  "candidate_ready_rows": 0,
+  "issue_16_recommendation": "KEEP_BLOCKED"
+}

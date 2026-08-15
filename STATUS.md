@@ -232,6 +232,27 @@ Canonical recovery record:
 
 - `research/romeo/phase6d/FIRST_PARTY_CAPTION_TRANSCRIPT_FRAME_RECOVERY_004.md`
 
+## Phase 6D — First-Party Caption Recovery 006
+
+The six bounded registered first-party routes could not be contacted because
+the runtime could not resolve YouTube or Telegram. This is a no-source-contact
+environment result, not an observation about source or payload availability.
+
+```text
+source contacts observed       0
+new artifacts / payload hashes 0
+closing field evidence         0
+candidate-ready rows           0
+decision = BLOCKED_NO_VERIFIED_PREDICATE_CLOSURE
+```
+
+Issue #16 and Phase 6C remain blocked; there is no predicate closure and no
+candidate, detector, outcome, paper, or live-trading authorization change.
+
+Canonical recovery record:
+
+- `research/romeo/phase6d/FIRST_PARTY_CAPTION_RECOVERY_006.md`
+
 ### Artifact-backed predicate state
 
 ```text
