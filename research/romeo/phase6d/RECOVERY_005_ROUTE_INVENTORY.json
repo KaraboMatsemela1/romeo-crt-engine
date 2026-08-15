@@ -1,0 +1,59 @@
+{
+  "schema_version": "P6D_RECOVERY_005_ROUTE_INVENTORY_V1",
+  "decision": "RECOVERY_COMPLETE_NO_PREDICATE_CLOSURE",
+  "routes": [
+    {
+      "source_id": "ROMEO-2026-CRTOLOGY-01",
+      "registered_route": "https://www.youtube.com/watch?v=4DZWbCzEvhM",
+      "source_contact_observed": true,
+      "outcome": "CONTACTED_NO_RELEVANT_PAYLOAD",
+      "evidence_surface": "official Romeo Telegram channel index + direct YouTube fetch",
+      "payload_admitted": false
+    },
+    {
+      "source_id": "ROMEO-2025-S6",
+      "registered_route": "https://www.youtube.com/watch?v=3IWgc52Dqsg",
+      "source_contact_observed": true,
+      "outcome": "CONTACTED_NO_RELEVANT_PAYLOAD",
+      "evidence_surface": "direct YouTube fetch",
+      "payload_admitted": false
+    },
+    {
+      "source_id": "ROMEO-2025-S9",
+      "registered_route": "https://www.youtube.com/watch?v=2sxdsgcIeYA",
+      "source_contact_observed": true,
+      "outcome": "CONTACTED_NO_RELEVANT_PAYLOAD",
+      "evidence_surface": "official Romeo Telegram channel index + direct YouTube fetch",
+      "payload_admitted": false
+    },
+    {
+      "source_id": "ROMEO-2024-TS",
+      "registered_route": "https://www.youtube.com/watch?v=U-gNCwbGtTI",
+      "source_contact_observed": false,
+      "outcome": "ENVIRONMENT_ACCESS_FAILURE",
+      "evidence_surface": "direct YouTube fetch attempt",
+      "payload_admitted": false
+    },
+    {
+      "source_id": "ROMEO-2025-S5",
+      "registered_route": "https://www.youtube.com/watch?v=p8UYOgVn1-g",
+      "source_contact_observed": true,
+      "outcome": "CONTACTED_NO_RELEVANT_PAYLOAD",
+      "evidence_surface": "official Romeo Telegram channel index + direct YouTube fetch",
+      "payload_admitted": false
+    },
+    {
+      "source_id": "ROMEO-2026-TG-TIME-TS-6361",
+      "registered_route": "https://t.me/officialRomeotpt/6361",
+      "source_contact_observed": true,
+      "outcome": "CONTACTED_NO_RELEVANT_PAYLOAD",
+      "evidence_surface": "official Romeo Telegram channel index; direct post cache-limited",
+      "payload_admitted": false,
+      "note": "Existing provenance-bound corpus artifact retained; no duplicate admission."
+    }
+  ],
+  "new_replayable_artifacts": 0,
+  "new_closing_field_evidence": 0,
+  "candidate_ready_rows": 0,
+  "issue_16_recommendation": "KEEP_BLOCKED"
+}
