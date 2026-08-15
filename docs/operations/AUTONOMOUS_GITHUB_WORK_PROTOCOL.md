@@ -44,7 +44,9 @@ Scheduled runners must detect multiple active claims and preserve only the earli
 - Use exactly one primary branch and one PR per issue.
 - Branch format: `agent/<issue-number>-<short-name>`.
 - PR title format: `Issue #<number>: <imperative change>`.
-- The PR body must link the issue with `Closes #<number>`, summarize safety impact, list tests, and state that no prohibited historical/OOS/CONFIRM outcome access occurred.
+- The PR body must reference the issue. Use `Closes #<number>` only when the PR actually satisfies that issue's definition of done and the issue should become terminal on merge. For bounded research/recovery/follow-up work against a standing blocked gate or another intentionally persistent issue, use `Related to #<number>` (or another non-closing reference) instead.
+- Before using a closing keyword, refetch the target issue and verify that the PR result is consistent with closing it. A result that says `BLOCKED`, `KEEP_BLOCKED`, `NO_PREDICATE_CLOSURE`, `INSUFFICIENT_EVIDENCE`, or otherwise leaves the issue's definition of done unsatisfied must not use a closing keyword.
+- The PR body must summarize safety impact, list tests, and state that no prohibited historical/OOS/CONFIRM outcome access occurred.
 - Do not reuse a branch for a different issue.
 - If `main` moved before implementation, rebase or recreate the branch so the PR is based on current `main` before merge when required.
 
@@ -140,15 +142,16 @@ Before merge:
 
 1. Run the repository test and lint/type-check commands documented by the project.
 2. Refetch issue claims and completion state; close/release duplicate work if another valid owner already completed or owns the issue.
-3. Open the PR against `main`.
-4. Classify the PR as `CI_PENDING` until required checks complete.
-5. While that PR is `CI_PENDING`, another independent task may proceed only under the bounded-concurrency rule in Section 3.
-6. If CI fails, classify `CI_FAILED`, diagnose the exact failure, and prioritize the fix before new implementation work unless owner input is required.
-7. If CI passes, inspect review threads, including resolved/unresolved state where available.
-8. If actionable review remains, classify `REVIEW_PENDING`, address it, and rerun CI as needed.
-9. When CI is green and no unresolved actionable review remains, classify `READY_TO_MERGE` and merge using the expected head SHA where available.
-10. Confirm the merge commit on `main`.
-11. If another PR merged while an independent branch was waiting, refresh/rebase/recreate that branch as required before merge.
+3. Verify the PR's issue reference semantics: use a closing keyword only if the PR satisfies the target issue's definition of done. If the issue remains intentionally open, blocked, or only partially advanced, use a non-closing reference.
+4. Open the PR against `main`.
+5. Classify the PR as `CI_PENDING` until required checks complete.
+6. While that PR is `CI_PENDING`, another independent task may proceed only under the bounded-concurrency rule in Section 3.
+7. If CI fails, classify `CI_FAILED`, diagnose the exact failure, and prioritize the fix before new implementation work unless owner input is required.
+8. If CI passes, inspect review threads, including resolved/unresolved state where available.
+9. If actionable review remains, classify `REVIEW_PENDING`, address it, and rerun CI as needed.
+10. When CI is green and no unresolved actionable review remains, classify `READY_TO_MERGE` and merge using the expected head SHA where available.
+11. Confirm the merge commit on `main`.
+12. If another PR merged while an independent branch was waiting, refresh/rebase/recreate that branch as required before merge.
 
 A passing local test is not a substitute for GitHub CI. A pending or failed CI state is not permission to claim completion.
 
