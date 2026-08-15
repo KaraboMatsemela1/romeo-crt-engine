@@ -1,14 +1,25 @@
 {
-  "artifacts": [],
-  "manifest_sha256": "e3723a33bb97d17c97c3f56bc036715be474749011c76aed4151feb0c0109e45",
-  "notes": "Registered first-party source identity migrated. Existing transcript/summary evidence is provisional and not direct first-party verified; no artifact is promoted; status remains PARTIAL.",
+  "artifacts": [
+    {
+      "byte_length": 162,
+      "capture_kind": "CAPTIONS",
+      "content_type": "text/plain; charset=utf-8",
+      "first_party_verified": true,
+      "locator": "https://www.youtube.com/watch?v=U-gNCwbGtTI&t=405s#auto-en-json3-06-45-07-23_19-42-21-19",
+      "payload_sha256": "a114db86ddda3319adf1a76eef7a378a35a8c6ddf56e7f06d96d4949d96e9752",
+      "retrieved_at_utc": "2026-08-15T00:00:00+00:00",
+      "source_id": "ROMEO-2024-TS"
+    }
+  ],
+  "manifest_sha256": "57c7cd373773d862aa11fefaa36baaacddcc25238e36a30f6db004175af3bd29",
+  "notes": "Registered first-party source identity migrated. Existing transcript/summary evidence is provisional and not direct first-party verified; no artifact is promoted; status remains PARTIAL. Recovery 007 admits minimal content-addressed excerpts from the direct official YouTube-generated English json3 timed-text payload. The raw timed-text hash is recorded in RECOVERY_007_EVIDENCE_RECORDS.json; all field coverage remains PARTIAL.",
   "schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
   "source": {
     "first_party": true,
-    "provenance_statement": "Timestamped evidence pass completed from indexed transcript/summary. Structural primitive extracted; direct first-party transcript/video verification still required before VERIFIED rule promotion.",
+    "provenance_statement": "Timestamped evidence pass completed from indexed transcript/summary. Structural primitive extracted; direct first-party transcript/video verification still required before VERIFIED rule promotion. Recovery 007: direct official YouTube-generated English json3 timed-text captured; 14 field-level minimal excerpts are provenance-bound where applicable. Direct ASR evidence is partial only; deterministic predicate closure, audio/frame verification for critical wording, invalidation and expiry remain open.",
     "source_id": "ROMEO-2024-TS",
     "source_kind": "YOUTUBE",
     "url": "https://www.youtube.com/watch?v=U-gNCwbGtTI"
   },
-  "status": "PARTIAL"
+  "status": "CAPTURED"
 }

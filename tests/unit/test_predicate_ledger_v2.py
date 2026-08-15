@@ -82,14 +82,14 @@ def test_checked_in_corpus_migration_audit_remains_research_only() -> None:
     )
     assert completed.returncode == 0, completed.stderr
     summary = json.loads(completed.stdout)
-    assert summary["acquisition_manifests"] == 21
-    assert summary["captured_manifests"] == 16
-    assert summary["partial_manifests"] == 5
-    assert summary["corpus_sources"] == 16
-    assert summary["corpus_artifacts"] == 18
-    assert summary["payload_files_verified"] == 18
-    assert summary["predicate_rows_with_artifact_evidence"] == 7
-    assert summary["observed_field_evidence"] == 17
+    assert summary["acquisition_manifests"] == 22
+    assert summary["captured_manifests"] == 22
+    assert summary["partial_manifests"] == 0
+    assert summary["corpus_sources"] == 22
+    assert summary["corpus_artifacts"] == 32
+    assert summary["payload_files_verified"] == 32
+    assert summary["predicate_rows_with_artifact_evidence"] == 8
+    assert summary["observed_field_evidence"] == 31
     assert summary["closing_field_evidence"] == 0
     assert summary["candidate_ready_rows"] == 0
     assert summary["candidate_creation_authorized"] is False
@@ -137,6 +137,24 @@ def test_recovery_004_route_audit_remains_bounded_and_research_only() -> None:
     assert summary["outcome_access_authorized"] is False
 
 
+def test_recovery_005_route_audit_remains_bounded_and_research_only() -> None:
+    completed = subprocess.run(
+        [sys.executable, "scripts/audit_phase6d_recovery_005.py"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    summary = json.loads(completed.stdout)
+    assert summary["bounded_routes"] == 6
+    assert summary["new_artifacts"] == 0
+    assert summary["closing_field_evidence"] == 0
+    assert summary["candidate_ready_rows"] == 0
+    assert summary["candidate_creation_authorized"] is False
+    assert summary["detector_activity_authorized"] is False
+    assert summary["outcome_access_authorized"] is False
+
+
 def test_recovery_006_route_audit_remains_bounded_and_research_only() -> None:
     completed = subprocess.run(
         [sys.executable, "scripts/audit_phase6d_recovery_006.py"],
@@ -151,6 +169,26 @@ def test_recovery_006_route_audit_remains_bounded_and_research_only() -> None:
     assert summary["new_artifacts"] == 0
     assert summary["new_payload_sha256s"] == 0
     assert summary["closing_field_evidence"] == 0
+    assert summary["candidate_ready_rows"] == 0
+    assert summary["candidate_creation_authorized"] is False
+    assert summary["detector_activity_authorized"] is False
+    assert summary["outcome_access_authorized"] is False
+
+
+def test_recovery_007_admits_only_partial_first_party_caption_evidence() -> None:
+    completed = subprocess.run(
+        [sys.executable, "scripts/audit_phase6d_recovery_007.py"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    summary = json.loads(completed.stdout)
+    assert summary["raw_timed_text_sources"] == 6
+    assert summary["evidence_records"] == 14
+    assert summary["payloads"] == 14
+    assert summary["closing_field_evidence"] == 0
+    assert summary["closed_predicates"] == 0
     assert summary["candidate_ready_rows"] == 0
     assert summary["candidate_creation_authorized"] is False
     assert summary["detector_activity_authorized"] is False

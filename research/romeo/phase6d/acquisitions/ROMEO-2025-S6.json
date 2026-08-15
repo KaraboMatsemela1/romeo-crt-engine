@@ -1,14 +1,55 @@
 {
-  "artifacts": [],
-  "manifest_sha256": "6df089c9f9376ddb2fe75280ce30b1c032abfcec0e0923791184829f58288f62",
-  "notes": "Registered first-party source identity migrated. Existing SMT summaries and direct-claim records are not replayable artifact payloads with exact source locators, so no technical artifact is promoted; status remains PARTIAL.",
+  "artifacts": [
+    {
+      "byte_length": 79,
+      "capture_kind": "CAPTIONS",
+      "content_type": "text/plain; charset=utf-8",
+      "first_party_verified": true,
+      "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=1379s#auto-en-json3-22-59-23-19",
+      "payload_sha256": "fa0d51d3713aff14c96b71c8e02366fd1ca09cec074fb83c0d3f3c5f1a88378b",
+      "retrieved_at_utc": "2026-08-15T00:00:00+00:00",
+      "source_id": "ROMEO-2025-S6"
+    },
+    {
+      "byte_length": 205,
+      "capture_kind": "CAPTIONS",
+      "content_type": "text/plain; charset=utf-8",
+      "first_party_verified": true,
+      "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=1693s#auto-en-json3-28-13-31-56",
+      "payload_sha256": "a1c10ff9a7f71f968ea9a10bd9439c9dba11aacbe6f8814e7e36c120b5cfa4b4",
+      "retrieved_at_utc": "2026-08-15T00:00:00+00:00",
+      "source_id": "ROMEO-2025-S6"
+    },
+    {
+      "byte_length": 100,
+      "capture_kind": "CAPTIONS",
+      "content_type": "text/plain; charset=utf-8",
+      "first_party_verified": true,
+      "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=203s#auto-en-json3-03-23-03-44",
+      "payload_sha256": "18a3f7c43e84e3707039ab8601ae7622e51e470e53d64c1b2d99d1da9c4e80d4",
+      "retrieved_at_utc": "2026-08-15T00:00:00+00:00",
+      "source_id": "ROMEO-2025-S6"
+    },
+    {
+      "byte_length": 93,
+      "capture_kind": "CAPTIONS",
+      "content_type": "text/plain; charset=utf-8",
+      "first_party_verified": true,
+      "locator": "https://www.youtube.com/watch?v=3IWgc52Dqsg&t=795s#auto-en-json3-13-15-13-34",
+      "payload_sha256": "b744231c1803e76aa8fa982b885b79d36b145902db9373f6ea0369c65fae291f",
+      "retrieved_at_utc": "2026-08-15T00:00:00+00:00",
+      "source_id": "ROMEO-2025-S6"
+    }
+  ],
+  "manifest_sha256": "424a01f6a48a7e5154ec3e5f6b732cca7bea287a36d78dd306c3dad92ad6d7af",
+  "notes": "Registered first-party source identity migrated. Existing SMT summaries and direct-claim records are not replayable artifact payloads with exact source locators, so no technical artifact is promoted; status remains PARTIAL. Recovery 007 admits minimal content-addressed excerpts from the direct official YouTube-generated English json3 timed-text payload. The raw timed-text hash is recorded in RECOVERY_007_EVIDENCE_RECORDS.json; all field coverage remains PARTIAL.",
   "schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
   "source": {
     "first_party": true,
-    "provenance_statement": "Evidence Pass 1 completed from indexed summary plus first-party Telegram corroboration of SMT's operational role. SMT treated as cross-market context/confirmation, not standalone entry. Local Turtle Soup may not always be required when SMT supplies manipulation evidence; exact substitution and pair-direction semantics remain unresolved. Episode 9 required before freezing correct SMT usage.",
+    "provenance_statement": "Evidence Pass 1 completed from indexed summary plus first-party Telegram corroboration of SMT's operational role. SMT treated as cross-market context/confirmation, not standalone entry. Local Turtle Soup may not always be required when SMT supplies manipulation evidence; exact substitution and pair-direction semantics remain unresolved. Episode 9 required before freezing correct SMT usage. Recovery 007: direct official YouTube-generated English json3 timed-text captured; 14 field-level minimal excerpts are provenance-bound where applicable. Direct ASR evidence is partial only; deterministic predicate closure, audio/frame verification for critical wording, invalidation and expiry remain open.",
     "source_id": "ROMEO-2025-S6",
     "source_kind": "YOUTUBE",
     "url": "https://www.youtube.com/watch?v=3IWgc52Dqsg"
   },
-  "status": "PARTIAL"
+  "status": "CAPTURED"
 }

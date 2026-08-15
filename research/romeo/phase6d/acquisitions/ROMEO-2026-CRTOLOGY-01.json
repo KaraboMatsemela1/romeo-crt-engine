@@ -1,14 +1,35 @@
 {
-  "artifacts": [],
-  "manifest_sha256": "4175fffb1cfbc1f1b2fb3830e66845131eb027f166a1e34c1351d9eda3918f1a",
-  "notes": "Registered first-party source identity migrated. No replayable direct technical transcript/caption/frame artifact exists in the repository corpus; status remains PARTIAL.",
+  "artifacts": [
+    {
+      "byte_length": 93,
+      "capture_kind": "CAPTIONS",
+      "content_type": "text/plain; charset=utf-8",
+      "first_party_verified": true,
+      "locator": "https://www.youtube.com/watch?v=4DZWbCzEvhM&t=287s#auto-en-json3-04-47-05-18",
+      "payload_sha256": "c866721107d52657b4b5f5821aae2eacdf3b48da1150ad9d1ec5d680edbdf0ca",
+      "retrieved_at_utc": "2026-08-15T00:00:00+00:00",
+      "source_id": "ROMEO-2026-CRTOLOGY-01"
+    },
+    {
+      "byte_length": 212,
+      "capture_kind": "CAPTIONS",
+      "content_type": "text/plain; charset=utf-8",
+      "first_party_verified": true,
+      "locator": "https://www.youtube.com/watch?v=4DZWbCzEvhM&t=77s#auto-en-json3-01-17-02-35",
+      "payload_sha256": "ea4098ac016199587a39ccaa64f88c915bdf1d8e80e8ca79a3ecb99250fda0a8",
+      "retrieved_at_utc": "2026-08-15T00:00:00+00:00",
+      "source_id": "ROMEO-2026-CRTOLOGY-01"
+    }
+  ],
+  "manifest_sha256": "153cd270554cc5c9826ca8a50f8d4eeb5ca4ce1bab2733abb94a03ed53632a18",
+  "notes": "Registered first-party source identity migrated. No replayable direct technical transcript/caption/frame artifact exists in the repository corpus; status remains PARTIAL. Recovery 007 admits minimal content-addressed excerpts from the direct official YouTube-generated English json3 timed-text payload. The raw timed-text hash is recorded in RECOVERY_007_EVIDENCE_RECORDS.json; all field coverage remains PARTIAL.",
   "schema_version": "P6D_FIRST_PARTY_SOURCE_ACQUISITION_V1",
   "source": {
     "first_party": true,
-    "provenance_statement": "Source/video identity and first-party provenance reconfirmed for Phase 6C. Gate 6C-1 closed TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT because explicit SS meaning/predicate and direct transcript were not captured. First-party follow-up clues are preserved but remain non-executable; re-entry requires new direct evidence.",
+    "provenance_statement": "Source/video identity and first-party provenance reconfirmed for Phase 6C. Gate 6C-1 closed TECHNICAL_SOURCE_CAPTURE_INSUFFICIENT because explicit SS meaning/predicate and direct transcript were not captured. First-party follow-up clues are preserved but remain non-executable; re-entry requires new direct evidence. Recovery 007: direct official YouTube-generated English json3 timed-text captured; 14 field-level minimal excerpts are provenance-bound where applicable. Direct ASR evidence is partial only; deterministic predicate closure, audio/frame verification for critical wording, invalidation and expiry remain open.",
     "source_id": "ROMEO-2026-CRTOLOGY-01",
     "source_kind": "YOUTUBE",
     "url": "https://www.youtube.com/watch?v=4DZWbCzEvhM"
   },
-  "status": "PARTIAL"
+  "status": "CAPTURED"
 }
