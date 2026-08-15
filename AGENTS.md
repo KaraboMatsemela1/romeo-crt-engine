@@ -33,6 +33,7 @@ ChatGPT Work, Codex, Hermes, and other agents share the same GitHub claim/depend
 - Never work an issue with an earlier valid active claim from another agent.
 - Follow the bounded work-in-flight rules for CI/review wait states.
 - Recheck claim ownership before opening a PR.
+- Use a closing keyword such as `Closes #<n>` only when the PR actually satisfies that issue's definition of done. For bounded research/recovery/follow-up work against a standing blocked gate, use `Related to #<n>` (or another non-closing reference) so the gate cannot be auto-closed prematurely.
 - After merge, record completion and immediately return to the shared queue.
 
 Hermes-specific continuous execution and bootstrap instructions are defined in `docs/operations/HERMES_EXECUTION_PROFILE.md`.
