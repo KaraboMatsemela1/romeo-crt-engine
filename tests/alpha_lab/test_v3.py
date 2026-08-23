@@ -60,6 +60,21 @@ def _signal_bars(*, weak_close: bool = False) -> tuple[Bar, ...]:
     return tuple(bars)
 
 
+def _metrics(*, expectancy_r: float, profit_factor: float) -> Metrics:
+    return Metrics(
+        closed_trades=120,
+        wins=60,
+        losses=60,
+        win_rate=0.5,
+        expectancy_r=expectancy_r,
+        profit_factor=profit_factor,
+        net_pnl=1000.0,
+        return_pct=1.0,
+        max_drawdown_pct=10.0,
+        final_equity=101_000.0,
+    )
+
+
 def test_v3_search_space_is_preregistered_576_configs() -> None:
     configs = tuple(v3_search_space())
     assert len(configs) == 576
@@ -87,27 +102,17 @@ def test_v3_enters_on_next_bar_open() -> None:
 def test_v3_search_prefers_hard_gate_passing_candidate(monkeypatch: pytest.MonkeyPatch) -> None:
     failing = _config(target_r=2.0)
     passing = _config(target_r=3.0)
-    common = dict(
-        closed_trades=120,
-        wins=60,
-        losses=60,
-        win_rate=0.5,
-        net_pnl=1000.0,
-        return_pct=1.0,
-        max_drawdown_pct=10.0,
-        final_equity=101_000.0,
-    )
     results = {
         failing.config_id: V3BacktestResult(
             config=failing,
             costs=CostModel(),
-            metrics=Metrics(expectancy_r=0.50, profit_factor=1.20, **common),
+            metrics=_metrics(expectancy_r=0.50, profit_factor=1.20),
             trades=(),
         ),
         passing.config_id: V3BacktestResult(
             config=passing,
             costs=CostModel(),
-            metrics=Metrics(expectancy_r=0.10, profit_factor=1.40, **common),
+            metrics=_metrics(expectancy_r=0.10, profit_factor=1.40),
             trades=(),
         ),
     }
