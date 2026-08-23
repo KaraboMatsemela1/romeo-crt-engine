@@ -2,7 +2,9 @@
 
 Evidence-driven research, validation, and execution platform for translating Romeo / @Romeotpt's publicly demonstrated CRT methodology into deterministic, testable, risk-controlled trading systems.
 
-> **Status:** Engineering phases 0–5 are complete for the frozen v0.1 route. Phase 6 completed with **`INSUFFICIENT_EVIDENCE`** and Phase 6B completed with **`INSUFFICIENT_MULTI_MARKET_SAMPLE`**. Phase 6C remains blocked on verified first-party predicate closure while Phase 6D research infrastructure is complete. OOS and CONFIRM remain unopened; paper, learning, shadow and controlled-live stages are not yet authorized.
+> **Project closeout — 2026-08-23:** `CLOSED_EVIDENCE_GATE`. The engineering and research platform is preserved, but the strategy lifecycle is retired because no complete deterministic successor predicate could be justified from directly verifiable first-party evidence. OOS and CONFIRM remain unopened and paper/shadow/live trading remain unauthorized. See [`docs/PROJECT_CLOSEOUT_2026-08-23.md`](docs/PROJECT_CLOSEOUT_2026-08-23.md).
+
+> **Historical gate status:** Engineering phases 0–5 are complete for the frozen v0.1 route. Phase 6 completed with **`INSUFFICIENT_EVIDENCE`** and Phase 6B completed with **`INSUFFICIENT_MULTI_MARKET_SAMPLE`**. Phase 6C reached a terminal blocked state on verified first-party predicate closure while Phase 6D research infrastructure is complete.
 
 ## Project Progress
 
@@ -34,10 +36,10 @@ MULTI-MARKET REVISION / PHASE 6B
 ████████████████████   COMPLETE — INSUFFICIENT_MULTI_MARKET_SAMPLE
 
 FIRST-PARTY EVIDENCE / PHASE 6C–6D
-████████████████░░░░   strong provenance corpus; predicates incomplete
+████████████████░░░░   TERMINAL — strong provenance corpus; predicates incomplete
 
 NEXT DETERMINISTIC CANDIDATE
-░░░░░░░░░░░░░░░░░░░░   BLOCKED — no candidate-ready predicate
+░░░░░░░░░░░░░░░░░░░░   NOT JUSTIFIED — project closed at evidence gate
 
 ACTIVITY VALIDATION
 ░░░░░░░░░░░░░░░░░░░░   not authorized
@@ -55,19 +57,19 @@ PAPER EXECUTION INFRASTRUCTURE
 ████████████████████   COMPLETE — execution remains disabled
 
 PAPER TRADING
-░░░░░░░░░░░░░░░░░░░░   BLOCKED — requires PROMOTE_TO_PAPER_CANDIDATE + Phase 7 qualification
+░░░░░░░░░░░░░░░░░░░░   NOT PLANNED UNDER CLOSED PROJECT
 
 LEARNING ENGINE
-░░░░░░░░░░░░░░░░░░░░   not started — requires sufficient deterministic/paper labels
+░░░░░░░░░░░░░░░░░░░░   NOT PLANNED UNDER CLOSED PROJECT
 
 SHADOW TRADING
-░░░░░░░░░░░░░░░░░░░░   not started — requires paper readiness
+░░░░░░░░░░░░░░░░░░░░   NOT PLANNED UNDER CLOSED PROJECT
 
 CONTROLLED LIVE
-░░░░░░░░░░░░░░░░░░░░   NOT AUTHORIZED — explicit future canary/risk approval required
+░░░░░░░░░░░░░░░░░░░░   NOT AUTHORIZED
 ```
 
-### Current Critical Path
+### Historical Critical Path
 
 ```text
 FIRST-PARTY PREDICATE CLOSURE
@@ -93,24 +95,22 @@ SHADOW TRADING
 CONTROLLED LIVE
 ```
 
-**Current bottleneck:** direct first-party evidence must close at least one held deterministic predicate before a new candidate can be selected and preregistered. See [`STATUS.md`](STATUS.md) for the canonical evidence/authorization state and [GitHub Issue #42](../../issues/42) for the autonomous full-project execution queue.
-
-Any PR that materially changes one of these gates must update this dashboard and the matching `STATUS.md` view.
+The path stopped at first-party predicate closure. See [`STATUS.md`](STATUS.md) for the canonical evidence/authorization state and [`docs/PROJECT_CLOSEOUT_2026-08-23.md`](docs/PROJECT_CLOSEOUT_2026-08-23.md) for the final disposition.
 
 ## Start here
 
-1. Read [`PROJECT_BIBLE.md`](PROJECT_BIBLE.md) — canonical governance and phase definitions.
-2. Read [`STATUS.md`](STATUS.md) — current candidate disposition and promotion state.
-3. Read [`AGENTS.md`](AGENTS.md) — operating contract for AI/coding agents.
-4. Read [`docs/operations/AUTONOMOUS_GITHUB_WORK_PROTOCOL.md`](docs/operations/AUTONOMOUS_GITHUB_WORK_PROTOCOL.md) before claiming or executing GitHub work.
-5. Follow the protocol’s claim, dependency, CI, review, and completion-record requirements.
+1. Read [`docs/PROJECT_CLOSEOUT_2026-08-23.md`](docs/PROJECT_CLOSEOUT_2026-08-23.md) — terminal project disposition and reactivation criteria.
+2. Read [`PROJECT_BIBLE.md`](PROJECT_BIBLE.md) — canonical governance and phase definitions.
+3. Read [`STATUS.md`](STATUS.md) — final candidate disposition and authorization state.
+4. Read [`AGENTS.md`](AGENTS.md) — operating contract for AI/coding agents.
+5. Read [`docs/operations/AUTONOMOUS_GITHUB_WORK_PROTOCOL.md`](docs/operations/AUTONOMOUS_GITHUB_WORK_PROTOCOL.md) before any future reactivation work.
 6. Read [`strategy/CRT_V0.1_SPEC.md`](strategy/CRT_V0.1_SPEC.md) and its freeze manifest before touching v0.1 strategy semantics.
 7. Read [`docs/MARKET_DATA.md`](docs/MARKET_DATA.md) before touching data semantics.
 8. Read [`docs/DETECTOR.md`](docs/DETECTOR.md) before touching detector semantics.
 9. Read [`docs/BACKTESTER.md`](docs/BACKTESTER.md) before touching simulator semantics.
 10. Read [`experiments/phase6/P6_VALIDATION_PROTOCOL_V1.md`](experiments/phase6/P6_VALIDATION_PROTOCOL_V1.md) and [`docs/PHASE_6_COMPLETION_REPORT.md`](docs/PHASE_6_COMPLETION_REPORT.md) before interpreting historical performance.
-11. Follow [`docs/ROADMAP.md`](docs/ROADMAP.md) and the Project Bible for ordered gates.
-12. Use [`research/romeo/VIDEO_ANALYSIS_TEMPLATE.md`](research/romeo/VIDEO_ANALYSIS_TEMPLATE.md) for new strategy-source research.
+11. Follow [`docs/ROADMAP.md`](docs/ROADMAP.md) and the Project Bible for historical ordered gates.
+12. Use [`research/romeo/VIDEO_ANALYSIS_TEMPLATE.md`](research/romeo/VIDEO_ANALYSIS_TEMPLATE.md) only if the project is formally reactivated under the closeout criteria.
 
 ## First candidate validation chain
 
@@ -124,7 +124,7 @@ result     INSUFFICIENT_EVIDENCE
 
 `CRT-BACKTEST-v0.1.1` is a data-gap compatibility patch to the v0.1 simulator; it does not change entry, stop, target, sizing or friction semantics.
 
-The strategy active route is deliberately narrow: bearish-only New-York D1 parent context with H1 Model #1 execution. Broader CRT doctrine remains deferred/versioned rather than silently mixed into v0.1.
+The strategy active route was deliberately narrow: bearish-only New-York D1 parent context with H1 Model #1 execution. Broader CRT doctrine remained deferred/versioned rather than silently mixed into v0.1.
 
 ## Phase-6 DEV result
 
@@ -197,17 +197,17 @@ Preregistered validation
         +--> pass -> independent risk -> paper -> learning -> shadow -> controlled live
 ```
 
-## Current project direction
+## Project direction after closeout
 
-Do **not** start Phase 7 from v0.1.
+No further autonomous strategy, validation, broker-execution or lifecycle work is authorized under the closed project.
 
-The next legitimate track is to return to the public-source evidence and unresolved/deferred CRT doctrine, define **one new evidence-backed strategy candidate/version**, create new deterministic fixtures/tests, and then repeat the gated validation lifecycle.
+Reactivation requires genuinely new first-party evidence that closes a named deterministic predicate field under the criteria in [`docs/PROJECT_CLOSEOUT_2026-08-23.md`](docs/PROJECT_CLOSEOUT_2026-08-23.md). A reactivated project must begin again at the research/candidate gate; it does not inherit paper, shadow or live authorization.
 
 The v0.1 OOS and CONFIRM windows remain unconsumed and must not be casually inspected.
 
 ## Safety boundary
 
-AI may research, classify, explain, propose, score, and generate candidate models. AI must never bypass deterministic strategy rules, independent hard risk controls, strategy-version promotion gates, or the emergency kill switch.
+AI may research, classify, explain, propose, score, and generate candidate models only after formal reactivation. AI must never bypass deterministic strategy rules, independent hard risk controls, strategy-version promotion gates, or the emergency kill switch.
 
 ```text
 PAPER_TRADING_AUTHORIZED=false

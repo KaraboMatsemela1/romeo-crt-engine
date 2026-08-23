@@ -1,10 +1,41 @@
 # Project Status
 
-Updated: 2026-08-15
+Updated: 2026-08-23
 
-## Project Progress
+## Final disposition
 
-This is the canonical executive gate view of the **entire project lifecycle**. The bars show **milestone/gate maturity**, not trading performance, probability of success, or a forecast. A completed validation process can still end with an insufficient/negative promotion result; infrastructure completion never authorizes strategy execution by itself.
+`romeo-crt-engine` is **closed at the evidence gate**.
+
+```text
+PROJECT_STATE                           = CLOSED_EVIDENCE_GATE
+ENGINEERING_FOUNDATION                  = COMPLETE
+ROMEO_CORPUS_RECONCILIATION             = COMPLETE
+FORMAL_CRT_SPEC_V0_1                    = COMPLETE_FROZEN
+MARKET_DATA_V0_1_ROUTE                  = COMPLETE
+DETERMINISTIC_DETECTOR_V0_1             = COMPLETE
+BACKTESTER_V0_1                         = COMPLETE
+V0_1_VALIDATION                         = INSUFFICIENT_EVIDENCE
+PHASE_6B_MULTI_MARKET                   = INSUFFICIENT_MULTI_MARKET_SAMPLE
+PHASE_6C_FIRST_PARTY_PREDICATE_CLOSURE  = TERMINAL_BLOCKED
+PHASE_6D_RESEARCH_INFRASTRUCTURE        = COMPLETE
+VERIFIED_PREDICATE_CLOSURES             = 0
+CANDIDATE_READY_ROWS                    = 0
+NEXT_DETERMINISTIC_CANDIDATE            = NOT_JUSTIFIED
+OOS                                     = UNOPENED
+CONFIRM                                 = UNOPENED
+PAPER_EXECUTION_INFRASTRUCTURE          = COMPLETE_DISABLED
+PAPER_TRADING_AUTHORIZED                = false
+SHADOW_TRADING_AUTHORIZED               = false
+LIVE_TRADING_AUTHORIZED                 = false
+```
+
+The owner directed project wrap-up on 2026-08-23. Remaining lifecycle gates are retired as `not_planned`, not `completed`, because their entry conditions were never satisfied.
+
+See [`docs/PROJECT_CLOSEOUT_2026-08-23.md`](docs/PROJECT_CLOSEOUT_2026-08-23.md) for the durable closeout record and reactivation criteria.
+
+## Project progress at closeout
+
+Bars show engineering/gate maturity, not trading performance or probability of success.
 
 ```text
 ENGINEERING FOUNDATION
@@ -32,273 +63,141 @@ MULTI-MARKET REVISION / PHASE 6B
 ████████████████████   COMPLETE — INSUFFICIENT_MULTI_MARKET_SAMPLE
 
 FIRST-PARTY EVIDENCE / PHASE 6C–6D
-████████████████░░░░   strong provenance corpus; predicates incomplete
+████████████████░░░░   TERMINAL — predicates incomplete
 
 NEXT DETERMINISTIC CANDIDATE
-░░░░░░░░░░░░░░░░░░░░   BLOCKED — no candidate-ready predicate
+░░░░░░░░░░░░░░░░░░░░   NOT JUSTIFIED
 
-ACTIVITY VALIDATION
-░░░░░░░░░░░░░░░░░░░░   not authorized
-
-PERFORMANCE VALIDATION
-░░░░░░░░░░░░░░░░░░░░   not authorized
+ACTIVITY / PERFORMANCE VALIDATION
+░░░░░░░░░░░░░░░░░░░░   NOT AUTHORIZED
 
 OOS
-░░░░░░░░░░░░░░░░░░░░   unopened
+░░░░░░░░░░░░░░░░░░░░   UNOPENED
 
 CONFIRM
-░░░░░░░░░░░░░░░░░░░░   unopened
+░░░░░░░░░░░░░░░░░░░░   UNOPENED
 
 PAPER EXECUTION INFRASTRUCTURE
-████████████████████   COMPLETE — execution remains disabled
+████████████████████   COMPLETE — EXECUTION DISABLED
 
-PAPER TRADING
-░░░░░░░░░░░░░░░░░░░░   BLOCKED — requires PROMOTE_TO_PAPER_CANDIDATE + Phase 7 qualification
-
-LEARNING ENGINE
-░░░░░░░░░░░░░░░░░░░░   not started — requires sufficient deterministic/paper labels
-
-SHADOW TRADING
-░░░░░░░░░░░░░░░░░░░░   not started — requires paper readiness
+PAPER / LEARNING / SHADOW
+░░░░░░░░░░░░░░░░░░░░   NOT PLANNED UNDER CLOSED PROJECT
 
 CONTROLLED LIVE
-░░░░░░░░░░░░░░░░░░░░   NOT AUTHORIZED — explicit future canary/risk approval required
+░░░░░░░░░░░░░░░░░░░░   NOT AUTHORIZED
 ```
-
-### Current Critical Path
-
-```text
-FIRST-PARTY PREDICATE CLOSURE
-          ↓
-NEXT DETERMINISTIC CANDIDATE
-          ↓
-DEV ACTIVITY + PERFORMANCE
-          ↓
-OOS
-          ↓
-CONFIRM
-          ↓
-PROMOTE_TO_PAPER_CANDIDATE
-          ↓
-PHASE-7 OPERATIONAL QUALIFICATION
-          ↓
-PAPER TRADING
-          ↓
-LEARNING-ENGINE READINESS
-          ↓
-SHADOW TRADING
-          ↓
-CONTROLLED LIVE
-```
-
-Current bottleneck: **Issue #16 / first-party predicate closure**. Paper execution infrastructure is complete but remains execution-disabled; no downstream strategy gate advances merely because supporting engineering is ready. Any PR that materially changes a gate represented above must update this block and the matching README view. The autonomous full-project queue is **Issue #42**.
-
-| Phase | Status | Primary exit condition |
-|---|---|---|
-| 0 — Engineering foundation | **COMPLETE** | Reproducible dev + CI + logging/storage/experiment contracts |
-| 1 — Romeo corpus / reconciliation | **COMPLETE** | Evidence-indexed corpus + explicit evidence debts |
-| 2 — Formal CRT spec | **COMPLETE — v0.1 FROZEN** | Deterministic v0.1 order path |
-| 3 — Market data | **COMPLETE FOR BINANCE/BTCUSDT v0.1 ROUTE** | Trusted/reproducible D1/H1 dataset |
-| 4 — CRT detector | **COMPLETE FOR v0.1** | Frozen deterministic detector |
-| 5 — Backtester | **COMPLETE FOR v0.1** | Deterministic cost-aware simulator |
-| 6 — Validation | **COMPLETE — INSUFFICIENT_EVIDENCE** | Terminal preregistered v0.1 DEV decision |
-| 6B — Candidate revision | **COMPLETE — INSUFFICIENT_MULTI_MARKET_SAMPLE** | Terminal preregistered multi-market activity decision |
-| 6C — Doctrine research | **BLOCKED — NO VERIFIED FIRST-PARTY PREDICATE CLOSURE** | Resume only when direct first-party evidence closes a deterministic held predicate |
-| 6D — Research infrastructure | **COMPLETE — V1 + CORPUS MIGRATION 001 + RECOVERY 002** | Provenance-bound evidence corpus; remaining blockers are unavailable technical source evidence |
-| 7 — Paper trading | **BLOCKED** | Infrastructure ready; requires a future candidate that passes full validation and Phase-7 qualification |
-| 8 — Learning engine | Not started | Requires sufficient deterministic labels |
-| 9 — Shadow trading | Not started | Requires paper readiness |
-| 10 — Controlled live | **NOT AUTHORIZED** | Explicit future approval + canary gates |
 
 ## Frozen historical validation results
 
+### Phase 6 — v0.1
+
 ```text
-Phase 6 v0.1
 strategy      CRT-C3-D1-H1-M1-BEAR-v0.1
 candidates    1,416
-TradePlans    4 / required 30
+TradePlans    4
+required      30
 decision      INSUFFICIENT_EVIDENCE
+```
 
-Phase 6B
+The preregistered DEV activity gate failed. OOS and CONFIRM were not opened.
+
+### Phase 6B — multi-market research revision
+
+```text
 candidate     CRT-C3-D1-H1-M1-BEAR-v0.2-MULTI-MARKET-RESEARCH
 alpha         CRT-C3-D1-H1-M1-BEAR-v0.1
 detector      CRT-DETECTOR-v0.2-MULTI-MARKET
 signal        MID
-TradePlans    7 / required 30
+TradePlans    7
+required      30
 decision      INSUFFICIENT_MULTI_MARKET_SAMPLE
 ```
 
-The v0.1 OOS and CONFIRM windows remain unopened. Historical Phase-6/6B evidence may not be rewritten or repaired in place.
+The activity threshold was not lowered after observing results. Historical Phase 6/6B results remain immutable.
 
-## Phase 6C terminal research state
+## Terminal Phase 6C / 6D state
 
-```text
-candidate_ready_rows        0
-verified predicate closures 0
-decision                    BLOCKED_NO_VERIFIED_PREDICATE_CLOSURE
-```
-
-Phase 6C remains blocked. Recovery of partial doctrine or context does not authorize a candidate.
-
-## Phase 6D — Research Infrastructure V1
-
-Completed:
+Repeated bounded first-party recovery passes produced a strong provenance corpus and materially useful partial doctrine, but no held predicate became complete enough for deterministic candidate selection.
 
 ```text
-registry-bound source capture
-SHA-256 artifact provenance
-canonical acquisition manifests
-strict source-registry validation
-predicate ledger with PARTIAL/CLOSING semantics
-doctrine delta validation
-positive + negative fixture gate
-deterministic corpus index
-research readiness audit
+verified predicate closures = 0
+candidate-ready rows         = 0
+decision                     = BLOCKED_NO_VERIFIED_PREDICATE_CLOSURE
 ```
 
-Canonical infrastructure records:
-
-- `research/romeo/phase6d/PHASE_6D_RESEARCH_INFRA_CHARTER.md`
-- `research/romeo/phase6d/PREDICATE_LEDGER_V2.json`
-- `research/romeo/phase6d/CORPUS_INDEX_V1.json`
-- `research/romeo/phase6d/acquisitions/`
-- `research/romeo/phase6d/payloads/`
-- `scripts/audit_phase6d_corpus_migration.py`
-- `docs/checklists/phase-6d.md`
-
-## Phase 6D — Corpus Migration 001
-
-The initial bounded migration admitted only one replayable source from the six-source Phase-6C set and established the fail-closed provenance chain.
+Representative unresolved deterministic debts remain:
 
 ```text
-migration decision = COMPLETE_NO_PREDICATE_CLOSURE
+MODEL_1       old-extreme selector, deterministic thick qualification,
+              structural stop/invalidation ownership, expiry
+TRUE_MSS      raw-candle swing construction, directly evidenced bearish form,
+              ownership/lifecycle
+SMT           corresponding-extreme construction, synchronization,
+              polarity/traded-leg ownership, lifecycle
+TURTLE_SOUP   qualifying old extreme, excursion/confirmation,
+              invalidation, expiry
+KEY_LEVEL     deterministic taxonomy/ranking, reach/consumed state,
+              time qualification
+TIME          timezone/DST/session ownership, hard-filter semantics,
+              qualification/invalidation/expiry
+DYNAMIC_BIAS  convincing-opposite-CRT predicate, owning timeframe,
+              transition timing, expiry
 ```
 
-Canonical record:
+These are evidence/semantic gaps, not unfinished repository engineering. Generic ICT substitutions, third-party summaries and post-hoc outcome-driven inference are not acceptable substitutes.
 
-- `research/romeo/phase6d/CORPUS_MIGRATION_001.md`
+## Completed reusable infrastructure
 
-## Phase 6D — First-Party Artifact Recovery 002
+The repository preserves:
 
-Recovery 002 searched only first-party Romeo channels for the previously quarantined technical claims. Fifteen exact Telegram post identities/payloads were recovered and admitted to the corpus.
+- evidence-indexed Romeo source registry and provenance records;
+- frozen CRT v0.1 specification and deterministic fixtures;
+- trusted market-data contracts;
+- deterministic detector and event-driven backtester;
+- candidate preregistration tooling;
+- DEV → OOS → CONFIRM sequential-access guard;
+- validation/promotion evaluator;
+- independent leakage/specification audit tooling;
+- OANDA practice-only adapter boundary;
+- risk engine and kill switch;
+- persistent order/position state and reconciliation;
+- observability, alerts and runbook;
+- execution-disabled paper-stack integration harness;
+- Phase 6D content-addressed payload, manifest, corpus and predicate-ledger infrastructure.
 
-Implementation CI run `31823845361`:
+The latest completed pre-closeout work was PR #125, whose CI run `32148283657` passed.
+
+## Closed downstream lifecycle
+
+The historical dependency chain was:
 
 ```text
-Ruff    PASS
-MyPy    PASS
-pytest  137 PASS
+FIRST-PARTY PREDICATE CLOSURE (#16)
+          ↓
+NEXT DETERMINISTIC CANDIDATE (#37)
+          ↓
+DEV / OOS / CONFIRM VALIDATION (#38)
+          ↓
+PHASE-7 OPERATIONAL QUALIFICATION (#39)
+          ↓
+PAPER TRADING (#41)
+          ↓
+LEARNING ENGINE
+          ↓
+SHADOW TRADING
+          ↓
+CONTROLLED LIVE
 ```
 
-Recovery inventory:
+The chain stopped at #16. Issues #16, #37, #38, #39 and #41 are retired as `not_planned` under the project closeout. This records project retirement only; it does not assert that any downstream gate passed.
 
-```text
-new direct first-party source records       15
-acquisition manifests total                 21
-captured manifests                          16
-partial identity-only manifests              5
-replayable corpus sources                   16
-replayable corpus artifacts                 18
-payload files independently verified        18
-predicate rows                               8
-predicate rows with artifact evidence        7
-observed PARTIAL field evidence             17
-CLOSING field evidence                       0
-candidate_ready_rows                         0
+## Reactivation rule
 
-decision = RECOVERY_COMPLETE_NO_PREDICATE_CLOSURE
-```
+No autonomous lifecycle work should resume unless there is a materially new first-party evidence event that can close a named deterministic predicate field.
 
-Canonical recovery record:
+A valid reactivation must begin at the research gate and satisfy the criteria in [`docs/PROJECT_CLOSEOUT_2026-08-23.md`](docs/PROJECT_CLOSEOUT_2026-08-23.md). It must not inherit access to protected outcomes or any trading authorization.
 
-- `research/romeo/phase6d/FIRST_PARTY_ARTIFACT_RECOVERY_002.md`
-
-## Phase 6D — First-Party Caption/Transcript/Frame Recovery 004
-
-The bounded Issue #16 pass exhausted one direct availability check and one
-official Romeo Telegram channel-index search for each of the six held routes.
-All twelve attempts failed during environment DNS resolution before source
-contact, so each route is recorded as `SOURCE_UNAVAILABLE`; this is not an
-observation that a video, caption, transcript, frame, or post is absent.
-
-```text
-new direct first-party artifacts  0
-CLOSING_FIELD_EVIDENCE            0
-candidate_ready_rows              0
-decision                          BLOCKED_NO_VERIFIED_PREDICATE_CLOSURE
-```
-
-Canonical recovery record:
-
-- `research/romeo/phase6d/FIRST_PARTY_CAPTION_TRANSCRIPT_FRAME_RECOVERY_004.md`
-
-## Phase 6D — First-Party Caption Recovery 006
-
-The six bounded registered first-party routes could not be contacted because
-the runtime could not resolve YouTube or Telegram. This is a no-source-contact
-environment result, not an observation about source or payload availability.
-
-```text
-source contacts observed       0
-new artifacts / payload hashes 0
-closing field evidence         0
-candidate-ready rows           0
-decision = BLOCKED_NO_VERIFIED_PREDICATE_CLOSURE
-```
-
-Issue #16 and Phase 6C remain blocked; there is no predicate closure and no
-candidate, detector, outcome, paper, or live-trading authorization change.
-
-Canonical recovery record:
-
-- `research/romeo/phase6d/FIRST_PARTY_CAPTION_RECOVERY_006.md`
-
-### Artifact-backed predicate state
-
-```text
-SS_MEANING_AND_CAUSAL_RULE   PARTIAL / 0 satisfied fields
-SMT_EXECUTABLE_SEMANTICS     PARTIAL / 0 satisfied fields
-MODEL_1_GEOMETRY             PARTIAL / 0 satisfied fields
-TRUE_MSS_ALGORITHM           UNRESOLVED / 0 satisfied fields
-TURTLE_SOUP_CONFIRMATION     PARTIAL / 0 satisfied fields
-KEY_LEVEL_SELECTOR           PARTIAL / 0 satisfied fields
-TIME_SELECTOR                PARTIAL / 0 satisfied fields
-DYNAMIC_BIAS_TRANSITION      PARTIAL / 0 satisfied fields
-```
-
-`PARTIAL` evidence is observable research evidence only. Only `CLOSING` evidence may satisfy a required predicate field.
-
-### Remaining evidence blockers
-
-The direct first-party recovery pass did not obtain usable original YouTube captions/transcripts for CRTology Episode 1, CRT Secrets Episodes 6/9, or the original Turtle Soup video. It also did not recover a direct first-party true-MSS algorithm.
-
-Remaining deterministic debts include:
-
-```text
-SS               meaning, geometry, ownership, lifecycle
-SMT              polarity, corresponding extreme, synchronization, leg ownership,
-                 exact TS substitution, confirmation, invalidation, expiry
-MODEL_1          exact geometry, timing, confirmation, invalidation, expiry
-TRUE_MSS         swing construction, break rule, ownership, confirmation, invalidation, expiry
-TURTLE_SOUP      qualifying old extreme, excursion, confirmation, invalidation, expiry
-KEY_LEVEL        selector/hierarchy and arrival/reaction qualification
-TIME             timezone/DST, market scope, filter semantics, confirmation, expiry
-DYNAMIC_BIAS     convincing-CRT predicate, timeframe, transition timing, confirmation, expiry
-```
-
-These are now evidence-availability blockers rather than unfinished repository engineering.
-
-## Phase 6C re-entry condition
-
-Phase 6C may reopen only when a directly verifiable first-party artifact closes a held deterministic predicate, for example:
-
-1. original captions/transcript/technical frames for a held source become available;
-2. a new first-party Romeo technical source defines the causal rule including ownership/timing/confirmation semantics; or
-3. a recovered original artifact closes the remaining required fields and passes the Phase-6D fixture gate.
-
-Even a closed predicate does not automatically authorize strategy implementation. A separate preregistered candidate decision is required.
-
-## Authorization
+## Final authorization state
 
 ```text
 V0_1_MUTATION_AUTHORIZED                    = false
@@ -309,7 +208,6 @@ LOWER_PHASE6B_ACTIVITY_THRESHOLD            = false
 PHASE6C_NEW_ALPHA_CANDIDATE_SELECTED         = false
 PHASE6C_ALPHA_IMPLEMENTATION_AUTHORIZED      = false
 PHASE6C_DETECTOR_ACTIVITY_AUTHORIZED         = false
-PHASE6D_RESEARCH_INFRA_ONLY                  = true
 PERFORMANCE_PROTOCOL_AUTHORIZED              = false
 BACKTEST_AUTHORIZED                          = false
 MULTI_MARKET_PNL_OUTCOME_ACCESS              = false
@@ -318,7 +216,4 @@ SHADOW_TRADING_AUTHORIZED                    = false
 LIVE_TRADING_AUTHORIZED                      = false
 ```
 
-
-## Phase 6D Recovery 007 — first-party timed-text admission
-
-Recovery 007 admitted six direct official YouTube-generated `json3` timed-text payloads and 14 minimal field-level excerpts. Classification is **B — STRONG_NEW_EVIDENCE_BUT_PREDICATE_INCOMPLETE**: all coverage remains `PARTIAL`, no contradiction is established, no predicate is closed, and no candidate is ready. Issue #16 remains **KEEP_BLOCKED**; Issue #37 must not start. Candidate creation, detector activity, and outcome access remain false.
+The project closes without converting insufficient evidence into a claimed profitable trading system.
