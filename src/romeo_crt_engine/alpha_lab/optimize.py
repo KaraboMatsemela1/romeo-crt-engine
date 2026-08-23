@@ -111,24 +111,35 @@ def search_dev(
     if configs is None:
         configs = default_search_space()
 
-    best: BacktestResult | None = None
-    best_score = -math.inf
+    best_overall: BacktestResult | None = None
+    best_overall_score = -math.inf
+    best_passing: BacktestResult | None = None
+    best_passing_score = -math.inf
     searched = 0
     for config in configs:
         result = run_backtest(bars, config, costs=costs)
         score = _score(result)
         searched += 1
-        if best is None or score > best_score or (
-            score == best_score and config.config_id < best.config.config_id
+        if best_overall is None or score > best_overall_score or (
+            score == best_overall_score and config.config_id < best_overall.config.config_id
         ):
-            best = result
-            best_score = score
+            best_overall = result
+            best_overall_score = score
+        if dev_gate(result) and (
+            best_passing is None
+            or score > best_passing_score
+            or (score == best_passing_score and config.config_id < best_passing.config.config_id)
+        ):
+            best_passing = result
+            best_passing_score = score
 
-    if best is None:
+    if best_overall is None:
         raise ValueError("search space must contain at least one configuration")
+    selected = best_passing if best_passing is not None else best_overall
+    selected_score = best_passing_score if best_passing is not None else best_overall_score
     return SearchResult(
-        result=best,
-        score=best_score,
+        result=selected,
+        score=selected_score,
         searched_configs=searched,
-        gate_pass=dev_gate(best),
+        gate_pass=best_passing is not None,
     )
