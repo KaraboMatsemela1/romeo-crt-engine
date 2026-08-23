@@ -1,4 +1,4 @@
-name: Alpha Lab Research
+name: Alpha Lab V3 Research
 
 on:
   workflow_dispatch:
@@ -6,16 +6,15 @@ on:
     paths:
       - "src/romeo_crt_engine/alpha_lab/models.py"
       - "src/romeo_crt_engine/alpha_lab/data.py"
-      - "src/romeo_crt_engine/alpha_lab/strategy.py"
-      - "src/romeo_crt_engine/alpha_lab/backtest.py"
-      - "src/romeo_crt_engine/alpha_lab/optimize.py"
       - "src/romeo_crt_engine/alpha_lab/run_cycle.py"
-      - "tests/alpha_lab/test_backtest.py"
-      - "tests/alpha_lab/test_data.py"
-      - "tests/alpha_lab/test_strategy.py"
-      - "tests/alpha_lab/test_windows.py"
-      - "tests/alpha_lab/test_optimize.py"
-      - "docs/ALPHA_LAB.md"
+      - "src/romeo_crt_engine/alpha_lab/models_v3.py"
+      - "src/romeo_crt_engine/alpha_lab/strategy_v3.py"
+      - "src/romeo_crt_engine/alpha_lab/backtest_v3.py"
+      - "src/romeo_crt_engine/alpha_lab/optimize_v3.py"
+      - "src/romeo_crt_engine/alpha_lab/run_cycle_v3.py"
+      - "tests/alpha_lab/test_v3.py"
+      - "docs/ALPHA_LAB_V3.md"
+      - ".github/workflows/alpha-lab-v3-research.yml"
 
 jobs:
   dev-search:
@@ -33,21 +32,21 @@ jobs:
         run: |
           pip install -r requirements.lock
           pip install --no-deps --no-build-isolation -e .
-      - name: Search DEV only
+      - name: Search V3 DEV only
         run: |
-          python -m romeo_crt_engine.alpha_lab.run_cycle dev-search \
-            --cache-dir .alpha-cache \
-            --candidate-out alpha-dev-candidate.json \
-            --metrics-out alpha-dev-metrics.json
-      - name: Freeze DEV candidate output
+          python -m romeo_crt_engine.alpha_lab.run_cycle_v3 dev-search \
+            --cache-dir .alpha-cache-v3 \
+            --candidate-out alpha-v3-dev-candidate.json \
+            --metrics-out alpha-v3-dev-metrics.json
+      - name: Freeze V3 DEV candidate output
         id: freeze
         shell: bash
         run: |
-          candidate_pass=$(python -c 'import json; print(str(json.load(open("alpha-dev-candidate.json"))["dev_gate_pass"]).lower())')
+          candidate_pass=$(python -c 'import json; print(str(json.load(open("alpha-v3-dev-candidate.json"))["dev_gate_pass"]).lower())')
           echo "candidate_pass=${candidate_pass}" >> "$GITHUB_OUTPUT"
-          echo "candidate_b64=$(base64 -w0 alpha-dev-candidate.json)" >> "$GITHUB_OUTPUT"
-      - name: Show frozen candidate
-        run: cat alpha-dev-candidate.json
+          echo "candidate_b64=$(base64 -w0 alpha-v3-dev-candidate.json)" >> "$GITHUB_OUTPUT"
+      - name: Show frozen V3 candidate
+        run: cat alpha-v3-dev-candidate.json
 
   oos-gate:
     needs: dev-search
@@ -63,16 +62,16 @@ jobs:
         run: |
           pip install -r requirements.lock
           pip install --no-deps --no-build-isolation -e .
-      - name: Restore exact frozen DEV candidate
+      - name: Restore exact frozen V3 DEV candidate
         shell: bash
         env:
           CANDIDATE_B64: ${{ needs.dev-search.outputs.candidate_b64 }}
-        run: echo "$CANDIDATE_B64" | base64 -d > alpha-dev-candidate.json
-      - name: Evaluate OOS once
+        run: echo "$CANDIDATE_B64" | base64 -d > alpha-v3-dev-candidate.json
+      - name: Evaluate V3 OOS once
         run: |
-          python -m romeo_crt_engine.alpha_lab.run_cycle oos-eval \
-            --cache-dir .alpha-cache \
-            --candidate alpha-dev-candidate.json \
-            --result-out alpha-oos-result.json
-      - name: Show OOS result
-        run: cat alpha-oos-result.json
+          python -m romeo_crt_engine.alpha_lab.run_cycle_v3 oos-eval \
+            --cache-dir .alpha-cache-v3 \
+            --candidate alpha-v3-dev-candidate.json \
+            --result-out alpha-v3-oos-result.json
+      - name: Show V3 OOS result
+        run: cat alpha-v3-oos-result.json
