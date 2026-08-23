@@ -1,0 +1,37 @@
+{
+  "schema_version": "ALPHA_LAB_HOLDOUT_A_RESULT_V4",
+  "run_id": 32638095351,
+  "candidate_id": "v4-a6627eb176a7e497b1ab",
+  "symbol": "ETHUSDT",
+  "timeframe": "H1",
+  "window": {
+    "start": "2019-01-01T00:00:00+00:00",
+    "end_exclusive": "2025-01-01T00:00:00+00:00"
+  },
+  "dataset_sha256": "75b2ee802b2b6cef8f837fc2ab0cdda984543a669aac2e80a574c19b27f983e3",
+  "metrics": {
+    "closed_trades": 680,
+    "wins": 213,
+    "losses": 467,
+    "win_rate": 0.31323529411764706,
+    "expectancy_r": 0.20209016372180105,
+    "profit_factor": 1.1955000328646477,
+    "net_pnl": 235617.88075156507,
+    "return_pct": 235.61788075156596,
+    "max_drawdown_pct": 28.289857418615917,
+    "final_equity": 335617.880751566
+  },
+  "holdout_a_gate": {
+    "minimum_closed_trades": 100,
+    "minimum_profit_factor": 1.15,
+    "positive_expectancy_required": true,
+    "maximum_drawdown_pct": 20.0
+  },
+  "holdout_a_gate_pass": false,
+  "failed_gate_components": ["max_drawdown_pct"],
+  "holdout_b_access_authorized": false,
+  "bnb_holdout_accessed": false,
+  "disposition": "HOLDOUT_A_FAIL_REJECT_V4",
+  "paper_trading_authorized": false,
+  "live_trading_authorized": false
+}

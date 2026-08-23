@@ -1,0 +1,44 @@
+{
+  "schema_version": "ALPHA_LAB_DEV_RESULT_V4",
+  "run_id": 32638095351,
+  "candidate_id": "v4-a6627eb176a7e497b1ab",
+  "development_market": "BTCUSDT",
+  "timeframe": "H1",
+  "dev_window": {
+    "start": "2019-01-01T00:00:00+00:00",
+    "end_exclusive": "2023-01-01T00:00:00+00:00"
+  },
+  "dev_dataset_sha256": "16932863ee4ba3b60e4094abdf27834ff71414cd056c784a465d30f5f2dc7e0a",
+  "searched_configs": 144,
+  "config": {
+    "entry_lookback": 24,
+    "breakout_buffer_bps": 10.0,
+    "use_rising_ema200_regime": false,
+    "atr_period": 14,
+    "initial_stop_atr": 1.5,
+    "trail_atr": 4.0,
+    "max_hold_bars": 168,
+    "risk_fraction": 0.01
+  },
+  "costs": {
+    "fee_bps_per_side": 4.0,
+    "slippage_bps_per_side": 2.0,
+    "max_leverage": 3.0
+  },
+  "metrics": {
+    "closed_trades": 422,
+    "wins": 135,
+    "losses": 287,
+    "win_rate": 0.31990521327014215,
+    "expectancy_r": 0.3736425191964399,
+    "profit_factor": 1.40264673015576,
+    "net_pnl": 306612.72120004444,
+    "return_pct": 306.61272120004463,
+    "max_drawdown_pct": 18.207124074358457,
+    "final_equity": 406612.7212000446
+  },
+  "dev_gate_pass": true,
+  "eth_holdout_access_authorized": true,
+  "btc_2023_plus_accessed_by_v4": false,
+  "disposition": "PROMOTE_V4_TO_FROZEN_ETH_HOLDOUT"
+}
