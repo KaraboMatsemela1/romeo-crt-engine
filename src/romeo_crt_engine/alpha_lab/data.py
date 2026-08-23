@@ -40,7 +40,10 @@ def _months(start: datetime, end: datetime) -> tuple[date, ...]:
 def _read_url(url: str) -> bytes:
     request = urllib.request.Request(url, headers={"User-Agent": "romeo-crt-alpha-lab/1"})
     with urllib.request.urlopen(request, timeout=60) as response:
-        return response.read()
+        payload = response.read()
+    if not isinstance(payload, bytes):
+        raise TypeError("provider response must be bytes")
+    return payload
 
 
 def _download_verified(url: str, path: Path) -> str:
