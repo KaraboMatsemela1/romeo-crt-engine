@@ -48,11 +48,11 @@ def _write_json(path: Path, payload: dict[str, object]) -> None:
 
 def _as_object_mapping(value: object, *, field: str) -> dict[str, object]:
     if not isinstance(value, dict):
-        raise ValueError(f"{field} must be an object")
+        raise TypeError(f"{field} must be an object")
     result: dict[str, object] = {}
     for key, item in value.items():
         if not isinstance(key, str):
-            raise ValueError(f"{field} keys must be strings")
+            raise TypeError(f"{field} keys must be strings")
         result[key] = item
     return result
 
@@ -97,7 +97,7 @@ def _read_config(candidate_path: Path) -> tuple[StrategyConfig, CostModel, str, 
         raise ValueError("candidate_id does not match frozen configuration")
     gate_raw = _required(payload, "dev_gate_pass")
     if not isinstance(gate_raw, bool):
-        raise ValueError("dev_gate_pass must be boolean")
+        raise TypeError("dev_gate_pass must be boolean")
     return config, costs, candidate_id, gate_raw
 
 
