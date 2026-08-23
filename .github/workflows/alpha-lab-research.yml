@@ -4,8 +4,17 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - "src/romeo_crt_engine/alpha_lab/**"
-      - "tests/alpha_lab/**"
+      - "src/romeo_crt_engine/alpha_lab/models.py"
+      - "src/romeo_crt_engine/alpha_lab/data.py"
+      - "src/romeo_crt_engine/alpha_lab/strategy.py"
+      - "src/romeo_crt_engine/alpha_lab/backtest.py"
+      - "src/romeo_crt_engine/alpha_lab/optimize.py"
+      - "src/romeo_crt_engine/alpha_lab/run_cycle.py"
+      - "tests/alpha_lab/test_backtest.py"
+      - "tests/alpha_lab/test_data.py"
+      - "tests/alpha_lab/test_strategy.py"
+      - "tests/alpha_lab/test_windows.py"
+      - "tests/alpha_lab/test_optimize.py"
       - "docs/ALPHA_LAB.md"
       - ".github/workflows/alpha-lab-research.yml"
 
