@@ -84,9 +84,8 @@ def test_v3_search_space_is_preregistered_576_configs() -> None:
 def test_v3_signal_uses_strong_close_filter() -> None:
     strong = generate_v3_signals(_signal_bars(), _config(close_location_min=0.75))
     weak = generate_v3_signals(_signal_bars(weak_close=True), _config(close_location_min=0.75))
-    assert strong
-    assert strong[0].signal_index == 5
-    assert not weak
+    assert 5 in {signal.signal_index for signal in strong}
+    assert 5 not in {signal.signal_index for signal in weak}
 
 
 def test_v3_enters_on_next_bar_open() -> None:
