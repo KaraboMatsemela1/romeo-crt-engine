@@ -1,0 +1,55 @@
+{
+  "schema_version": "ALPHA_LAB_DEV_RESULT_V3",
+  "run_id": 32637405603,
+  "candidate_id": "v3-47f727727bbd433e5b22",
+  "symbol": "BTCUSDT",
+  "timeframe": "H1",
+  "dev_window": {
+    "start": "2019-01-01T00:00:00+00:00",
+    "end_exclusive": "2023-01-01T00:00:00+00:00"
+  },
+  "dev_dataset_sha256": "16932863ee4ba3b60e4094abdf27834ff71414cd056c784a465d30f5f2dc7e0a",
+  "searched_configs": 576,
+  "config": {
+    "lookback_hours": 24,
+    "breakout_buffer_bps": 10.0,
+    "use_ema200_regime": true,
+    "volatility_ratio_min": 1.0,
+    "close_location_min": 0.5,
+    "atr_period": 14,
+    "volatility_lookback": 48,
+    "stop_atr": 1.5,
+    "target_r": 3.0,
+    "max_hold_bars": 24,
+    "risk_fraction": 0.01
+  },
+  "costs": {
+    "fee_bps_per_side": 4.0,
+    "slippage_bps_per_side": 2.0,
+    "max_leverage": 3.0
+  },
+  "metrics": {
+    "closed_trades": 283,
+    "wins": 131,
+    "losses": 152,
+    "win_rate": 0.4628975265017668,
+    "expectancy_r": 0.3523408047423906,
+    "profit_factor": 1.5963735277807491,
+    "net_pnl": 161485.68873077893,
+    "return_pct": 161.48568873077903,
+    "max_drawdown_pct": 8.671152823099938,
+    "final_equity": 261485.68873077902
+  },
+  "search_score": 5.91350407160831,
+  "dev_gate": {
+    "minimum_closed_trades": 100,
+    "minimum_profit_factor": 1.30,
+    "positive_expectancy_required": true,
+    "maximum_drawdown_pct": 20.0
+  },
+  "dev_gate_pass": true,
+  "oos_access_authorized": true,
+  "confirm_access_authorized": false,
+  "confirm_accessed": false,
+  "disposition": "PROMOTE_V3_TO_FROZEN_OOS_EVALUATION"
+}
