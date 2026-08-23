@@ -1,0 +1,77 @@
+name: Alpha Lab V3 Research
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "src/romeo_crt_engine/alpha_lab/models.py"
+      - "src/romeo_crt_engine/alpha_lab/data.py"
+      - "src/romeo_crt_engine/alpha_lab/run_cycle.py"
+      - "src/romeo_crt_engine/alpha_lab/models_v3.py"
+      - "src/romeo_crt_engine/alpha_lab/strategy_v3.py"
+      - "src/romeo_crt_engine/alpha_lab/backtest_v3.py"
+      - "src/romeo_crt_engine/alpha_lab/optimize_v3.py"
+      - "src/romeo_crt_engine/alpha_lab/run_cycle_v3.py"
+      - "tests/alpha_lab/test_v3.py"
+      - "docs/ALPHA_LAB_V3.md"
+      - ".github/workflows/alpha-lab-v3-research.yml"
+
+jobs:
+  dev-search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      candidate_pass: ${{ steps.freeze.outputs.candidate_pass }}
+      candidate_b64: ${{ steps.freeze.outputs.candidate_b64 }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Install locked environment
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps --no-build-isolation -e .
+      - name: Search V3 DEV only
+        run: |
+          python -m romeo_crt_engine.alpha_lab.run_cycle_v3 dev-search \
+            --cache-dir .alpha-cache-v3 \
+            --candidate-out alpha-v3-dev-candidate.json \
+            --metrics-out alpha-v3-dev-metrics.json
+      - name: Freeze V3 DEV candidate output
+        id: freeze
+        shell: bash
+        run: |
+          candidate_pass=$(python -c 'import json; print(str(json.load(open("alpha-v3-dev-candidate.json"))["dev_gate_pass"]).lower())')
+          echo "candidate_pass=${candidate_pass}" >> "$GITHUB_OUTPUT"
+          echo "candidate_b64=$(base64 -w0 alpha-v3-dev-candidate.json)" >> "$GITHUB_OUTPUT"
+      - name: Show frozen V3 candidate
+        run: cat alpha-v3-dev-candidate.json
+
+  oos-gate:
+    needs: dev-search
+    if: needs.dev-search.outputs.candidate_pass == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Install locked environment
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps --no-build-isolation -e .
+      - name: Restore exact frozen V3 DEV candidate
+        shell: bash
+        env:
+          CANDIDATE_B64: ${{ needs.dev-search.outputs.candidate_b64 }}
+        run: echo "$CANDIDATE_B64" | base64 -d > alpha-v3-dev-candidate.json
+      - name: Evaluate V3 OOS once
+        run: |
+          python -m romeo_crt_engine.alpha_lab.run_cycle_v3 oos-eval \
+            --cache-dir .alpha-cache-v3 \
+            --candidate alpha-v3-dev-candidate.json \
+            --result-out alpha-v3-oos-result.json
+      - name: Show V3 OOS result
+        run: cat alpha-v3-oos-result.json
