@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from romeo_crt_engine.alpha_lab.models import Bar, CostModel, Metrics, Trade
+from romeo_crt_engine.alpha_lab.models import Bar, CostModel, ExitReason, Metrics, Trade
 from romeo_crt_engine.alpha_lab.models_v4 import V4BacktestResult, V4Config, V4Signal
 from romeo_crt_engine.alpha_lab.strategy_v4 import atr_series, generate_v4_signals
 
@@ -64,7 +64,7 @@ def _trade_from_signal(
     highest_high = entry_bar.high
     exit_reference = bars[final_index].close
     exit_index = final_index
-    exit_reason = "max_hold"
+    exit_reason: ExitReason = "max_hold"
     stop_at_exit = active_stop
 
     for index in range(entry_index, final_index + 1):
