@@ -16,7 +16,6 @@ on:
       - "tests/alpha_lab/test_windows.py"
       - "tests/alpha_lab/test_optimize.py"
       - "docs/ALPHA_LAB.md"
-      - ".github/workflows/alpha-lab-research.yml"
 
 jobs:
   dev-search:
