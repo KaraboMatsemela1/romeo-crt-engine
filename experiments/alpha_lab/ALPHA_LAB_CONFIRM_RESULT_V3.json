@@ -1,0 +1,53 @@
+{
+  "schema_version": "ALPHA_LAB_CONFIRM_RESULT_V3",
+  "run_id": 32637754408,
+  "candidate_id": "v3-47f727727bbd433e5b22",
+  "symbol": "BTCUSDT",
+  "timeframe": "H1",
+  "confirm_window": {
+    "start": "2025-01-01T00:00:00+00:00",
+    "end_exclusive": "2026-08-01T00:00:00+00:00"
+  },
+  "confirm_dataset_sha256": "cc5dd26b182d3f3cc75c77d55fe6a918a62c76f6cf48d7f070d254657616cac3",
+  "config": {
+    "lookback_hours": 24,
+    "breakout_buffer_bps": 10.0,
+    "use_ema200_regime": true,
+    "volatility_ratio_min": 1.0,
+    "close_location_min": 0.5,
+    "atr_period": 14,
+    "volatility_lookback": 48,
+    "stop_atr": 1.5,
+    "target_r": 3.0,
+    "max_hold_bars": 24,
+    "risk_fraction": 0.01
+  },
+  "costs": {
+    "fee_bps_per_side": 4.0,
+    "slippage_bps_per_side": 2.0,
+    "max_leverage": 3.0
+  },
+  "metrics": {
+    "closed_trades": 127,
+    "wins": 43,
+    "losses": 84,
+    "win_rate": 0.33858267716535434,
+    "expectancy_r": -0.09866244291449704,
+    "profit_factor": 0.8348001516778641,
+    "net_pnl": -12773.244583890653,
+    "return_pct": -12.773244583890483,
+    "max_drawdown_pct": 17.608903332840008,
+    "final_equity": 87226.75541610952
+  },
+  "confirm_gate": {
+    "minimum_closed_trades": 100,
+    "minimum_profit_factor": 1.15,
+    "positive_expectancy_required": true,
+    "maximum_drawdown_pct": 20.0
+  },
+  "confirm_gate_pass": false,
+  "disposition": "CONFIRM_FAIL_REJECT_V3",
+  "parameter_retuning_authorized": false,
+  "paper_trading_authorized": false,
+  "live_trading_authorized": false
+}
