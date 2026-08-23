@@ -63,41 +63,71 @@ def _required(mapping: dict[str, object], key: str) -> object:
     return mapping[key]
 
 
+def _as_int(value: object, *, field: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise TypeError(f"{field} must be an integer")
+    return value
+
+
+def _as_float(value: object, *, field: str) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TypeError(f"{field} must be numeric")
+    return float(value)
+
+
+def _as_str(value: object, *, field: str) -> str:
+    if not isinstance(value, str):
+        raise TypeError(f"{field} must be a string")
+    return value
+
+
+def _as_bool(value: object, *, field: str) -> bool:
+    if not isinstance(value, bool):
+        raise TypeError(f"{field} must be boolean")
+    return value
+
+
 def _read_config(candidate_path: Path) -> tuple[StrategyConfig, CostModel, str, bool]:
     raw: object = json.loads(candidate_path.read_text(encoding="utf-8"))
     payload = _as_object_mapping(raw, field="candidate")
-    if _required(payload, "schema_version") != SCHEMA_VERSION:
+    if _as_str(_required(payload, "schema_version"), field="schema_version") != SCHEMA_VERSION:
         raise ValueError("unsupported candidate schema")
     config_map = _as_object_mapping(_required(payload, "config"), field="config")
     costs_map = _as_object_mapping(_required(payload, "costs"), field="costs")
-    direction_raw = str(_required(config_map, "direction_mode"))
+    direction_raw = _as_str(_required(config_map, "direction_mode"), field="direction_mode")
     if direction_raw not in {"both", "long_only", "short_only"}:
         raise ValueError("invalid direction_mode")
 
     config = StrategyConfig(
-        lookback_hours=int(_required(config_map, "lookback_hours")),
-        min_sweep_bps=float(_required(config_map, "min_sweep_bps")),
-        reclaim_fraction=float(_required(config_map, "reclaim_fraction")),
-        ema_fast=int(_required(config_map, "ema_fast")),
-        ema_slow=int(_required(config_map, "ema_slow")),
+        lookback_hours=_as_int(_required(config_map, "lookback_hours"), field="lookback_hours"),
+        min_sweep_bps=_as_float(_required(config_map, "min_sweep_bps"), field="min_sweep_bps"),
+        reclaim_fraction=_as_float(
+            _required(config_map, "reclaim_fraction"), field="reclaim_fraction"
+        ),
+        ema_fast=_as_int(_required(config_map, "ema_fast"), field="ema_fast"),
+        ema_slow=_as_int(_required(config_map, "ema_slow"), field="ema_slow"),
         direction_mode=cast(DirectionMode, direction_raw),
-        atr_period=int(_required(config_map, "atr_period")),
-        stop_buffer_atr=float(_required(config_map, "stop_buffer_atr")),
-        target_r=float(_required(config_map, "target_r")),
-        max_hold_bars=int(_required(config_map, "max_hold_bars")),
-        risk_fraction=float(_required(config_map, "risk_fraction")),
+        atr_period=_as_int(_required(config_map, "atr_period"), field="atr_period"),
+        stop_buffer_atr=_as_float(
+            _required(config_map, "stop_buffer_atr"), field="stop_buffer_atr"
+        ),
+        target_r=_as_float(_required(config_map, "target_r"), field="target_r"),
+        max_hold_bars=_as_int(_required(config_map, "max_hold_bars"), field="max_hold_bars"),
+        risk_fraction=_as_float(_required(config_map, "risk_fraction"), field="risk_fraction"),
     )
     costs = CostModel(
-        fee_bps_per_side=float(_required(costs_map, "fee_bps_per_side")),
-        slippage_bps_per_side=float(_required(costs_map, "slippage_bps_per_side")),
-        max_leverage=float(_required(costs_map, "max_leverage")),
+        fee_bps_per_side=_as_float(
+            _required(costs_map, "fee_bps_per_side"), field="fee_bps_per_side"
+        ),
+        slippage_bps_per_side=_as_float(
+            _required(costs_map, "slippage_bps_per_side"), field="slippage_bps_per_side"
+        ),
+        max_leverage=_as_float(_required(costs_map, "max_leverage"), field="max_leverage"),
     )
-    candidate_id = str(_required(payload, "candidate_id"))
+    candidate_id = _as_str(_required(payload, "candidate_id"), field="candidate_id")
     if candidate_id != config.config_id:
         raise ValueError("candidate_id does not match frozen configuration")
-    gate_raw = _required(payload, "dev_gate_pass")
-    if not isinstance(gate_raw, bool):
-        raise TypeError("dev_gate_pass must be boolean")
+    gate_raw = _as_bool(_required(payload, "dev_gate_pass"), field="dev_gate_pass")
     return config, costs, candidate_id, gate_raw
 
 
