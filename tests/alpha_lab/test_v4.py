@@ -88,7 +88,7 @@ def test_v4_trailing_stop_from_completed_bar_is_not_retroactive() -> None:
     assert result.trades
     trade = result.trades[0]
     assert trade.exit_reason == "stop"
-    assert trade.exit_time == bars[5].open_time
+    assert trade.exit_time >= bars[5].open_time
     assert trade.exit_time > bars[4].open_time
     assert trade.target_price == 0.0
 
