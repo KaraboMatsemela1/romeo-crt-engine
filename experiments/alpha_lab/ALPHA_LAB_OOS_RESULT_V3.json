@@ -1,0 +1,33 @@
+{
+  "schema_version": "ALPHA_LAB_OOS_RESULT_V3",
+  "run_id": 32637405603,
+  "candidate_id": "v3-47f727727bbd433e5b22",
+  "symbol": "BTCUSDT",
+  "timeframe": "H1",
+  "oos_window": {
+    "start": "2023-01-01T00:00:00+00:00",
+    "end_exclusive": "2025-01-01T00:00:00+00:00"
+  },
+  "oos_dataset_sha256": "41731710ca984804b2bfb2b7215274c59c74ceb58bcbb54f17566c50fb438d07",
+  "metrics": {
+    "closed_trades": 171,
+    "wins": 71,
+    "losses": 100,
+    "win_rate": 0.4152046783625731,
+    "expectancy_r": 0.21384315633506795,
+    "profit_factor": 1.3276390691436586,
+    "net_pnl": 41239.40585498118,
+    "return_pct": 41.2394058549811,
+    "max_drawdown_pct": 8.610328018757484,
+    "final_equity": 141239.4058549811
+  },
+  "oos_gate": {
+    "minimum_closed_trades": 50,
+    "minimum_profit_factor": 1.15,
+    "positive_expectancy_required": true
+  },
+  "oos_gate_pass": true,
+  "confirm_access_authorized": true,
+  "confirm_data_accessed": false,
+  "disposition": "PROMOTE_V3_TO_CONFIRM_CANDIDATE"
+}
