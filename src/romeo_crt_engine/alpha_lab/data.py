@@ -39,7 +39,7 @@ def _months(start: datetime, end: datetime) -> tuple[date, ...]:
 
 def _read_url(url: str) -> bytes:
     request = urllib.request.Request(url, headers={"User-Agent": "romeo-crt-alpha-lab/1"})
-    with urllib.request.urlopen(request, timeout=60) as response:  # noqa: S310 - fixed HTTPS provider
+    with urllib.request.urlopen(request, timeout=60) as response:
         return response.read()
 
 
