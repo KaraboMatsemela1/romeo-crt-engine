@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import replace
 
+from pytest import MonkeyPatch
+
 from romeo_crt_engine.alpha_lab import optimize
 from romeo_crt_engine.alpha_lab.models import (
     BacktestResult,
@@ -30,7 +32,7 @@ def _result(config: StrategyConfig, metrics: Metrics) -> BacktestResult:
     return BacktestResult(config=config, costs=CostModel(), metrics=metrics, trades=())
 
 
-def test_search_prefers_gate_passing_candidate(monkeypatch: object) -> None:
+def test_search_prefers_gate_passing_candidate(monkeypatch: MonkeyPatch) -> None:
     failing = _config(target_r=1.0)
     passing = _config(target_r=2.0)
     base_metrics = Metrics(
@@ -58,7 +60,7 @@ def test_search_prefers_gate_passing_candidate(monkeypatch: object) -> None:
         assert isinstance(config, StrategyConfig)
         return results[config.config_id]
 
-    getattr(monkeypatch, "setattr")(optimize, "run_backtest", fake_backtest)
+    monkeypatch.setattr(optimize, "run_backtest", fake_backtest)
     search = optimize.search_dev([], configs=(failing, passing))
 
     assert search.gate_pass is True
